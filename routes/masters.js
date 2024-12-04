@@ -16,6 +16,11 @@ const {
   updateProduct,
   getProductList,
   toggleProductActiveStatus,
+
+  addCurrency,
+  updateCurrency,
+  toggleCurrencyActiveStatus,
+  getCurrencyList,
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -56,6 +61,17 @@ router.post(
   "/toggleProductActiveStatus",
   authMiddleware,
   toggleProductActiveStatus
+);
+
+// Currency Master
+// Product Master
+router.post("/addCurrency", authMiddleware, addCurrency);
+router.post("/updateCurrency", authMiddleware, updateCurrency);
+router.post("/productList", authMiddleware, getCurrencyList);
+router.post(
+  "/toggleCurrencyActiveStatus",
+  authMiddleware,
+  toggleCurrencyActiveStatus
 );
 
 module.exports = router;

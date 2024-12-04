@@ -438,6 +438,100 @@ const toggleProductActiveStatusDetails = async (
   }
 };
 
+// Currency Master
+const createCurrency = async (
+  currencyName,
+  currencyDescription,
+  exchangeRate,
+  updatedBy
+) => {
+  try {
+    const query = `
+        INSERT INTO currency_master (currencyName, currencyDescription, exchangeRate, isActive, updated_by, updated_at)
+        VALUES (?, ?, ?, 1, ?, CURRENT_TIMESTAMP)
+      `;
+
+    const [result] = await db.execute(query, [
+      currencyName,
+      currencyDescription,
+      exchangeRate,
+      updatedBy,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error adding currency");
+  }
+};
+
+const updateCurrencyDetails = async (
+  currencyId,
+  currencyName,
+  currencyDescription,
+  exchangeRate,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+        UPDATE currency_master
+        SET currencyName = ?, currencyDescription = ?, exchangeRate = ?, isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `;
+
+    const [result] = await db.execute(query, [
+      currencyName,
+      currencyDescription,
+      exchangeRate,
+      isActive ? 1 : 0,
+      updatedBy,
+      currencyId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error updating currency");
+  }
+};
+
+const toggleCurrencyStatus = async (currencyId, isActive, updatedBy) => {
+  try {
+    const query = `
+        UPDATE currency_master
+        SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `;
+
+    const [result] = await db.execute(query, [
+      isActive ? 1 : 0,
+      updatedBy,
+      currencyId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error toggling currency active status");
+  }
+};
+
+const fetchCurrencyList = async (isActive) => {
+  try {
+    let query =
+      "SELECT id, currencyName, currencyDescription, exchangeRate, isActive FROM currency_master";
+
+    // If `isActive` is provided, filter by active status
+    if (isActive !== undefined) {
+      query += " WHERE isActive = ?";
+    }
+
+    const [result] = await db.execute(query, isActive ? [isActive] : []);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error fetching currency list");
+  }
+};
+
 module.exports = {
   createCompany,
   updateCompanyDetails,
@@ -455,4 +549,8 @@ module.exports = {
   updateProductDetails,
   getProductListDetails,
   toggleProductActiveStatusDetails,
+  createCurrency,
+  updateCurrencyDetails,
+  toggleCurrencyStatus,
+  fetchCurrencyList,
 };

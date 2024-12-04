@@ -18,6 +18,11 @@ const {
   updateProductDetails,
   getProductListDetails,
   toggleProductActiveStatusDetails,
+
+  createCurrency,
+  updateCurrencyDetails,
+  toggleCurrencyStatus,
+  fetchCurrencyList,
 } = require("../models/masterModel");
 
 // Comapny Master
@@ -302,6 +307,79 @@ const toggleProductActiveStatus = async (req, res) => {
   }
 };
 
+// Currency Master
+const addCurrency = async (req, res) => {
+  const { currencyName, currencyDescription, exchangeRate, updatedBy } =
+    req.body;
+
+  try {
+    await createCurrency(
+      currencyName,
+      currencyDescription,
+      exchangeRate,
+      updatedBy
+    );
+    res.status(201).json({ message: "Currency added successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const updateCurrency = async (req, res) => {
+  const {
+    currencyId,
+    currencyName,
+    currencyDescription,
+    exchangeRate,
+    isActive,
+    updatedBy,
+  } = req.body;
+
+  try {
+    await updateCurrencyDetails(
+      currencyId,
+      currencyName,
+      currencyDescription,
+      exchangeRate,
+      isActive,
+      updatedBy
+    );
+    res.status(200).json({ message: "Currency updated successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const toggleCurrencyActiveStatus = async (req, res) => {
+  const { currencyId, isActive, updatedBy } = req.body;
+
+  try {
+    await toggleCurrencyStatus(currencyId, isActive, updatedBy);
+    res.status(200).json({
+      message: `Currency ${
+        isActive ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getCurrencyList = async (req, res) => {
+  const { isActive } = req.query; // Optional query parameter to filter by active status (1 or 0)
+
+  try {
+    const currencies = await fetchCurrencyList(isActive);
+    res.status(200).json(currencies);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   addCompany,
   updateCompany,
@@ -322,4 +400,9 @@ module.exports = {
   updateProduct,
   getProductList,
   toggleProductActiveStatus,
+
+  addCurrency,
+  updateCurrency,
+  toggleCurrencyActiveStatus,
+  getCurrencyList,
 };
