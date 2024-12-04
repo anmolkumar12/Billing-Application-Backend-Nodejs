@@ -212,6 +212,30 @@ const toggleIndustryActiveStatusDetails = async (
   }
 };
 
+const getIndustryListDetails = async () => {
+  try {
+    // SQL query to retrieve the list of industries
+    const query = `
+        SELECT 
+          id, 
+          industryName, 
+          description, 
+          industryHead, 
+          isActive, 
+          updated_at, 
+          updated_by
+        FROM industries
+      `;
+
+    // Execute the query and return the list of industries
+    const [industries] = await db.execute(query);
+    return industries; // Return the industries data
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error retrieving industry list");
+  }
+};
+
 module.exports = {
   createCompany,
   updateCompanyDetails,
@@ -220,4 +244,5 @@ module.exports = {
   createIndustry,
   updateIndustryDetails,
   toggleIndustryActiveStatusDetails,
+  getIndustryListDetails
 };

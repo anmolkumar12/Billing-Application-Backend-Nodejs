@@ -7,6 +7,7 @@ const {
   addIndustry,
   updateIndustry,
   toggleIndustryActiveStatus,
+  getIndustryList,
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -18,6 +19,8 @@ router.post("/add-company", authMiddleware, upload.single("file"), addCompany);
 router.post("/edit", authMiddleware, updateCompany);
 router.post("/activateDeactivate", authMiddleware, activateDeactivateCompany);
 router.post("/getCompaniesList", authMiddleware, getCompaniesList);
+
+// Industry Master
 router.post("/addIndustry", authMiddleware, addIndustry);
 router.post("/updateIndustry", authMiddleware, updateIndustry);
 router.post(
@@ -25,6 +28,6 @@ router.post(
   authMiddleware,
   toggleIndustryActiveStatus
 );
-// Industry Master
+router.post("/industryList", authMiddleware, getIndustryList);
 
 module.exports = router;

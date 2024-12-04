@@ -5,6 +5,7 @@ const {
   createIndustry,
   updateIndustryDetails,
   toggleIndustryActiveStatusDetails,
+  getIndustryListDetails
 } = require("../models/masterModel");
 
 // Comapny Master
@@ -161,6 +162,17 @@ const toggleIndustryActiveStatus = async (req, res) => {
   }
 };
 
+const getIndustryList = async (req, res) => {
+  try {
+    // Call the model function to fetch the list of industries
+    const industries = await getIndustryListDetails();
+    res.status(200).json({ industries });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   addCompany,
   updateCompany,
@@ -169,4 +181,5 @@ module.exports = {
   addIndustry,
   updateIndustry,
   toggleIndustryActiveStatus,
+  getIndustryList
 };
