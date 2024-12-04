@@ -9,10 +9,10 @@ const {
 const { use } = require("../routes/authRoutes");
 
 const signup = async (req, res) => {
-  const { email, username, password } = req.body;
+  const { email, username, password, role } = req.body;
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    await createUser(email, username, hashedPassword);
+    await createUser(email, username, hashedPassword, role);
     res.status(201).json({ message: "User created successfully" });
   } catch (err) {
     res.status(500).json({ message: "Server error" });
@@ -24,7 +24,6 @@ const login = async (req, res) => {
 
   try {
     const user = await findUserByUsernameOrEmail(identifier);
-    //  console.log(user)
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
@@ -34,7 +33,7 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
     const token = generateToken(user);
-    res.json({ token, name: user.name });
+    res.json({ token, name: user.username });
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
@@ -64,6 +63,7 @@ const changePassword = async (req, res) => {
 
     res.status(200).json({ message: "Password changed successfully" });
   } catch (err) {
+    console.log("errrrrr",err)
     res.status(500).json({ message: "Server error" });
   }
 };

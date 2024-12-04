@@ -14,16 +14,16 @@ const updateUserPassword = async (email, hashedPassword) => {
   ]);
 };
 
-const createUser = async (email, username, password) => {
+const createUser = async (email, username, password, role) => {
   // Check if any of the parameters are undefined or null
-  if (!email || !username || !password) {
-    throw new Error("Email, username, and password are required");
+  if (!email || !username || !password || !role) {
+    throw new Error("Email, username, role and password are required");
   }
 
   // Execute the SQL query
   const [result] = await db.execute(
-    "INSERT INTO users (email, username, password) VALUES (?, ?, ?)",
-    [email, username, password]
+    "INSERT INTO users (email, username, password, role) VALUES (?, ?, ?, ?)",
+    [email, username, password, role]
   );
   
   return result;
