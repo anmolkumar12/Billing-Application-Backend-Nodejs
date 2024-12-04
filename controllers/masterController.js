@@ -2,10 +2,22 @@ const {
   createCompany,
   updateCompanyDetails,
   getCompanies,
+  activateDeactivateCompanyDetails,
+
   createIndustry,
   updateIndustryDetails,
   toggleIndustryActiveStatusDetails,
-  getIndustryListDetails
+  getIndustryListDetails,
+
+  createProject,
+  updateProjectDetails,
+  getProjectListDetails,
+  toggleProjectActiveStatusDetails,
+
+  createProduct,
+  updateProductDetails,
+  getProductListDetails,
+  toggleProductActiveStatusDetails,
 } = require("../models/masterModel");
 
 // Comapny Master
@@ -173,13 +185,141 @@ const getIndustryList = async (req, res) => {
   }
 };
 
+// Project Master
+const addProject = async (req, res) => {
+  const { projectName, projectDescription, updatedBy } = req.body;
+
+  try {
+    await createProject(projectName, projectDescription, updatedBy);
+    res.status(201).json({ message: "Project added successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const updateProject = async (req, res) => {
+  const { projectId, projectName, projectDescription, isActive, updatedBy } =
+    req.body;
+
+  try {
+    await updateProjectDetails(
+      projectId,
+      projectName,
+      projectDescription,
+      isActive,
+      updatedBy
+    );
+    res.status(200).json({ message: "Project updated successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getProjectList = async (req, res) => {
+  try {
+    // Call the model function to fetch the list of projects
+    const projects = await getProjectListDetails();
+    res.status(200).json({ projects });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const toggleProjectActiveStatus = async (req, res) => {
+  const { projectId, isActive, updatedBy } = req.body; // `isActive` is the new status (1 for active, 0 for inactive)
+
+  try {
+    // Call the model function to activate or deactivate the project, including updatedBy
+    await toggleProjectActiveStatusDetails(projectId, isActive, updatedBy);
+    res.status(200).json({
+      message: `Project ${isActive ? "activated" : "deactivated"} successfully`,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Product Master
+
+const addProduct = async (req, res) => {
+  const { productName, productDescription, updatedBy } = req.body;
+
+  try {
+    await createProduct(productName, productDescription, updatedBy);
+    res.status(201).json({ message: "Product added successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const updateProduct = async (req, res) => {
+  const { productId, productName, productDescription, isActive, updatedBy } =
+    req.body;
+
+  try {
+    await updateProductDetails(
+      productId,
+      productName,
+      productDescription,
+      isActive,
+      updatedBy
+    );
+    res.status(200).json({ message: "Product updated successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getProductList = async (req, res) => {
+  try {
+    // Call the model function to fetch the list of projects
+    const products = await getProductListDetails();
+    res.status(200).json({ products });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const toggleProductActiveStatus = async (req, res) => {
+  const { productId, isActive, updatedBy } = req.body; // `isActive` is the new status (1 for active, 0 for inactive)
+
+  try {
+    // Call the model function to activate or deactivate the project, including updatedBy
+    await toggleProductActiveStatusDetails(productId, isActive, updatedBy);
+    res.status(200).json({
+      message: `Product ${isActive ? "activated" : "deactivated"} successfully`,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   addCompany,
   updateCompany,
   activateDeactivateCompany,
   getCompaniesList,
+
   addIndustry,
   updateIndustry,
   toggleIndustryActiveStatus,
-  getIndustryList
+  getIndustryList,
+
+  addProject,
+  updateProject,
+  getProjectList,
+  toggleProjectActiveStatus,
+
+  addProduct,
+  updateProduct,
+  getProductList,
+  toggleProductActiveStatus,
 };

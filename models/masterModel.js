@@ -236,6 +236,208 @@ const getIndustryListDetails = async () => {
   }
 };
 
+// Project
+const createProject = async (projectName, projectDescription, updatedBy) => {
+  try {
+    // SQL query to insert project data into the project_master table
+    const query = `
+          INSERT INTO project_master (projectName, projectDescription, isActive, updated_by, updated_at)
+          VALUES (?, ?, 1, ?, CURRENT_TIMESTAMP)
+        `;
+
+    // Execute the query with the provided project data
+    const [result] = await db.execute(query, [
+      projectName,
+      projectDescription,
+      updatedBy,
+    ]);
+    return result; // Return the result of the insert operation
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error adding project");
+  }
+};
+
+const updateProjectDetails = async (
+  projectId,
+  projectName,
+  projectDescription,
+  isActive,
+  updatedBy
+) => {
+  try {
+    // SQL query to update the project details including isActive and updatedBy
+    const query = `
+          UPDATE project_master
+          SET projectName = ?, projectDescription = ?, isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `;
+
+    // Execute the query with the updated details
+    const [result] = await db.execute(query, [
+      projectName,
+      projectDescription,
+      isActive ? 1 : 0,
+      updatedBy, // Store the user who updated the project
+      projectId, // The ID of the project to update
+    ]);
+    return result; // Return the result of the update operation
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error updating project");
+  }
+};
+
+const getProjectListDetails = async () => {
+  try {
+    // SQL query to retrieve the list of projects
+    const query = `
+        SELECT 
+          id, 
+          projectName, 
+          projectDescription, 
+          isActive, 
+          updated_at, 
+          updated_by
+        FROM project_master
+      `;
+
+    // Execute the query and return the list of projects
+    const [projects] = await db.execute(query);
+    return projects; // Return the project data
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error retrieving project list");
+  }
+};
+
+const toggleProjectActiveStatusDetails = async (
+  projectId,
+  isActive,
+  updatedBy
+) => {
+  try {
+    // SQL query to update the project active status and log the user who made the update
+    const query = `
+        UPDATE project_master
+        SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `;
+
+    // Execute the query with the provided details
+    const [result] = await db.execute(query, [
+      isActive ? 1 : 0, // Convert boolean to 1/0 for SQL
+      updatedBy, // Store the user who updated the status
+      projectId, // Specify the project ID for the update
+    ]);
+    return result; // Return the result of the update operation
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error toggling project active status");
+  }
+};
+
+// Product Master
+const createProduct = async (productName, productDescription, updatedBy) => {
+  try {
+    // SQL query to insert project data into the project_master table
+    const query = `
+            INSERT INTO product_master (productName, productDescription, isActive, updated_by, updated_at)
+            VALUES (?, ?, 1, ?, CURRENT_TIMESTAMP)
+          `;
+
+    // Execute the query with the provided project data
+    const [result] = await db.execute(query, [
+      productName,
+      productDescription,
+      updatedBy,
+    ]);
+    return result; // Return the result of the insert operation
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error adding project");
+  }
+};
+
+const updateProductDetails = async (
+  productId,
+  productName,
+  productDescription,
+  isActive,
+  updatedBy
+) => {
+  try {
+    // SQL query to update the project details including isActive and updatedBy
+    const query = `
+            UPDATE product_master
+            SET productName = ?, productDescription = ?, isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+          `;
+
+    // Execute the query with the updated details
+    const [result] = await db.execute(query, [
+      productName,
+      productDescription,
+      isActive ? 1 : 0,
+      updatedBy, // Store the user who updated the project
+      productId, // The ID of the project to update
+    ]);
+    return result; // Return the result of the update operation
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error updating project");
+  }
+};
+
+const getProductListDetails = async () => {
+  try {
+    // SQL query to retrieve the list of projects
+    const query = `
+          SELECT 
+            id, 
+            productName, 
+            productDescription, 
+            isActive, 
+            updated_at, 
+            updated_by
+          FROM product_master
+        `;
+
+    // Execute the query and return the list of projects
+    const [projects] = await db.execute(query);
+    return projects; // Return the project data
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error retrieving project list");
+  }
+};
+
+const toggleProductActiveStatusDetails = async (
+  projectId,
+  isActive,
+  updatedBy
+) => {
+  try {
+    // SQL query to update the project active status and log the user who made the update
+    const query = `
+          UPDATE product_master
+          SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `;
+
+    // Execute the query with the provided details
+    const [result] = await db.execute(query, [
+      isActive ? 1 : 0, // Convert boolean to 1/0 for SQL
+      updatedBy, // Store the user who updated the status
+      productId, // Specify the project ID for the update
+    ]);
+    return result; // Return the result of the update operation
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error toggling project active status");
+  }
+};
+
 module.exports = {
   createCompany,
   updateCompanyDetails,
@@ -244,5 +446,13 @@ module.exports = {
   createIndustry,
   updateIndustryDetails,
   toggleIndustryActiveStatusDetails,
-  getIndustryListDetails
+  getIndustryListDetails,
+  createProject,
+  updateProjectDetails,
+  getProjectListDetails,
+  toggleProjectActiveStatusDetails,
+  createProduct,
+  updateProductDetails,
+  getProductListDetails,
+  toggleProductActiveStatusDetails,
 };

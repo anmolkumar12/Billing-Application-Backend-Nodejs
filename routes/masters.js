@@ -8,6 +8,14 @@ const {
   updateIndustry,
   toggleIndustryActiveStatus,
   getIndustryList,
+  addProject,
+  updateProject,
+  getProjectList,
+  toggleProjectActiveStatus,
+  addProduct,
+  updateProduct,
+  getProductList,
+  toggleProductActiveStatus,
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -29,5 +37,25 @@ router.post(
   toggleIndustryActiveStatus
 );
 router.post("/industryList", authMiddleware, getIndustryList);
+
+// Project Master
+router.post("/addProject", authMiddleware, addProject);
+router.post("/updateProject", authMiddleware, updateProject);
+router.post("/projectList", authMiddleware, getProjectList);
+router.post(
+  "/toggleProjectActiveStatus",
+  authMiddleware,
+  toggleProjectActiveStatus
+);
+
+// Product Master
+router.post("/addProduct", authMiddleware, addProduct);
+router.post("/updateProduct", authMiddleware, updateProduct);
+router.post("/productList", authMiddleware, getProductList);
+router.post(
+  "/toggleProductActiveStatus",
+  authMiddleware,
+  toggleProductActiveStatus
+);
 
 module.exports = router;
