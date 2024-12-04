@@ -9,16 +9,17 @@ const createCompany = async (
   Email,
   description,
   isactive,
+  updatedBy,
   logopath
 ) => {
   try {
     // SQL query to insert company data into the company_info table
     const query = `
-        INSERT INTO company_info (companyName, Website, CINNO, IECode, PAN, Email, logopath, description, created_by, updated_by, isactive)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?)
-      `;
+          INSERT INTO company_info (companyName, Website, CINNO, IECode, PAN, Email, logopath, description, isactive, updated_by, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        `;
 
-    // Execute the query with the provided values and the current timestamp for created_by and updated_by
+    // Execute the query with the provided values
     const [result] = await db.execute(query, [
       companyName,
       Website,
@@ -29,6 +30,7 @@ const createCompany = async (
       logopath,
       description,
       isactive,
+      updatedBy,
     ]);
 
     return result; // Return the result of the insert operation (e.g., insert id or success message)
@@ -54,10 +56,10 @@ const updateCompanyDetails = async (
   try {
     // SQL query to update company data in the company_info table
     const query = `
-          UPDATE company_info
-          SET companyName = ?, Website = ?, CINNO = ?, IECode = ?, PAN = ?, Email = ?, logopath = ?, description = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP, isactive = ?
-          WHERE id = ?
-        `;
+            UPDATE company_info
+            SET companyName = ?, Website = ?, CINNO = ?, IECode = ?, PAN = ?, Email = ?, logopath = ?, description = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP, isactive = ?
+            WHERE id = ?
+          `;
 
     // Execute the query with the provided values and companyId
     const [result] = await db.execute(query, [
@@ -125,8 +127,97 @@ const getCompanies = async () => {
   }
 };
 
+// Industry
+const createIndustry = async (
+  industryName,
+  description,
+  industryHead,
+  updatedBy
+) => {
+  try {
+    // SQL query to insert industry data into the industries table
+    const query = `
+          INSERT INTO industries (industryName, description, industryHead, updated_by, isActive, updated_at)
+          VALUES (?, ?, ?, ?, 1, CURRENT_TIMESTAMP)
+        `;
+
+    // Execute the query with the provided industry data
+    const [result] = await db.execute(query, [
+      industryName,
+      description,
+      industryHead,
+      updatedBy,
+    ]);
+    return result; // Return the result of the insert operation
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error adding industry");
+  }
+};
+
+const updateIndustryDetails = async (
+  industryId,
+  industryName,
+  description,
+  industryHead,
+  isActive,
+  updatedBy // Include updatedBy as a parameter
+) => {
+  try {
+    // SQL query to update the industry details including isActive and updated_by
+    const query = `
+            UPDATE industries
+            SET industryName = ?, description = ?, industryHead = ?, isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+          `;
+
+    // Execute the query with the updated details
+    const [result] = await db.execute(query, [
+      industryName,
+      description,
+      industryHead,
+      isActive, // Update isActive column
+      updatedBy, // Update updated_by column
+      industryId, // Specify the industry ID for the update
+    ]);
+    return result; // Return the result of the update operation
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error updating industry");
+  }
+};
+
+const toggleIndustryActiveStatusDetails = async (
+  industryId,
+  isActive,
+  updatedBy
+) => {
+  try {
+    // SQL query to update the industry active status and log the user who made the update
+    const query = `
+          UPDATE industries
+          SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `;
+
+    const [result] = await db.execute(query, [
+      isActive ? 1 : 0, // Convert boolean to 1/0 for SQL
+      updatedBy, // Store the user who updated the status
+      industryId, // Specify the industry ID for the update
+    ]);
+    return result; // Return the result of the update operation
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error toggling industry active status");
+  }
+};
+
 module.exports = {
   createCompany,
   updateCompanyDetails,
   activateDeactivateCompanyDetails,
+  getCompanies,
+  createIndustry,
+  updateIndustryDetails,
+  toggleIndustryActiveStatusDetails,
 };

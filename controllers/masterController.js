@@ -1,8 +1,13 @@
 const {
   createCompany,
   updateCompanyDetails,
+  getCompanies,
+  createIndustry,
+  updateIndustryDetails,
+  toggleIndustryActiveStatusDetails,
 } = require("../models/masterModel");
 
+// Comapny Master
 const addCompany = async (req, res) => {
   const {
     companyName,
@@ -13,6 +18,7 @@ const addCompany = async (req, res) => {
     Email,
     description,
     isactive,
+    updatedBy,
   } = req.body;
   const logopath = req.file ? req.file.path : null; // Get the file path if the logo is uploaded
 
@@ -26,10 +32,12 @@ const addCompany = async (req, res) => {
       Email,
       description,
       isactive,
+      updatedBy,
       logopath
     );
     res.status(201).json({ message: "Company created successfully" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -97,9 +105,68 @@ const getCompaniesList = async (req, res) => {
   }
 };
 
+// Industry Master
+const addIndustry = async (req, res) => {
+  const { industryName, description, industryHead, updatedBy } = req.body; // Added updatedBy
+
+  try {
+    await createIndustry(industryName, description, industryHead, updatedBy);
+    res.status(201).json({ message: "Industry added successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const updateIndustry = async (req, res) => {
+  const {
+    industryId,
+    industryName,
+    description,
+    industryHead,
+    isActive,
+    updatedBy, // Added updatedBy to the request body
+  } = req.body;
+
+  try {
+    await updateIndustryDetails(
+      industryId,
+      industryName,
+      description,
+      industryHead,
+      isActive,
+      updatedBy // Pass updatedBy to the model function
+    );
+    res.status(200).json({ message: "Industry updated successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const toggleIndustryActiveStatus = async (req, res) => {
+  const { industryId, isActive, updatedBy } = req.body; // `industryId` and `updatedBy` are required
+
+  try {
+    // Call the model function to activate or deactivate the industry, including updatedBy
+    await toggleIndustryActiveStatusDetails(industryId, isActive, updatedBy);
+    res.status(200).json({
+      message: `Industry ${
+        isActive ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   addCompany,
   updateCompany,
   activateDeactivateCompany,
   getCompaniesList,
+  addIndustry,
+  updateIndustry,
+  toggleIndustryActiveStatus,
 };
