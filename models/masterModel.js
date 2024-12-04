@@ -108,6 +108,23 @@ const activateDeactivateCompanyDetails = async (
   }
 };
 
+const getCompanies = async () => {
+  try {
+    // SQL query to select all companies from the company_info table
+    const query = `
+        SELECT id, companyName, Website, CINNO, IECode, PAN, Email, logopath, description, created_by, updated_by, isactive, created_at, updated_at
+        FROM company_info
+      `;
+
+    // Execute the query and return the result
+    const [companies] = await db.execute(query);
+    return companies; // Return the list of companies
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error retrieving companies list");
+  }
+};
+
 module.exports = {
   createCompany,
   updateCompanyDetails,

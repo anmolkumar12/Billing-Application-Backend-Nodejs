@@ -1,4 +1,7 @@
-const { createCompany,updateCompanyDetails } = require("../models/masterModel");
+const {
+  createCompany,
+  updateCompanyDetails,
+} = require("../models/masterModel");
 
 const addCompany = async (req, res) => {
   const {
@@ -84,8 +87,19 @@ const activateDeactivateCompany = async (req, res) => {
   }
 };
 
+const getCompaniesList = async (req, res) => {
+  try {
+    const companies = await getCompanies();
+    res.status(200).json({ companies });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   addCompany,
   updateCompany,
   activateDeactivateCompany,
+  getCompaniesList,
 };
