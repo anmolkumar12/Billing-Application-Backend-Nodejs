@@ -4,14 +4,17 @@ const {
   updateCompany,
   activateDeactivateCompany,
   getCompaniesList,
+
   addIndustry,
   updateIndustry,
   toggleIndustryActiveStatus,
   getIndustryList,
+
   addProject,
   updateProject,
   getProjectList,
   toggleProjectActiveStatus,
+
   addProduct,
   updateProduct,
   getProductList,
@@ -64,10 +67,9 @@ router.post(
 );
 
 // Currency Master
-// Product Master
 router.post("/addCurrency", authMiddleware, addCurrency);
 router.post("/updateCurrency", authMiddleware, updateCurrency);
-router.post("/productList", authMiddleware, getCurrencyList);
+router.post("/currencyList", authMiddleware, getCurrencyList);
 router.post(
   "/toggleCurrencyActiveStatus",
   authMiddleware,
