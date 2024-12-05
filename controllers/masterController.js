@@ -34,7 +34,10 @@ const {
   getStateListDetails,
   toggleStateActiveStatusDetails,
 
-  getCountries,
+  createAccount,
+  updateAccountDetails,
+  getAccountListDetails,
+  toggleAccountActiveStatusDetails,
 } = require("../models/masterModel");
 
 // Comapny Master
@@ -695,7 +698,130 @@ const toggleStateActiveStatus = async (req, res) => {
   }
 };
 
+const addAccount = async (req, res) => {
+  const {
+    companyId,
+    accountType,
+    bankName,
+    bankAddress,
+    accountNo,
+    ifscCode,
+    micrCode,
+    routingNoSwiftCode,
+    bankCode,
+    updatedBy,
+  } = req.body;
+
+  try {
+    await createAccount(
+      companyId,
+      accountType,
+      bankName,
+      bankAddress,
+      accountNo,
+      ifscCode,
+      micrCode,
+      routingNoSwiftCode,
+      bankCode,
+      updatedBy
+    );
+    res.status(201).json({
+      statusCode: 201,
+      message: "Account added successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const updateAccount = async (req, res) => {
+  const {
+    accountId,
+    companyId,
+    accountType,
+    bankName,
+    bankAddress,
+    accountNo,
+    ifscCode,
+    micrCode,
+    routingNoSwiftCode,
+    bankCode,
+    updatedBy,
+  } = req.body;
+
+  try {
+    await updateAccountDetails(
+      accountId,
+      companyId,
+      accountType,
+      bankName,
+      bankAddress,
+      accountNo,
+      ifscCode,
+      micrCode,
+      routingNoSwiftCode,
+      bankCode,
+      updatedBy
+    );
+    res.status(200).json({
+      statusCode: 200,
+      message: "Account updated successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const getAccountList = async (req, res) => {
+  try {
+    const accounts = await getAccountListDetails();
+    res.status(200).json({
+      statusCode: 200,
+      accounts,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const toggleAccountActiveStatus = async (req, res) => {
+  const { accountId, isActive, updatedBy } = req.body;
+
+  try {
+    await toggleAccountActiveStatusDetails(accountId, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: `Account ${
+        isActive == 1 ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
 module.exports = {
+  addAccount,
+  updateAccount,
+  getAccountList,
+  toggleAccountActiveStatus,
+
   addState,
   updateState,
   getStateList,

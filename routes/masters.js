@@ -4,27 +4,22 @@ const {
   updateCompany,
   activateDeactivateCompany,
   getCompaniesList,
-
   addIndustry,
   updateIndustry,
   toggleIndustryActiveStatus,
   getIndustryList,
-
   addProject,
   updateProject,
   getProjectList,
   toggleProjectActiveStatus,
-
   addProduct,
   updateProduct,
   getProductList,
   toggleProductActiveStatus,
-
   addCurrency,
   updateCurrency,
   toggleCurrencyActiveStatus,
   getCurrencyList,
-
   addTax,
   updateTax,
   getTaxList,
@@ -34,19 +29,20 @@ const {
   getStateList,
   toggleStateActiveStatus,
   countriesList,
+  addAccount,
+  updateAccount,
+  getAccountList,
+  toggleAccountActiveStatus,
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 const authMiddleware = require("../middleware/authMiddleware");
-
 const router = express.Router();
-// company master
+
 router.post("/add-company", authMiddleware, upload.single("file"), addCompany);
 router.post("/edit", authMiddleware, upload.single("file"), updateCompany);
 router.post("/activateDeactivate", authMiddleware, activateDeactivateCompany);
 router.get("/getCompaniesList", authMiddleware, getCompaniesList);
-
-// Industry Master
 router.post("/addIndustry", authMiddleware, addIndustry);
 router.post("/updateIndustry", authMiddleware, updateIndustry);
 router.post(
@@ -55,8 +51,6 @@ router.post(
   toggleIndustryActiveStatus
 );
 router.get("/industryList", authMiddleware, getIndustryList);
-
-// Project Master
 router.post("/addProject", authMiddleware, addProject);
 router.post("/updateProject", authMiddleware, updateProject);
 router.get("/projectList", authMiddleware, getProjectList);
@@ -65,8 +59,6 @@ router.post(
   authMiddleware,
   toggleProjectActiveStatus
 );
-
-// Product Master
 router.post("/addProduct", authMiddleware, addProduct);
 router.post("/updateProduct", authMiddleware, updateProduct);
 router.get("/productList", authMiddleware, getProductList);
@@ -75,8 +67,6 @@ router.post(
   authMiddleware,
   toggleProductActiveStatus
 );
-
-// Currency Master
 router.post("/addCurrency", authMiddleware, addCurrency);
 router.post("/updateCurrency", authMiddleware, updateCurrency);
 router.get("/currencyList", authMiddleware, getCurrencyList);
@@ -85,8 +75,6 @@ router.post(
   authMiddleware,
   toggleCurrencyActiveStatus
 );
-
-// Tax Master
 router.post("/addTaxType", authMiddleware, addTax);
 router.post("/updateTaxType", authMiddleware, updateTax);
 router.get("/taxTypeList", authMiddleware, getTaxList);
@@ -95,10 +83,7 @@ router.post(
   authMiddleware,
   toggleTaxActiveStatus
 );
-
-// Country and States
 router.get("/countriesList", authMiddleware, countriesList);
-
 router.post("/addState", authMiddleware, addState);
 router.post("/updateState", authMiddleware, updateState);
 router.post("/statesList", authMiddleware, getStateList);
@@ -106,6 +91,15 @@ router.post(
   "/toggleStateActiveStatus",
   authMiddleware,
   toggleStateActiveStatus
+);
+
+router.post("/addAccount", authMiddleware, addAccount);
+router.post("/updateAccountDetails", authMiddleware, updateAccount);
+router.post("/accountsList", authMiddleware, getAccountList);
+router.post(
+  "/toggleAccountActiveStatus",
+  authMiddleware,
+  toggleAccountActiveStatus
 );
 
 module.exports = router;

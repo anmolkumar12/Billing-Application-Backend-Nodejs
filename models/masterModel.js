@@ -626,7 +626,6 @@ const toggleTaxActiveStatusDetails = async (taxId, isActive, updatedBy) => {
   }
 };
 
-// adding states:
 // States Model
 
 const createState = async (stateCode, stateName, countryId, updatedBy) => {
@@ -713,7 +712,137 @@ const toggleStateActiveStatusDetails = async (stateId, isActive, updatedBy) => {
   }
 };
 
+// Account
+const createAccount = async (
+  companyId,
+  accountType,
+  bankName,
+  bankAddress,
+  accountNo,
+  ifscCode,
+  micrCode,
+  routingNoSwiftCode,
+  bankCode,
+  updatedBy
+) => {
+  try {
+    const query = `
+      INSERT INTO accounts (
+        company_id, account_type, bank_name, bank_address, account_no,
+        ifsc_code, micr_code, routing_no_swift_code, bank_code,
+        is_active, updated_by, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, CURRENT_TIMESTAMP)
+    `;
+
+    const [result] = await db.execute(query, [
+      companyId,
+      accountType,
+      bankName,
+      bankAddress,
+      accountNo,
+      ifscCode,
+      micrCode,
+      routingNoSwiftCode,
+      bankCode,
+      updatedBy,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error adding account");
+  }
+};
+
+const updateAccountDetails = async (
+  accountId,
+  companyId,
+  accountType,
+  bankName,
+  bankAddress,
+  accountNo,
+  ifscCode,
+  micrCode,
+  routingNoSwiftCode,
+  bankCode,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE accounts 
+      SET company_id = ?, account_type = ?, bank_name = ?, bank_address = ?, 
+          account_no = ?, ifsc_code = ?, micr_code = ?, 
+          routing_no_swift_code = ?, bank_code = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE account_id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      companyId,
+      accountType,
+      bankName,
+      bankAddress,
+      accountNo,
+      ifscCode,
+      micrCode,
+      routingNoSwiftCode,
+      bankCode,
+      updatedBy,
+      accountId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error updating account");
+  }
+};
+
+const getAccountListDetails = async () => {
+  try {
+    const query = `
+      SELECT account_id, company_id, account_type, bank_name, bank_address, 
+             account_no, ifsc_code, micr_code, routing_no_swift_code, bank_code, 
+             is_active, updated_at, updated_by
+      FROM accounts
+    `;
+
+    const [accounts] = await db.execute(query);
+    return accounts;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error retrieving account list");
+  }
+};
+
+const toggleAccountActiveStatusDetails = async (
+  accountId,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE accounts
+      SET is_active = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE account_id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      isActive ? 1 : 0,
+      updatedBy,
+      accountId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error toggling account active status");
+  }
+};
+
 module.exports = {
+  createAccount,
+  updateAccountDetails,
+  getAccountListDetails,
+  toggleAccountActiveStatusDetails,
+
   createState,
   updateStateDetails,
   getStateListDetails,
