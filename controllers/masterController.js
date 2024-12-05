@@ -62,23 +62,19 @@ const addCompany = async (req, res) => {
 
 const updateCompany = async (req, res) => {
   const {
-    companyId, // The company to be updated
-    companyName,
-    Website,
-    CINNO,
-    IECode,
-    PAN,
-    Email,
-    description,
-    isactive,
-    updatedBy,
+    companyId, companyName, Website, CINNO, IECode, PAN, Email, description, isactive, updatedBy,
   } = req.body;
 
-  const logopath = req.file ? req.file.path : null; // Get the file path if the logo is uploaded
+  const logopath = req.file ? req.file.path : null; // Handle optional file upload for the logo
+
+  // Validate critical inputs
+  if (!companyId) {
+    return res.status(400).json({ message: "Company ID is required" });
+  }
 
   try {
-    // Pass the companyId, updatedBy, and other fields to the updateCompany function
-    await updateCompanyDetails(
+    // Call the model function to update the company details
+    const result = await updateCompanyDetails(
       companyId,
       companyName,
       Website,
@@ -91,10 +87,13 @@ const updateCompany = async (req, res) => {
       logopath,
       updatedBy
     );
+
+    // Respond to the client with success
     res.status(200).json({ message: "Company updated successfully" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
+    // Log the error and respond with server error
+    console.error("Error updating company:", err);
+    res.status(500).json({ message: "Server error while updating company details" });
   }
 };
 
@@ -105,7 +104,7 @@ const activateDeactivateCompany = async (req, res) => {
     // Call the model function to activate or deactivate the company
     await activateDeactivateCompanyDetails(companyId, isActive, updatedBy);
     res.status(200).json({
-      message: `Company ${isActive ? "activated" : "deactivated"} successfully`,
+      message: `Company ${isActive == 1 ? "activated" : "deactivated"} successfully`,
     });
   } catch (err) {
     console.error(err);
@@ -170,7 +169,7 @@ const toggleIndustryActiveStatus = async (req, res) => {
     await toggleIndustryActiveStatusDetails(industryId, isActive, updatedBy);
     res.status(200).json({
       message: `Industry ${
-        isActive ? "activated" : "deactivated"
+        isActive == 1 ? "activated" : "deactivated"
       } successfully`,
     });
   } catch (err) {
@@ -240,7 +239,7 @@ const toggleProjectActiveStatus = async (req, res) => {
     // Call the model function to activate or deactivate the project, including updatedBy
     await toggleProjectActiveStatusDetails(projectId, isActive, updatedBy);
     res.status(200).json({
-      message: `Project ${isActive ? "activated" : "deactivated"} successfully`,
+      message: `Project ${isActive == 1 ? "activated" : "deactivated"} successfully`,
     });
   } catch (err) {
     console.error(err);
@@ -299,7 +298,7 @@ const toggleProductActiveStatus = async (req, res) => {
     // Call the model function to activate or deactivate the project, including updatedBy
     await toggleProductActiveStatusDetails(productId, isActive, updatedBy);
     res.status(200).json({
-      message: `Product ${isActive ? "activated" : "deactivated"} successfully`,
+      message: `Product ${isActive == 1 ? "activated" : "deactivated"} successfully`,
     });
   } catch (err) {
     console.error(err);
@@ -359,7 +358,7 @@ const toggleCurrencyActiveStatus = async (req, res) => {
     await toggleCurrencyStatus(currencyId, isActive, updatedBy);
     res.status(200).json({
       message: `Currency ${
-        isActive ? "activated" : "deactivated"
+        isActive == 1 ? "activated" : "deactivated"
       } successfully`,
     });
   } catch (err) {

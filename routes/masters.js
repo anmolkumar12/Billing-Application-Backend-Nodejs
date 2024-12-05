@@ -32,9 +32,9 @@ const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
 // company master
 router.post("/add-company", authMiddleware, upload.single("file"), addCompany);
-router.post("/edit", authMiddleware, updateCompany);
+router.post("/edit", authMiddleware,upload.single("file"), updateCompany);
 router.post("/activateDeactivate", authMiddleware, activateDeactivateCompany);
-router.post("/getCompaniesList", authMiddleware, getCompaniesList);
+router.get("/getCompaniesList", authMiddleware, getCompaniesList);
 
 // Industry Master
 router.post("/addIndustry", authMiddleware, addIndustry);
@@ -44,12 +44,12 @@ router.post(
   authMiddleware,
   toggleIndustryActiveStatus
 );
-router.post("/industryList", authMiddleware, getIndustryList);
+router.get("/industryList", authMiddleware, getIndustryList);
 
 // Project Master
 router.post("/addProject", authMiddleware, addProject);
 router.post("/updateProject", authMiddleware, updateProject);
-router.post("/projectList", authMiddleware, getProjectList);
+router.get("/projectList", authMiddleware, getProjectList);
 router.post(
   "/toggleProjectActiveStatus",
   authMiddleware,
@@ -59,7 +59,7 @@ router.post(
 // Product Master
 router.post("/addProduct", authMiddleware, addProduct);
 router.post("/updateProduct", authMiddleware, updateProduct);
-router.post("/productList", authMiddleware, getProductList);
+router.get("/productList", authMiddleware, getProductList);
 router.post(
   "/toggleProductActiveStatus",
   authMiddleware,
@@ -69,7 +69,7 @@ router.post(
 // Currency Master
 router.post("/addCurrency", authMiddleware, addCurrency);
 router.post("/updateCurrency", authMiddleware, updateCurrency);
-router.post("/currencyList", authMiddleware, getCurrencyList);
+router.get("/currencyList", authMiddleware, getCurrencyList);
 router.post(
   "/toggleCurrencyActiveStatus",
   authMiddleware,

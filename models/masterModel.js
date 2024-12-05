@@ -54,32 +54,45 @@ const updateCompanyDetails = async (
   updatedBy
 ) => {
   try {
-    // SQL query to update company data in the company_info table
+    // Sanitize inputs to replace undefined with null
+    const sanitizedValues = [
+      companyName ?? null,
+      Website ?? null,
+      CINNO ?? null,
+      IECode ?? null,
+      PAN ?? null,
+      Email ?? null,
+      logopath ?? null,
+      description ?? null,
+      updatedBy ?? null,
+      isactive ?? null,
+      companyId,
+    ];
+
+    // SQL query to update company details
     const query = `
-            UPDATE company_info
-            SET companyName = ?, Website = ?, CINNO = ?, IECode = ?, PAN = ?, Email = ?, logopath = ?, description = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP, isactive = ?
-            WHERE id = ?
-          `;
+      UPDATE company_info
+      SET 
+        companyName = ?, 
+        Website = ?, 
+        CINNO = ?, 
+        IECode = ?, 
+        PAN = ?, 
+        Email = ?, 
+        logopath = ?, 
+        description = ?, 
+        updated_by = ?, 
+        updated_at = CURRENT_TIMESTAMP, 
+        isactive = ?
+      WHERE id = ?
+    `;
 
-    // Execute the query with the provided values and companyId
-    const [result] = await db.execute(query, [
-      companyName,
-      Website,
-      CINNO,
-      IECode,
-      PAN,
-      Email,
-      logopath,
-      description,
-      updatedBy, // Use the authenticated user's ID for updated_by
-      isactive,
-      companyId, // The ID of the company to update
-    ]);
-
-    return result; // Return the result of the update operation (e.g., number of rows affected)
+    // Execute the query and return the result
+    const [result] = await db.execute(query, sanitizedValues);
+    return result; // Contains affectedRows and other metadata
   } catch (err) {
-    console.error(err);
-    throw new Error("Error updating company");
+    console.error("Database error:", err);
+    throw new Error("Error updating company details in the database");
   }
 };
 
@@ -113,10 +126,7 @@ const activateDeactivateCompanyDetails = async (
 const getCompanies = async () => {
   try {
     // SQL query to select all companies from the company_info table
-    const query = `
-        SELECT id, companyName, Website, CINNO, IECode, PAN, Email, logopath, description, created_by, updated_by, isactive, created_at, updated_at
-        FROM company_info
-      `;
+    const query = `SELECT * FROM company_info`;
 
     // Execute the query and return the result
     const [companies] = await db.execute(query);
@@ -413,7 +423,7 @@ const getProductListDetails = async () => {
 };
 
 const toggleProductActiveStatusDetails = async (
-  projectId,
+  productId,
   isActive,
   updatedBy
 ) => {
