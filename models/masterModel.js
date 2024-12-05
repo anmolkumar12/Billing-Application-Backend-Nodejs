@@ -137,6 +137,20 @@ const getCompanies = async () => {
   }
 };
 
+const getCountries = async () => {
+  try {
+    // SQL query to select all companies from the company_info table
+    const query = `SELECT * FROM countries`;
+
+    // Execute the query and return the result
+    const [countries] = await db.execute(query);
+    return countries; // Return the list of companies
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error retrieving companies list");
+  }
+};
+
 // Industry
 const createIndustry = async (
   industryName,
@@ -872,4 +886,5 @@ module.exports = {
   updateTaxDetails,
   getTaxListDetails,
   toggleTaxActiveStatusDetails,
+  getCountries,
 };
