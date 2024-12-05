@@ -29,6 +29,8 @@ const {
   updateTax,
   getTaxList,
   toggleTaxActiveStatus,
+
+  countriesList
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -91,6 +93,8 @@ router.post(
   toggleTaxActiveStatus
 );
 
-// Tax API
+// Country and States
+router.get("/countriesList", authMiddleware, countriesList);
+
 
 module.exports = router;

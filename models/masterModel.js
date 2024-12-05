@@ -626,6 +626,18 @@ const toggleTaxActiveStatusDetails = async (taxId, isActive, updatedBy) => {
   }
 };
 
+const getCountries = async () => {
+  try {
+    const query = `SELECT * FROM countries`;
+
+    const [countries] = await db.execute(query);
+    return countries;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error retrieving tax list");
+  }
+};
+
 module.exports = {
   createCompany,
   updateCompanyDetails,
@@ -652,4 +664,5 @@ module.exports = {
   updateTaxDetails,
   getTaxListDetails,
   toggleTaxActiveStatusDetails,
+  getCountries
 };

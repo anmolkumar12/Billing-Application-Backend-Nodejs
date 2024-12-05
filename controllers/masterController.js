@@ -28,6 +28,8 @@ const {
   updateTaxDetails,
   getTaxListDetails,
   toggleTaxActiveStatusDetails,
+  
+  getCountries
 } = require("../models/masterModel");
 
 // Comapny Master
@@ -590,6 +592,22 @@ const toggleTaxActiveStatus = async (req, res) => {
   }
 };
 
+const countriesList = async (req, res) => {
+  try {
+    const countries = await getCountries();
+    res.status(200).json({
+      statusCode: 200,
+      countries,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
 module.exports = {
   addCompany,
   updateCompany,
@@ -620,4 +638,6 @@ module.exports = {
   updateTax,
   getTaxList,
   toggleTaxActiveStatus,
+
+  countriesList
 };
