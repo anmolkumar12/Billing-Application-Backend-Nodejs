@@ -626,19 +626,98 @@ const toggleTaxActiveStatusDetails = async (taxId, isActive, updatedBy) => {
   }
 };
 
-const getCountries = async () => {
-  try {
-    const query = `SELECT * FROM countries`;
+// adding states:
+// States Model
 
-    const [countries] = await db.execute(query);
-    return countries;
+const createState = async (stateCode, stateName, countryId, updatedBy) => {
+  try {
+    const query = `
+      INSERT INTO states (state_code, state_name, country_id, isActive, updated_by, updated_at)
+      VALUES (?, ?, ?, 1, ?, CURRENT_TIMESTAMP)
+    `;
+
+    const [result] = await db.execute(query, [
+      stateCode,
+      stateName,
+      countryId,
+      updatedBy,
+    ]);
+    return result;
   } catch (err) {
     console.error(err);
-    throw new Error("Error retrieving tax list");
+    throw new Error("Error adding state");
+  }
+};
+
+const updateStateDetails = async (
+  stateId,
+  stateCode,
+  stateName,
+  countryId,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE states
+      SET state_code = ?, state_name = ?, country_id = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE state_id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      stateCode,
+      stateName,
+      countryId,
+      updatedBy,
+      stateId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error updating state");
+  }
+};
+
+const getStateListDetails = async (countryId) => {
+  try {
+    const query = `
+      SELECT state_id, state_code, state_name, country_id, isActive, updated_at, updated_by
+      FROM states
+      WHERE country_id = ?
+    `;
+
+    const [states] = await db.execute(query, [countryId]);
+    return states;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error retrieving state list");
+  }
+};
+
+const toggleStateActiveStatusDetails = async (stateId, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE states
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE state_id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      isActive ? 1 : 0,
+      updatedBy,
+      stateId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error toggling state active status");
   }
 };
 
 module.exports = {
+  createState,
+  updateStateDetails,
+  getStateListDetails,
+  toggleStateActiveStatusDetails,
   createCompany,
   updateCompanyDetails,
   activateDeactivateCompanyDetails,
@@ -664,5 +743,4 @@ module.exports = {
   updateTaxDetails,
   getTaxListDetails,
   toggleTaxActiveStatusDetails,
-  getCountries
 };

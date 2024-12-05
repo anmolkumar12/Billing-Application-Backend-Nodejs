@@ -29,8 +29,11 @@ const {
   updateTax,
   getTaxList,
   toggleTaxActiveStatus,
-
-  countriesList
+  addState,
+  updateState,
+  getStateList,
+  toggleStateActiveStatus,
+  countriesList,
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -96,5 +99,13 @@ router.post(
 // Country and States
 router.get("/countriesList", authMiddleware, countriesList);
 
+router.post("/addState", authMiddleware, addState);
+router.post("/updateState", authMiddleware, updateState);
+router.post("/statesList", authMiddleware, getStateList);
+router.post(
+  "/toggleStateActiveStatus",
+  authMiddleware,
+  toggleStateActiveStatus
+);
 
 module.exports = router;

@@ -28,8 +28,13 @@ const {
   updateTaxDetails,
   getTaxListDetails,
   toggleTaxActiveStatusDetails,
-  
-  getCountries
+
+  createState,
+  updateStateDetails,
+  getStateListDetails,
+  toggleStateActiveStatusDetails,
+
+  getCountries,
 } = require("../models/masterModel");
 
 // Comapny Master
@@ -608,7 +613,94 @@ const countriesList = async (req, res) => {
   }
 };
 
+// States Controller
+
+const addState = async (req, res) => {
+  const { stateCode, stateName, countryId, updatedBy } = req.body;
+
+  try {
+    await createState(stateCode, stateName, countryId, updatedBy);
+    res.status(201).json({
+      statusCode: 201,
+      message: "State added successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const updateState = async (req, res) => {
+  const { stateId, stateCode, stateName, countryId, updatedBy } = req.body;
+
+  try {
+    await updateStateDetails(
+      stateId,
+      stateCode,
+      stateName,
+      countryId,
+      updatedBy
+    );
+    res.status(200).json({
+      statusCode: 200,
+      message: "State updated successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const getStateList = async (req, res) => {
+  const { countryId } = req.body; // Get the countryId from the request parameters
+
+  try {
+    const states = await getStateListDetails(countryId);
+    res.status(200).json({
+      statusCode: 200,
+      states,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const toggleStateActiveStatus = async (req, res) => {
+  const { stateId, isActive, updatedBy } = req.body;
+
+  try {
+    await toggleStateActiveStatusDetails(stateId, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: `State ${
+        isActive == 1 ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
 module.exports = {
+  addState,
+  updateState,
+  getStateList,
+  toggleStateActiveStatus,
+
   addCompany,
   updateCompany,
   activateDeactivateCompany,
@@ -639,5 +731,5 @@ module.exports = {
   getTaxList,
   toggleTaxActiveStatus,
 
-  countriesList
+  countriesList,
 };
