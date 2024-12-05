@@ -24,6 +24,11 @@ const {
   updateCurrency,
   toggleCurrencyActiveStatus,
   getCurrencyList,
+
+  addTax,
+  updateTax,
+  getTaxList,
+  toggleTaxActiveStatus,
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -32,7 +37,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
 // company master
 router.post("/add-company", authMiddleware, upload.single("file"), addCompany);
-router.post("/edit", authMiddleware,upload.single("file"), updateCompany);
+router.post("/edit", authMiddleware, upload.single("file"), updateCompany);
 router.post("/activateDeactivate", authMiddleware, activateDeactivateCompany);
 router.get("/getCompaniesList", authMiddleware, getCompaniesList);
 
@@ -75,5 +80,17 @@ router.post(
   authMiddleware,
   toggleCurrencyActiveStatus
 );
+
+// Tax Master
+router.post("/addTaxType", authMiddleware, addTax);
+router.post("/updateTaxType", authMiddleware, updateTax);
+router.get("/taxTypeList", authMiddleware, getTaxList);
+router.post(
+  "/toggleTaxTypeActiveStatus",
+  authMiddleware,
+  toggleTaxActiveStatus
+);
+
+// Tax API
 
 module.exports = router;

@@ -23,6 +23,11 @@ const {
   updateCurrencyDetails,
   toggleCurrencyStatus,
   fetchCurrencyList,
+
+  createTax,
+  updateTaxDetails,
+  getTaxListDetails,
+  toggleTaxActiveStatusDetails,
 } = require("../models/masterModel");
 
 // Comapny Master
@@ -53,23 +58,42 @@ const addCompany = async (req, res) => {
       updatedBy,
       logopath
     );
-    res.status(201).json({ message: "Company created successfully" });
+    res.status(201).json({
+      statusCode: 201,
+      message: "Company created successfully",
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
   }
 };
 
+
 const updateCompany = async (req, res) => {
   const {
-    companyId, companyName, Website, CINNO, IECode, PAN, Email, description, isactive, updatedBy,
+    companyId,
+    companyName,
+    Website,
+    CINNO,
+    IECode,
+    PAN,
+    Email,
+    description,
+    isactive,
+    updatedBy,
   } = req.body;
 
   const logopath = req.file ? req.file.path : null; // Handle optional file upload for the logo
 
   // Validate critical inputs
   if (!companyId) {
-    return res.status(400).json({ message: "Company ID is required" });
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Company ID is required",
+    });
   }
 
   try {
@@ -89,13 +113,19 @@ const updateCompany = async (req, res) => {
     );
 
     // Respond to the client with success
-    res.status(200).json({ message: "Company updated successfully" });
+    res.status(200).json({
+      statusCode: 200,
+      message: "Company updated successfully",
+    });
   } catch (err) {
     // Log the error and respond with server error
-    console.error("Error updating company:", err);
-    res.status(500).json({ message: "Server error while updating company details" });
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating company details",
+    });
   }
 };
+
 
 const activateDeactivateCompany = async (req, res) => {
   const { companyId, isActive, updatedBy } = req.body; // `isActive` will be a boolean or 0/1
@@ -104,23 +134,37 @@ const activateDeactivateCompany = async (req, res) => {
     // Call the model function to activate or deactivate the company
     await activateDeactivateCompanyDetails(companyId, isActive, updatedBy);
     res.status(200).json({
-      message: `Company ${isActive == 1 ? "activated" : "deactivated"} successfully`,
+      statusCode: 200,
+      message: `Company ${
+        isActive == 1 ? "activated" : "deactivated"
+      } successfully`,
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
   }
 };
+
 
 const getCompaniesList = async (req, res) => {
   try {
     const companies = await getCompanies();
-    res.status(200).json({ companies });
+    res.status(200).json({
+      statusCode: 200,
+      companies,
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
   }
 };
+
 
 // Industry Master
 const addIndustry = async (req, res) => {
@@ -128,10 +172,16 @@ const addIndustry = async (req, res) => {
 
   try {
     await createIndustry(industryName, description, industryHead, updatedBy);
-    res.status(201).json({ message: "Industry added successfully" });
+    res.status(201).json({
+      statusCode: 201,
+      message: "Industry added successfully",
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
   }
 };
 
@@ -154,12 +204,19 @@ const updateIndustry = async (req, res) => {
       isActive,
       updatedBy // Pass updatedBy to the model function
     );
-    res.status(200).json({ message: "Industry updated successfully" });
+    res.status(200).json({
+      statusCode: 200,
+      message: "Industry updated successfully",
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
   }
 };
+
 
 const toggleIndustryActiveStatus = async (req, res) => {
   const { industryId, isActive, updatedBy } = req.body; // `industryId` and `updatedBy` are required
@@ -168,24 +225,35 @@ const toggleIndustryActiveStatus = async (req, res) => {
     // Call the model function to activate or deactivate the industry, including updatedBy
     await toggleIndustryActiveStatusDetails(industryId, isActive, updatedBy);
     res.status(200).json({
+      statusCode: 200,
       message: `Industry ${
         isActive == 1 ? "activated" : "deactivated"
       } successfully`,
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
   }
 };
+
 
 const getIndustryList = async (req, res) => {
   try {
     // Call the model function to fetch the list of industries
     const industries = await getIndustryListDetails();
-    res.status(200).json({ industries });
+    res.status(200).json({
+      statusCode: 200,
+      industries,
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
   }
 };
 
@@ -195,12 +263,19 @@ const addProject = async (req, res) => {
 
   try {
     await createProject(projectName, projectDescription, updatedBy);
-    res.status(201).json({ message: "Project added successfully" });
+    res.status(201).json({
+      statusCode: 201,
+      message: "Project added successfully",
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
   }
 };
+
 
 const updateProject = async (req, res) => {
   const { projectId, projectName, projectDescription, isActive, updatedBy } =
@@ -214,23 +289,37 @@ const updateProject = async (req, res) => {
       isActive,
       updatedBy
     );
-    res.status(200).json({ message: "Project updated successfully" });
+    res.status(200).json({
+      statusCode: 200,
+      message: "Project updated successfully",
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
   }
 };
+
 
 const getProjectList = async (req, res) => {
   try {
     // Call the model function to fetch the list of projects
     const projects = await getProjectListDetails();
-    res.status(200).json({ projects });
+    res.status(200).json({
+      statusCode: 200,
+      projects,
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
   }
 };
+
 
 const toggleProjectActiveStatus = async (req, res) => {
   const { projectId, isActive, updatedBy } = req.body; // `isActive` is the new status (1 for active, 0 for inactive)
@@ -239,13 +328,20 @@ const toggleProjectActiveStatus = async (req, res) => {
     // Call the model function to activate or deactivate the project, including updatedBy
     await toggleProjectActiveStatusDetails(projectId, isActive, updatedBy);
     res.status(200).json({
-      message: `Project ${isActive == 1 ? "activated" : "deactivated"} successfully`,
+      statusCode: 200,
+      message: `Project ${
+        isActive == 1 ? "activated" : "deactivated"
+      } successfully`,
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
   }
 };
+
 
 // Product Master
 
@@ -298,7 +394,9 @@ const toggleProductActiveStatus = async (req, res) => {
     // Call the model function to activate or deactivate the project, including updatedBy
     await toggleProductActiveStatusDetails(productId, isActive, updatedBy);
     res.status(200).json({
-      message: `Product ${isActive == 1 ? "activated" : "deactivated"} successfully`,
+      message: `Product ${
+        isActive == 1 ? "activated" : "deactivated"
+      } successfully`,
     });
   } catch (err) {
     console.error(err);
@@ -379,6 +477,63 @@ const getCurrencyList = async (req, res) => {
   }
 };
 
+// Tax Master:
+const addTax = async (req, res) => {
+  const { taxType, taxPercentage, effectiveDate, updatedBy } = req.body;
+
+  try {
+    await createTax(taxType, taxPercentage, effectiveDate, updatedBy);
+    res.status(201).json({ message: "Tax added successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const updateTax = async (req, res) => {
+  const { taxId, taxType, taxPercentage, effectiveDate, updatedBy } = req.body;
+
+  try {
+    await updateTaxDetails(
+      taxId,
+      taxType,
+      taxPercentage,
+      effectiveDate,
+      updatedBy
+    );
+    res.status(200).json({ message: "Tax updated successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getTaxList = async (req, res) => {
+  try {
+    const taxes = await getTaxListDetails();
+    res.status(200).json({ taxes });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const toggleTaxActiveStatus = async (req, res) => {
+  const { taxId, isActive, updatedBy } = req.body;
+
+  try {
+    await toggleTaxActiveStatusDetails(taxId, isActive, updatedBy);
+    res.status(200).json({
+      message: `Tax ${
+        isActive == 1 ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   addCompany,
   updateCompany,
@@ -404,4 +559,9 @@ module.exports = {
   updateCurrency,
   toggleCurrencyActiveStatus,
   getCurrencyList,
+
+  addTax,
+  updateTax,
+  getTaxList,
+  toggleTaxActiveStatus,
 };

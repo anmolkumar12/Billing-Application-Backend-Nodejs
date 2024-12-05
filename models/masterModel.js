@@ -542,6 +542,90 @@ const fetchCurrencyList = async (isActive) => {
   }
 };
 
+// Tax Master
+const createTax = async (taxType, taxPercentage, effectiveDate, updatedBy) => {
+  try {
+    const query = `
+      INSERT INTO tax_master (taxType, taxPercentage, effectiveDate, isActive, updated_by, updated_at)
+      VALUES (?, ?, ?, 1, ?, CURRENT_TIMESTAMP)
+    `;
+
+    const [result] = await db.execute(query, [
+      taxType,
+      taxPercentage,
+      effectiveDate,
+      updatedBy,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error adding tax");
+  }
+};
+
+const updateTaxDetails = async (
+  taxId,
+  taxType,
+  taxPercentage,
+  effectiveDate,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE tax_master
+      SET taxType = ?, taxPercentage = ?, effectiveDate = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      taxType,
+      taxPercentage,
+      effectiveDate,
+      updatedBy,
+      taxId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error updating tax");
+  }
+};
+
+const getTaxListDetails = async () => {
+  try {
+    const query = `
+      SELECT id, taxType, taxPercentage, effectiveDate, isActive, updated_at, updated_by
+      FROM tax_master
+    `;
+
+    const [taxes] = await db.execute(query);
+    return taxes;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error retrieving tax list");
+  }
+};
+
+const toggleTaxActiveStatusDetails = async (taxId, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE tax_master
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      isActive ? 1 : 0,
+      updatedBy,
+      taxId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error toggling tax active status");
+  }
+};
+
 module.exports = {
   createCompany,
   updateCompanyDetails,
@@ -563,4 +647,9 @@ module.exports = {
   updateCurrencyDetails,
   toggleCurrencyStatus,
   fetchCurrencyList,
+
+  createTax,
+  updateTaxDetails,
+  getTaxListDetails,
+  toggleTaxActiveStatusDetails,
 };
