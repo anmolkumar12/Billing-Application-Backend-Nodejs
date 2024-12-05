@@ -51,7 +51,8 @@ const login = async (req, res) => {
       statusCode: 200,
       data: {
         token: token,
-        name: user.username
+        name: user.username,
+        role: user.role
       }
     });
   } catch (err) {
