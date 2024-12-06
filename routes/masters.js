@@ -95,7 +95,7 @@ router.post(
 
 router.post("/addAccount", authMiddleware, addAccount);
 router.post("/updateAccountDetails", authMiddleware, updateAccount);
-router.post("/accountsList", authMiddleware, getAccountList);
+router.get("/accountsList", authMiddleware, getAccountList);
 router.post(
   "/toggleAccountActiveStatus",
   authMiddleware,
