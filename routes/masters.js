@@ -33,6 +33,11 @@ const {
   updateAccount,
   getAccountList,
   toggleAccountActiveStatus,
+
+  addClient,
+  updateClient,
+  getClients,
+  toggleClientActiveStatus,
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -43,6 +48,7 @@ router.post("/add-company", authMiddleware, upload.single("file"), addCompany);
 router.post("/edit", authMiddleware, upload.single("file"), updateCompany);
 router.post("/activateDeactivate", authMiddleware, activateDeactivateCompany);
 router.get("/getCompaniesList", authMiddleware, getCompaniesList);
+
 router.post("/addIndustry", authMiddleware, addIndustry);
 router.post("/updateIndustry", authMiddleware, updateIndustry);
 router.post(
@@ -100,6 +106,15 @@ router.post(
   "/toggleAccountActiveStatus",
   authMiddleware,
   toggleAccountActiveStatus
+);
+
+router.post("/addClient", authMiddleware, addClient);
+router.post("/updateClientDetails", authMiddleware, updateClient);
+router.get("/clientsList", authMiddleware, getClients);
+router.post(
+  "/toggleClientsActiveStatus",
+  authMiddleware,
+  toggleClientActiveStatus
 );
 
 module.exports = router;

@@ -312,3 +312,48 @@ is_active BOOLEAN DEFAULT 1,
 updated_by VARCHAR(255),
 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+--client details creation----
+
+CREATE TABLE client_details (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT,
+  name VARCHAR(255),
+  alias VARCHAR(255),
+  pan_no VARCHAR(255),
+  address1 VARCHAR(255),
+  address2 VARCHAR(255),
+  address3 VARCHAR(255),
+  pin VARCHAR(6),
+  country_id INT,
+  state_id INT,
+  polestar_bank_account_id INT,
+  gstn VARCHAR(15),
+  client_ship_to_address1 VARCHAR(255),
+  client_ship_to_address2 VARCHAR(255),
+  client_ship_to_address3 VARCHAR(255),
+  client_ship_to_pin VARCHAR(6),
+  client_ship_to_country_id INT,
+  client_ship_to_state_id INT,
+  client_ship_to_gstn VARCHAR(15),
+  salutation VARCHAR(10),
+  first_name VARCHAR(255),
+  last_name VARCHAR(255),
+  email VARCHAR(255),
+  phone VARCHAR(20),
+  msa_flag BOOLEAN,
+  is_performa BOOLEAN,
+  msa_start_date DATE,
+  msa_end_date DATE,
+  non_solicitation_clause BOOLEAN,
+  use_logo_permission BOOLEAN,
+  client_category VARCHAR(100),
+  servicing_type VARCHAR(100),
+  missing_msa_deadline BOOLEAN,
+  is_msa_missing BOOLEAN,
+  logopath VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  updated_by VARCHAR(255)  -- Add updated_by here
+);

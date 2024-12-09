@@ -878,7 +878,226 @@ const toggleAccountActiveStatusDetails = async (
   }
 };
 
+// Clients 
+const createClient = async (
+  company_id,
+  name,
+  alias,
+  pan_no,
+  address1,
+  address2,
+  address3,
+  pin,
+  country_id,
+  state_id,
+  polestar_bank_account_id,
+  gstn,
+  client_ship_to_address1,
+  client_ship_to_address2,
+  client_ship_to_address3,
+  client_ship_to_pin,
+  client_ship_to_country_id,
+  client_ship_to_state_id,
+  client_ship_to_gstn,
+  salutation,
+  first_name,
+  last_name,
+  email,
+  phone,
+  msa_flag,
+  is_performa,
+  msa_start_date,
+  msa_end_date,
+  non_solicitation_clause,
+  use_logo_permission,
+  client_category,
+  servicing_type,
+  missing_msa_deadline,
+  is_msa_missing,
+  logopath,
+  updated_by // Add updated_by here
+) => {
+  const query = `
+    INSERT INTO client_details (
+      company_id, name, alias, pan_no, address1, address2, address3, pin,
+      country_id, state_id, polestar_bank_account_id, gstn, client_ship_to_address1,
+      client_ship_to_address2, client_ship_to_address3, client_ship_to_pin,
+      client_ship_to_country_id, client_ship_to_state_id, client_ship_to_gstn,
+      salutation, first_name, last_name, email, phone, msa_flag, is_performa,
+      msa_start_date, msa_end_date, non_solicitation_clause, use_logo_permission,
+      client_category, servicing_type, missing_msa_deadline, is_msa_missing, logopath, updated_by
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+  const params = [
+    company_id,
+    name,
+    alias,
+    pan_no,
+    address1,
+    address2,
+    address3,
+    pin,
+    country_id,
+    state_id,
+    polestar_bank_account_id,
+    gstn,
+    client_ship_to_address1,
+    client_ship_to_address2,
+    client_ship_to_address3,
+    client_ship_to_pin,
+    client_ship_to_country_id,
+    client_ship_to_state_id,
+    client_ship_to_gstn,
+    salutation,
+    first_name,
+    last_name,
+    email,
+    phone,
+    msa_flag,
+    is_performa,
+    msa_start_date,
+    msa_end_date,
+    non_solicitation_clause,
+    use_logo_permission,
+    client_category,
+    servicing_type,
+    missing_msa_deadline,
+    is_msa_missing,
+    logopath,
+    updated_by, // Add updated_by to params
+  ];
+  await db.execute(query, params);
+};
+
+const updateClientDetails = async (
+  id,
+  company_id,
+  name,
+  alias,
+  pan_no,
+  address1,
+  address2,
+  address3,
+  pin,
+  country_id,
+  state_id,
+  polestar_bank_account_id,
+  gstn,
+  client_ship_to_address1,
+  client_ship_to_address2,
+  client_ship_to_address3,
+  client_ship_to_pin,
+  client_ship_to_country_id,
+  client_ship_to_state_id,
+  client_ship_to_gstn,
+  salutation,
+  first_name,
+  last_name,
+  email,
+  phone,
+  msa_flag,
+  is_performa,
+  msa_start_date,
+  msa_end_date,
+  non_solicitation_clause,
+  use_logo_permission,
+  client_category,
+  servicing_type,
+  missing_msa_deadline,
+  is_msa_missing,
+  logopath,
+  updated_by // Add updated_by here
+) => {
+  const query = `
+    UPDATE client_details
+    SET company_id = ?, name = ?, alias = ?, pan_no = ?, address1 = ?, address2 = ?, address3 = ?,
+        pin = ?, country_id = ?, state_id = ?, polestar_bank_account_id = ?, gstn = ?,
+        client_ship_to_address1 = ?, client_ship_to_address2 = ?, client_ship_to_address3 = ?,
+        client_ship_to_pin = ?, client_ship_to_country_id = ?, client_ship_to_state_id = ?,
+        client_ship_to_gstn = ?, salutation = ?, first_name = ?, last_name = ?, email = ?, phone = ?,
+        msa_flag = ?, is_performa = ?, msa_start_date = ?, msa_end_date = ?, non_solicitation_clause = ?,
+        use_logo_permission = ?, client_category = ?, servicing_type = ?, missing_msa_deadline = ?,
+        is_msa_missing = ?, logopath = ?, updated_at = CURRENT_TIMESTAMP, updated_by = ?
+    WHERE id = ?
+  `;
+  const params = [
+    company_id,
+    name,
+    alias,
+    pan_no,
+    address1,
+    address2,
+    address3,
+    pin,
+    country_id,
+    state_id,
+    polestar_bank_account_id,
+    gstn,
+    client_ship_to_address1,
+    client_ship_to_address2,
+    client_ship_to_address3,
+    client_ship_to_pin,
+    client_ship_to_country_id,
+    client_ship_to_state_id,
+    client_ship_to_gstn,
+    salutation,
+    first_name,
+    last_name,
+    email,
+    phone,
+    msa_flag,
+    is_performa,
+    msa_start_date,
+    msa_end_date,
+    non_solicitation_clause,
+    use_logo_permission,
+    client_category,
+    servicing_type,
+    missing_msa_deadline,
+    is_msa_missing,
+    logopath,
+    updated_by, // Add updated_by to params
+    id,
+  ];
+  await db.execute(query, params);
+};
+
+const fetchClients = async () => {
+  const query = `SELECT * FROM client_details WHERE is_deleted = 0`;
+  const [rows] = await db.query(query);
+  return rows;
+};
+
+const toggleClientActiveStatusDetails = async (
+  clientId,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE client_details
+      SET is_active = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      isActive ? 1 : 0,
+      updatedBy,
+      clientId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error toggling account active status");
+  }
+};
+
 module.exports = {
+  createClient,
+  updateClientDetails,
+  fetchClients,
+  toggleClientActiveStatusDetails,
+
   createAccount,
   updateAccountDetails,
   getAccountListDetails,

@@ -39,6 +39,11 @@ const {
   updateAccountDetails,
   getAccountListDetails,
   toggleAccountActiveStatusDetails,
+
+  createClient,
+  updateClientDetails,
+  fetchClients,
+  toggleClientActiveStatusDetails
 } = require("../models/masterModel");
 
 // Comapny Master
@@ -817,7 +822,243 @@ const toggleAccountActiveStatus = async (req, res) => {
   }
 };
 
+const addClient = async (req, res) => {
+  const {
+    company_id,
+    name,
+    alias,
+    pan_no,
+    address1,
+    address2,
+    address3,
+    pin,
+    country_id,
+    state_id,
+    polestar_bank_account_id,
+    gstn,
+    client_ship_to_address1,
+    client_ship_to_address2,
+    client_ship_to_address3,
+    client_ship_to_pin,
+    client_ship_to_country_id,
+    client_ship_to_state_id,
+    client_ship_to_gstn,
+    salutation,
+    first_name,
+    last_name,
+    email,
+    phone,
+    msa_flag,
+    is_performa,
+    msa_start_date,
+    msa_end_date,
+    non_solicitation_clause,
+    use_logo_permission,
+    client_category,
+    servicing_type,
+    missing_msa_deadline,
+    is_msa_missing,
+    updated_by
+  } = req.body;
+
+  const logopath = req.file ? req.file.path : null; // Handle file upload for logo
+
+  try {
+    await createClient(
+      company_id,
+      name,
+      alias,
+      pan_no,
+      address1,
+      address2,
+      address3,
+      pin,
+      country_id,
+      state_id,
+      polestar_bank_account_id,
+      gstn,
+      client_ship_to_address1,
+      client_ship_to_address2,
+      client_ship_to_address3,
+      client_ship_to_pin,
+      client_ship_to_country_id,
+      client_ship_to_state_id,
+      client_ship_to_gstn,
+      salutation,
+      first_name,
+      last_name,
+      email,
+      phone,
+      msa_flag,
+      is_performa,
+      msa_start_date,
+      msa_end_date,
+      non_solicitation_clause,
+      use_logo_permission,
+      client_category,
+      servicing_type,
+      missing_msa_deadline,
+      is_msa_missing,
+      logopath,
+      updated_by
+    );
+    res.status(201).json({
+      statusCode: 201,
+      message: "Client added successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while adding client",
+    });
+  }
+};
+
+const updateClient = async (req, res) => {
+  const {
+    id,
+    company_id,
+    name,
+    alias,
+    pan_no,
+    address1,
+    address2,
+    address3,
+    pin,
+    country_id,
+    state_id,
+    polestar_bank_account_id,
+    gstn,
+    client_ship_to_address1,
+    client_ship_to_address2,
+    client_ship_to_address3,
+    client_ship_to_pin,
+    client_ship_to_country_id,
+    client_ship_to_state_id,
+    client_ship_to_gstn,
+    salutation,
+    first_name,
+    last_name,
+    email,
+    phone,
+    msa_flag,
+    is_performa,
+    msa_start_date,
+    msa_end_date,
+    non_solicitation_clause,
+    use_logo_permission,
+    client_category,
+    servicing_type,
+    missing_msa_deadline,
+    is_msa_missing,
+    updated_by
+  } = req.body;
+
+  const logopath = req.file ? req.file.path : null;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Client ID is required",
+    });
+  }
+
+  try {
+    await updateClientDetails(
+      id,
+      company_id,
+      name,
+      alias,
+      pan_no,
+      address1,
+      address2,
+      address3,
+      pin,
+      country_id,
+      state_id,
+      polestar_bank_account_id,
+      gstn,
+      client_ship_to_address1,
+      client_ship_to_address2,
+      client_ship_to_address3,
+      client_ship_to_pin,
+      client_ship_to_country_id,
+      client_ship_to_state_id,
+      client_ship_to_gstn,
+      salutation,
+      first_name,
+      last_name,
+      email,
+      phone,
+      msa_flag,
+      is_performa,
+      msa_start_date,
+      msa_end_date,
+      non_solicitation_clause,
+      use_logo_permission,
+      client_category,
+      servicing_type,
+      missing_msa_deadline,
+      is_msa_missing,
+      logopath,
+      updated_by
+    );
+    res.status(200).json({
+      statusCode: 200,
+      message: "Client updated successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating client",
+    });
+  }
+};
+
+const getClients = async (req, res) => {
+  try {
+    const clients = await fetchClients();
+    res.status(200).json({
+      statusCode: 200,
+      clients,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while fetching clients",
+    });
+  }
+};
+
+const toggleClientActiveStatus = async (req, res) => {
+  const { clientId, isActive, updatedBy } = req.body;
+
+  try {
+    await toggleClientActiveStatusDetails(clientId, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: `Client ${
+        isActive == 1 ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
 module.exports = {
+  addClient,
+  updateClient,
+  getClients,
+  toggleClientActiveStatus,
+
   addAccount,
   updateAccount,
   getAccountList,
