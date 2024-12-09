@@ -692,17 +692,44 @@ const updateStateDetails = async (
 
 const getStateListDetails = async (countryId) => {
   try {
-    const query = `
-      SELECT state_id, state_code, state_name, country_id, isActive, updated_at, updated_by
-      FROM states
-      WHERE country_id = ?
+    let query = `
+      SELECT 
+        s.state_id, s.state_code, s.state_name, s.country_id, s.isActive, s.updated_at, s.updated_by,
+        c.name AS country_name, c.code as country_code
+      FROM states s
+      LEFT JOIN countries c ON s.country_id = c.id
     `;
+    let params = [];
 
-    const [states] = await db.execute(query, [countryId]);
-    return states;
+    if (countryId) {
+      query += " WHERE s.country_id = ?";
+      params.push(countryId);
+    }
+
+    const [results] = await db.execute(query, params);
+
+    // Group states under the country details if needed
+    // const countryDetails = results.length > 0 ? {
+    //   country_id: results[0].country_id,
+    //   country_name: results[0].country_name,
+    //   country_code: results[0].country_code,
+    //   isActive: results[0].country_isActive,
+    // } : null;
+
+    // const states = results.map(state => ({
+    //   state_id: state.state_id,
+    //   state_code: state.state_code,
+    //   state_name: state.state_name,
+    //   country_id: state.country_id,
+    //   isActive: state.isActive,
+    //   updated_at: state.updated_at,
+    //   updated_by: state.updated_by,
+    // }));
+
+    return results;
   } catch (err) {
     console.error(err);
-    throw new Error("Error retrieving state list");
+    throw new Error("Error retrieving state and country details");
   }
 };
 
