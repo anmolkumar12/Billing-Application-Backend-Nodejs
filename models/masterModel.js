@@ -840,10 +840,27 @@ const updateAccountDetails = async (
 const getAccountListDetails = async () => {
   try {
     const query = `
-      SELECT account_id, company_id, account_type, bank_name, bank_address, 
-             account_no, ifsc_code, micr_code, routing_no_swift_code, bank_code, 
-             is_active, updated_at, updated_by
-      FROM accounts
+SELECT 
+    a.account_id, 
+    a.company_id, 
+    ci.companyName as company_name, 
+    a.account_type, 
+    a.bank_name, 
+    a.bank_address, 
+    a.account_no, 
+    a.ifsc_code, 
+    a.micr_code, 
+    a.routing_no_swift_code, 
+    a.bank_code, 
+    a.is_active, 
+    a.updated_at, 
+    a.updated_by
+FROM 
+    accounts a
+JOIN 
+    company_info ci 
+ON 
+    a.company_id = ci.id;
     `;
 
     const [accounts] = await db.execute(query);
