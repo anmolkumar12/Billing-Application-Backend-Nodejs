@@ -1080,7 +1080,29 @@ const updateClientDetails = async (
 };
 
 const fetchClients = async () => {
-  const query = `SELECT * FROM client_details WHERE is_deleted = 0`;
+  const query = `SELECT 
+  cd.*,
+  c.name AS country_name,
+  s.state_name AS state_name,
+  cs.name AS client_ship_to_country_name,
+  ss.state_name AS client_ship_to_state_name,
+  a.account_no AS polestar_bank_account_number,
+  ci.companyName AS company_name
+FROM 
+  client_details cd
+LEFT JOIN 
+  countries c ON cd.country_id = c.id
+LEFT JOIN 
+  states s ON cd.state_id = s.state_id
+LEFT JOIN 
+  countries cs ON cd.client_ship_to_country_id = cs.id
+LEFT JOIN 
+  states ss ON cd.client_ship_to_state_id = ss.state_id
+LEFT JOIN 
+  accounts a ON cd.polestar_bank_account_id = a.account_id 
+LEFT JOIN 
+  company_info ci ON cd.company_id = ci.id;
+`;
   const [rows] = await db.query(query);
   return rows;
 };
