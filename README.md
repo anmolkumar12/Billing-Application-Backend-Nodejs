@@ -355,5 +355,6 @@ CREATE TABLE client_details (
   logopath VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  updated_by VARCHAR(255)  -- Add updated_by here
+  updated_by VARCHAR(255),  -- Add updated_by here
+  isActive TINYINT(1) DEFAULT 1
 );
