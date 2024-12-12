@@ -932,7 +932,7 @@ const createClient = async (
   missing_msa_deadline,
   is_msa_missing,
   logopath,
-  updated_by
+  updated_by // Include updated_by
 ) => {
   const query = `
     INSERT INTO client_details (
@@ -943,7 +943,7 @@ const createClient = async (
       salutation, first_name, last_name, email, phone, msa_flag, is_performa,
       msa_start_date, msa_end_date, non_solicitation_clause, use_logo_permission,
       client_category, servicing_type, missing_msa_deadline, is_msa_missing, logopath, updated_by
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)
   `;
   const params = [
     company_id,
@@ -983,9 +983,9 @@ const createClient = async (
     logopath,
     updated_by
   ];
-  console.log(params); // Debugging step
   await db.execute(query, params);
 };
+
 
 
 const updateClientDetails = async (

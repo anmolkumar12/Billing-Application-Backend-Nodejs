@@ -321,27 +321,27 @@ CREATE TABLE client_details (
   company_id INT,
   name VARCHAR(255),
   alias VARCHAR(255),
-  pan_no VARCHAR(255),
-  address1 VARCHAR(255),
-  address2 VARCHAR(255),
-  address3 VARCHAR(255),
-  pin VARCHAR(6),
+  pan_no VARCHAR(20), -- Adjusted to match typical PAN card format
+  address1 VARCHAR(500), -- Increased length for longer addresses
+  address2 VARCHAR(500), -- Increased length for longer addresses
+  address3 VARCHAR(500), -- Increased length for longer addresses
+  pin VARCHAR(10), -- Increased to accommodate longer PIN codes
   country_id INT,
   state_id INT,
   polestar_bank_account_id INT,
-  gstn VARCHAR(15),
-  client_ship_to_address1 VARCHAR(255),
-  client_ship_to_address2 VARCHAR(255),
-  client_ship_to_address3 VARCHAR(255),
-  client_ship_to_pin VARCHAR(6),
+  gstn VARCHAR(15), -- GSTIN format remains valid
+  client_ship_to_address1 VARCHAR(500), -- Increased length for longer addresses
+  client_ship_to_address2 VARCHAR(500), -- Increased length for longer addresses
+  client_ship_to_address3 VARCHAR(500), -- Increased length for longer addresses
+  client_ship_to_pin VARCHAR(10), -- Increased to accommodate longer PIN codes
   client_ship_to_country_id INT,
   client_ship_to_state_id INT,
-  client_ship_to_gstn VARCHAR(15),
-  salutation VARCHAR(10),
+  client_ship_to_gstn VARCHAR(15), -- GSTIN format remains valid
+  salutation VARCHAR(20), -- Increased for diverse salutations
   first_name VARCHAR(255),
   last_name VARCHAR(255),
-  email VARCHAR(255),
-  phone VARCHAR(20),
+  email VARCHAR(320), -- Maximum valid email length
+  phone VARCHAR(20), -- Increased to handle country codes with phone numbers
   msa_flag BOOLEAN,
   is_performa BOOLEAN,
   msa_start_date DATE,
@@ -352,9 +352,10 @@ CREATE TABLE client_details (
   servicing_type VARCHAR(100),
   missing_msa_deadline BOOLEAN,
   is_msa_missing BOOLEAN,
-  logopath VARCHAR(255),
+  logopath VARCHAR(500), -- Increased to accommodate longer file paths
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  updated_by VARCHAR(255),  -- Add updated_by here
+  updated_by VARCHAR(255),
   isActive TINYINT(1) DEFAULT 1
 );
+
