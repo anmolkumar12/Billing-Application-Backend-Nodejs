@@ -108,7 +108,7 @@ router.post(
   toggleAccountActiveStatus
 );
 
-router.post("/addClient", authMiddleware, addClient);
+router.post("/addClient", upload.single("file"), authMiddleware, addClient);
 router.post("/updateClientDetails", authMiddleware, updateClient);
 router.get("/clientsList", authMiddleware, getClients);
 router.post(
