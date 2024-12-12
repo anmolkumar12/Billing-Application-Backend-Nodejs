@@ -932,7 +932,7 @@ const createClient = async (
   missing_msa_deadline,
   is_msa_missing,
   logopath,
-  updated_by // Add updated_by here
+  updated_by
 ) => {
   const query = `
     INSERT INTO client_details (
@@ -981,10 +981,12 @@ const createClient = async (
     missing_msa_deadline,
     is_msa_missing,
     logopath,
-    updated_by, // Add updated_by to params
+    updated_by
   ];
+  console.log(params); // Debugging step
   await db.execute(query, params);
 };
+
 
 const updateClientDetails = async (
   id,
@@ -1115,7 +1117,7 @@ const toggleClientActiveStatusDetails = async (
   try {
     const query = `
       UPDATE client_details
-      SET is_active = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
 
