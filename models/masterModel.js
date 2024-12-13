@@ -897,7 +897,7 @@ const toggleAccountActiveStatusDetails = async (
 
 // Clients 
 const createClient = async (
-  company_id,
+  industry_id,
   name,
   alias,
   pan_no,
@@ -936,7 +936,7 @@ const createClient = async (
 ) => {
   const query = `
     INSERT INTO client_details (
-      company_id, name, alias, pan_no, address1, address2, address3, pin,
+      industry_id, name, alias, pan_no, address1, address2, address3, pin,
       country_id, state_id, polestar_bank_account_id, gstn, client_ship_to_address1,
       client_ship_to_address2, client_ship_to_address3, client_ship_to_pin,
       client_ship_to_country_id, client_ship_to_state_id, client_ship_to_gstn,
@@ -946,7 +946,7 @@ const createClient = async (
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)
   `;
   const params = [
-    company_id,
+    industry_id,
     name,
     alias,
     pan_no,
@@ -990,7 +990,7 @@ const createClient = async (
 
 const updateClientDetails = async (
   id,
-  company_id,
+  industry_id,
   name,
   alias,
   pan_no,
@@ -1029,7 +1029,7 @@ const updateClientDetails = async (
 ) => {
   const query = `
     UPDATE client_details
-    SET company_id = ?, name = ?, alias = ?, pan_no = ?, address1 = ?, address2 = ?, address3 = ?,
+    SET industry_id = ?, name = ?, alias = ?, pan_no = ?, address1 = ?, address2 = ?, address3 = ?,
         pin = ?, country_id = ?, state_id = ?, polestar_bank_account_id = ?, gstn = ?,
         client_ship_to_address1 = ?, client_ship_to_address2 = ?, client_ship_to_address3 = ?,
         client_ship_to_pin = ?, client_ship_to_country_id = ?, client_ship_to_state_id = ?,
@@ -1040,7 +1040,7 @@ const updateClientDetails = async (
     WHERE id = ?
   `;
   const params = [
-    company_id,
+    industry_id,
     name,
     alias,
     pan_no,
@@ -1089,7 +1089,7 @@ const fetchClients = async () => {
   cs.name AS client_ship_to_country_name,
   ss.state_name AS client_ship_to_state_name,
   a.account_no AS polestar_bank_account_number,
-  ci.companyName AS company_name
+  i.industryName AS industry_name
 FROM 
   client_details cd
 LEFT JOIN 
@@ -1103,7 +1103,7 @@ LEFT JOIN
 LEFT JOIN 
   accounts a ON cd.polestar_bank_account_id = a.account_id 
 LEFT JOIN 
-  company_info ci ON cd.company_id = ci.id;
+  industries i ON cd.industry_id = i.id;
 `;
   const [rows] = await db.query(query);
   return rows;

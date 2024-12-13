@@ -318,7 +318,7 @@ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 CREATE TABLE client_details (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  company_id INT,
+  industry_id INT,
   name VARCHAR(255),
   alias VARCHAR(255),
   pan_no VARCHAR(20), -- Adjusted to match typical PAN card format

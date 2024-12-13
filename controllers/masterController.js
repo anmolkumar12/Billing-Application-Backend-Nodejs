@@ -824,7 +824,7 @@ const toggleAccountActiveStatus = async (req, res) => {
 
 const addClient = async (req, res) => {
   const {
-    company_id,
+    industry_id,
     name,
     alias,
     pan_no,
@@ -864,7 +864,7 @@ const addClient = async (req, res) => {
 
   try {
     await createClient(
-    company_id,
+      industry_id,
     name,
     alias,
     pan_no,
@@ -917,7 +917,7 @@ const addClient = async (req, res) => {
 const updateClient = async (req, res) => {
   const {
     id,
-    company_id,
+    industry_id,
     name,
     alias,
     pan_no,
@@ -966,7 +966,7 @@ const updateClient = async (req, res) => {
   try {
     await updateClientDetails(
       id,
-      company_id,
+      industry_id,
       name,
       alias,
       pan_no,
