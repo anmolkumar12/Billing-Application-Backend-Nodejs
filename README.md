@@ -346,8 +346,8 @@ CREATE TABLE client_details (
   phone VARCHAR(20), -- Increased to handle country codes with phone numbers
   msa_flag BOOLEAN,
   is_performa BOOLEAN,
-  msa_start_date DATE,
-  msa_end_date DATE,
+  msa_start_date VARCHAR(255),
+  msa_end_date VARCHAR(255),
   non_solicitation_clause BOOLEAN,
   use_logo_permission BOOLEAN,
   client_category VARCHAR(100),
