@@ -23,7 +23,9 @@ logopath VARCHAR(255),
 description TEXT,
 updated_by VARCHAR(255),
 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-isactive BOOLEAN DEFAULT TRUE
+isactive BOOLEAN DEFAULT TRUE,
+gst_number VARCHAR(255),
+address VARCHAR(255)
 );
 
 --industries table creation----

@@ -10,13 +10,16 @@ const createCompany = async (
   description,
   isactive,
   updatedBy,
-  logopath
+  logopath,
+  gst_number,
+  address
 ) => {
   try {
     // SQL query to insert company data into the company_info table
     const query = `
-          INSERT INTO company_info (companyName, Website, CINNO, IECode, PAN, Email, logopath, description, isactive, updated_by, updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+          INSERT INTO company_info (companyName, Website, CINNO, IECode, PAN, Email, logopath, description, isactive, updated_by,gst_number,
+          address, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?, CURRENT_TIMESTAMP)
         `;
 
     // Execute the query with the provided values
@@ -31,6 +34,8 @@ const createCompany = async (
       description,
       isactive,
       updatedBy,
+      gst_number,
+      address
     ]);
 
     return result; // Return the result of the insert operation (e.g., insert id or success message)
@@ -51,7 +56,9 @@ const updateCompanyDetails = async (
   description,
   isactive,
   logopath,
-  updatedBy
+  updatedBy,
+  gst_number,
+  address
 ) => {
   try {
     // Sanitize inputs to replace undefined with null
@@ -65,7 +72,11 @@ const updateCompanyDetails = async (
       logopath ?? null,
       description ?? null,
       updatedBy ?? null,
+      gst_number ?? null,
+      address ?? null,
       isactive ?? null,
+      gst_number ?? null,
+      address ?? null,
       companyId,
     ];
 
@@ -82,6 +93,8 @@ const updateCompanyDetails = async (
         logopath = ?, 
         description = ?, 
         updated_by = ?, 
+        gst_number = ?,
+        address = ?,
         updated_at = CURRENT_TIMESTAMP, 
         isactive = ?
       WHERE id = ?

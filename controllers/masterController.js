@@ -58,6 +58,8 @@ const addCompany = async (req, res) => {
     description,
     isactive,
     updatedBy,
+    gst_number,
+    address
   } = req.body;
   const logopath = req.file ? req.file.path : null; // Get the file path if the logo is uploaded
 
@@ -72,7 +74,9 @@ const addCompany = async (req, res) => {
       description,
       isactive,
       updatedBy,
-      logopath
+      logopath,
+      gst_number,
+      address
     );
     res.status(201).json({
       statusCode: 201,
@@ -99,6 +103,8 @@ const updateCompany = async (req, res) => {
     description,
     isactive,
     updatedBy,
+    gst_number,
+    address
   } = req.body;
 
   const logopath = req.file ? req.file.path : null; // Handle optional file upload for the logo
@@ -124,7 +130,9 @@ const updateCompany = async (req, res) => {
       description,
       isactive,
       logopath,
-      updatedBy
+      updatedBy,
+      gst_number,
+      address
     );
 
     // Respond to the client with success
