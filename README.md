@@ -364,6 +364,28 @@ CREATE TABLE client_billing_info (
     updated_by INT                            -- User who updated the record
 );
 
+--client Shipping Info creation----
+
+CREATE TABLE client_shipping_info (
+    client_id INT AUTO_INCREMENT PRIMARY KEY,          -- Primary key for the table
+    client_ship_to_address1 VARCHAR(255) NOT NULL,     -- First line of the shipping address
+    client_ship_to_address2 VARCHAR(255),              -- Second line of the shipping address (optional)
+    client_ship_to_address3 VARCHAR(255),              -- Third line of the shipping address (optional)
+    client_ship_to_pin VARCHAR(20) NOT NULL,           -- Postal/ZIP code
+    client_ship_to_country_id INT NOT NULL,            -- Foreign key to the countries table
+    client_ship_to_state_id INT NOT NULL,              -- Foreign key to the states table
+    client_ship_to_gstn VARCHAR(50),                   -- GST number for the client shipping address
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,     -- Timestamp for record creation
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Timestamp for last update
+    updated_by INT                                     -- User who updated the record
+);
+
+-- Add foreign key constraints
+ALTER TABLE client_shipping_info
+ADD CONSTRAINT fk_ship_country FOREIGN KEY (client_ship_to_country_id) REFERENCES countries(id),
+ADD CONSTRAINT fk_ship_state FOREIGN KEY (client_ship_to_state_id) REFERENCES states(state_id);
+
+
 -- States for india----
 INSERT INTO states (state_code, state_name, country_id, isActive, updated_by) 
 VALUES

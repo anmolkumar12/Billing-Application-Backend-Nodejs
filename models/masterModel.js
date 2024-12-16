@@ -968,8 +968,6 @@ const createClient = async (
   await db.execute(query, params);
 };
 
-
-
 const updateClientDetails = async (
   id,
   industry_id,
@@ -1175,7 +1173,7 @@ const updateClientBillingDetails = async (
   }
 };
 
-const getClientBillingDetails = async (clientId) => {
+const getClientBillingDetails = async () => {
   try {
     const query = `
       SELECT 
@@ -1183,7 +1181,7 @@ const getClientBillingDetails = async (clientId) => {
       FROM client_billing_info
     `;
 
-    const [results] = await db.execute(query, [clientId]);
+    const [results] = await db.execute(query, []);
     return results;
   } catch (err) {
     console.error(err);
@@ -1211,8 +1209,106 @@ const toggleClientBillingActiveStatusDetails = async (billingId, isActive, updat
   }
 };
 
+const createClientShippingInfo = async (clientId, address1, address2, address3, pin, countryId, stateId, gstn, updatedBy) => {
+  try {
+    const query = `
+      INSERT INTO client_shipping_info (client_id, client_ship_to_address1, client_ship_to_address2, client_ship_to_address3, 
+      client_ship_to_pin, client_ship_to_country_id, client_ship_to_state_id, client_ship_to_gstn, updated_by, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    `;
+
+    const [result] = await db.execute(query, [
+      clientId,
+      address1,
+      address2,
+      address3,
+      pin,
+      countryId,
+      stateId,
+      gstn,
+      updatedBy,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error adding client shipping information");
+  }
+};
+
+const updateClientShippingDetails = async (shippingId, clientId, address1, address2, address3, pin, countryId, stateId, gstn, updatedBy) => {
+  try {
+    const query = `
+      UPDATE client_shipping_info
+      SET client_id = ?, client_ship_to_address1 = ?, client_ship_to_address2 = ?, client_ship_to_address3 = ?, 
+      client_ship_to_pin = ?, client_ship_to_country_id = ?, client_ship_to_state_id = ?, client_ship_to_gstn = ?, 
+      updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE shipping_id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      clientId,
+      address1,
+      address2,
+      address3,
+      pin,
+      countryId,
+      stateId,
+      gstn,
+      updatedBy,
+      shippingId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error updating client shipping information");
+  }
+};
+
+const getClientShippingDetails = async () => {
+  try {
+    const query = `
+      SELECT 
+        shipping_id, client_id, client_ship_to_address1, client_ship_to_address2, client_ship_to_address3, 
+        client_ship_to_pin, client_ship_to_country_id, client_ship_to_state_id, client_ship_to_gstn, 
+        created_at, updated_at, updated_by
+      FROM client_shipping_info
+    `;
+
+    const [results] = await db.execute(query, []);
+    return results;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error retrieving client shipping information");
+  }
+};
+
+const toggleClientShippingActiveStatusDetails = async (shippingId, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE client_shipping_info
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE shipping_id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      isActive ? 1 : 0,
+      updatedBy,
+      shippingId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error toggling client shipping active status");
+  }
+};
+
 
 module.exports = {
+  createClientShippingInfo,
+  updateClientShippingDetails,
+  getClientShippingDetails,
+  toggleClientShippingActiveStatusDetails,
+
   createClientBillingInfo,
   updateClientBillingDetails,
   getClientBillingDetails,

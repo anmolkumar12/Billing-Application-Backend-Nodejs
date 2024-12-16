@@ -49,6 +49,11 @@ const {
   updateClientBillingDetails,
   getClientBillingDetails,
   toggleClientBillingActiveStatusDetails,
+
+  createClientShippingInfo,
+  updateClientShippingDetails,
+  getClientShippingDetails,
+  toggleClientShippingActiveStatusDetails
 } = require("../models/masterModel");
 
 // Comapny Master
@@ -1089,10 +1094,8 @@ const updateClientBillingInfo = async (req, res) => {
 };
 
 const getClientBillingInfo = async (req, res) => {
-  const { clientId } = req.body;
-
   try {
-    const billingInfo = await getClientBillingDetails(clientId);
+    const billingInfo = await getClientBillingDetails();
     res.status(200).json({
       statusCode: 200,
       billingInfo,
@@ -1126,7 +1129,83 @@ const toggleClientBillingActiveStatus = async (req, res) => {
   }
 };
 
+const addClientShippingInfo = async (req, res) => {
+  const { clientId, address1, address2, address3, pin, countryId, stateId, gstn, updatedBy } = req.body;
+
+  try {
+    await createClientShippingInfo(clientId, address1, address2, address3, pin, countryId, stateId, gstn, updatedBy);
+    res.status(201).json({
+      statusCode: 201,
+      message: "Client shipping information added successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const updateClientShippingInfo = async (req, res) => {
+  const { shippingId, clientId, address1, address2, address3, pin, countryId, stateId, gstn, updatedBy } = req.body;
+
+  try {
+    await updateClientShippingDetails(shippingId, clientId, address1, address2, address3, pin, countryId, stateId, gstn, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: "Client shipping information updated successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const getClientShippingInfo = async (req, res) => {
+  try {
+    const shippingInfo = await getClientShippingDetails();
+    res.status(200).json({
+      statusCode: 200,
+      shippingInfo,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const toggleClientShippingActiveStatus = async (req, res) => {
+  const { shippingId, isActive, updatedBy } = req.body;
+
+  try {
+    await toggleClientShippingActiveStatusDetails(shippingId, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: `Shipping record ${isActive == 1 ? "activated" : "deactivated"} successfully`,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+
 module.exports = {
+  addClientShippingInfo,
+  updateClientShippingInfo,
+  getClientShippingInfo,
+  toggleClientShippingActiveStatus,
+
   addClientBillingInfo,
   updateClientBillingInfo,
   getClientBillingInfo,

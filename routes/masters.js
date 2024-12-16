@@ -42,11 +42,17 @@ const {
   updateClientBillingInfo,
   getClientBillingInfo,
   toggleClientBillingActiveStatus,
+
+  addClientShippingInfo,
+  updateClientShippingInfo,
+  getClientShippingInfo,
+  toggleClientShippingActiveStatus,
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
+
 
 router.post("/add-company", authMiddleware, upload.single("file"), addCompany);
 router.post("/edit", authMiddleware, upload.single("file"), updateCompany);
@@ -128,7 +134,13 @@ router.post(
 
 router.post("/addClientBillingInfo", authMiddleware, addClientBillingInfo);
 router.post("/updateClientBillingInfo", authMiddleware, updateClientBillingInfo);
-router.post("/getClientBillingInfo", authMiddleware, getClientBillingInfo);
+router.get("/getClientBillingInfo", authMiddleware, getClientBillingInfo);
 router.post("/toggleClientBillingActiveStatus", authMiddleware, toggleClientBillingActiveStatus);
+
+router.post("/addClientShippingInfo", authMiddleware, addClientShippingInfo);
+router.post("/updateClientShippingInfo", authMiddleware, updateClientShippingInfo);
+router.get("/getClientShippingInfo", authMiddleware, getClientShippingInfo);
+router.post("/toggleClientShippingActiveStatus", authMiddleware, toggleClientShippingActiveStatus);
+
 
 module.exports = router;
