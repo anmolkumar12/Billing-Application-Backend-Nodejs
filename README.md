@@ -287,15 +287,15 @@ VALUES
 
 --states table creation----
 
-CREATE TABLE states (
-state_id INT AUTO_INCREMENT PRIMARY KEY, 
-state_code VARCHAR(10) NOT NULL,
-state_name VARCHAR(255) NOT NULL,
-country_id INT,
-isActive BOOLEAN DEFAULT 1,
-updated_by VARCHAR(255),
-updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+  CREATE TABLE states (
+  state_id INT AUTO_INCREMENT PRIMARY KEY, 
+  state_code VARCHAR(10) NOT NULL,
+  state_name VARCHAR(255) NOT NULL,
+  country_id INT,
+  isActive BOOLEAN DEFAULT 1,
+  updated_by VARCHAR(255),
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
 
 --accounts table creation----
 
@@ -361,3 +361,42 @@ CREATE TABLE client_details (
   isActive TINYINT(1) DEFAULT 1
 );
 
+-- States for india----
+INSERT INTO states (state_code, state_name, country_id, isActive, updated_by) 
+VALUES
+('AP', 'Andhra Pradesh', 505, 1, '1'),
+('AR', 'Arunachal Pradesh', 505, 1, '1'),
+('AS', 'Assam', 505, 1, '1'),
+('BR', 'Bihar', 505, 1, '1'),
+('CT', 'Chhattisgarh', 505, 1, '1'),
+('GA', 'Goa', 505, 1, '1'),
+('GJ', 'Gujarat', 505, 1, '1'),
+('HR', 'Haryana', 505, 1, '1'),
+('HP', 'Himachal Pradesh', 505, 1, '1'),
+('JH', 'Jharkhand', 505, 1, '1'),
+('KA', 'Karnataka', 505, 1, '1'),
+('KL', 'Kerala', 505, 1, '1'),
+('MP', 'Madhya Pradesh', 505, 1, '1'),
+('MH', 'Maharashtra', 505, 1, '1'),
+('MN', 'Manipur', 505, 1, '1'),
+('ML', 'Meghalaya', 505, 1, '1'),
+('MZ', 'Mizoram', 505, 1, '1'),
+('NL', 'Nagaland', 505, 1, '1'),
+('OR', 'Odisha', 505, 1, '1'),
+('PB', 'Punjab', 505, 1, '1'),
+('RJ', 'Rajasthan', 505, 1, '1'),
+('SK', 'Sikkim', 505, 1, '1'),
+('TN', 'Tamil Nadu', 505, 1, '1'),
+('TG', 'Telangana', 505, 1, '1'),
+('TR', 'Tripura', 505, 1, '1'),
+('UP', 'Uttar Pradesh', 505, 1, '1'),
+('UT', 'Uttarakhand', 505, 1, '1'),
+('WB', 'West Bengal', 505, 1, '1'),
+('AN', 'Andaman and Nicobar Islands', 505, 1, '1'),
+('CH', 'Chandigarh', 505, 1, '1'),
+('DN', 'Dadra and Nagar Haveli and Daman and Diu', 505, 1, '1'),
+('DL', 'Delhi', 505, 1, '1'),
+('JK', 'Jammu and Kashmir', 505, 1, '1'),
+('LA', 'Ladakh', 505, 1, '1'),
+('LD', 'Lakshadweep', 505, 1, '1'),
+('PY', 'Puducherry', 505, 1, '1');

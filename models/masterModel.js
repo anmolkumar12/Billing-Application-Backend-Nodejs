@@ -61,7 +61,6 @@ const updateCompanyDetails = async (
   address
 ) => {
   try {
-    // Sanitize inputs to replace undefined with null
     const sanitizedValues = [
       companyName ?? null,
       Website ?? null,
@@ -75,12 +74,12 @@ const updateCompanyDetails = async (
       gst_number ?? null,
       address ?? null,
       isactive ?? null,
-      gst_number ?? null,
-      address ?? null,
       companyId,
     ];
 
-    // SQL query to update company details
+    // Log the values to debug
+    console.log("Sanitized Values:", sanitizedValues);
+
     const query = `
       UPDATE company_info
       SET 
@@ -100,9 +99,8 @@ const updateCompanyDetails = async (
       WHERE id = ?
     `;
 
-    // Execute the query and return the result
     const [result] = await db.execute(query, sanitizedValues);
-    return result; // Contains affectedRows and other metadata
+    return result;
   } catch (err) {
     console.error("Database error:", err);
     throw new Error("Error updating company details in the database");
