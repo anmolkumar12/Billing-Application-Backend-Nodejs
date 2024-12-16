@@ -324,21 +324,8 @@ CREATE TABLE client_details (
   name VARCHAR(255),
   alias VARCHAR(255),
   pan_no VARCHAR(20), -- Adjusted to match typical PAN card format
-  address1 VARCHAR(500), -- Increased length for longer addresses
-  address2 VARCHAR(500), -- Increased length for longer addresses
-  address3 VARCHAR(500), -- Increased length for longer addresses
-  pin VARCHAR(10), -- Increased to accommodate longer PIN codes
-  country_id INT,
-  state_id INT,
   polestar_bank_account_id INT,
   gstn VARCHAR(15), -- GSTIN format remains valid
-  client_ship_to_address1 VARCHAR(500), -- Increased length for longer addresses
-  client_ship_to_address2 VARCHAR(500), -- Increased length for longer addresses
-  client_ship_to_address3 VARCHAR(500), -- Increased length for longer addresses
-  client_ship_to_pin VARCHAR(10), -- Increased to accommodate longer PIN codes
-  client_ship_to_country_id INT,
-  client_ship_to_state_id INT,
-  client_ship_to_gstn VARCHAR(15), -- GSTIN format remains valid
   salutation VARCHAR(20), -- Increased for diverse salutations
   first_name VARCHAR(255),
   last_name VARCHAR(255),
@@ -359,6 +346,22 @@ CREATE TABLE client_details (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   updated_by VARCHAR(255),
   isActive TINYINT(1) DEFAULT 1
+);
+
+
+--client Billing Info creation----
+
+CREATE TABLE client_billing_info (
+    client_id INT AUTO_INCREMENT PRIMARY KEY, -- Primary key for the table
+    address1 VARCHAR(255) NOT NULL,           -- First line of the address
+    address2 VARCHAR(255),                    -- Second line of the address (optional)
+    address3 VARCHAR(255),                    -- Third line of the address (optional)
+    pin VARCHAR(20) NOT NULL,                 -- Postal/ZIP code
+    country_id INT NOT NULL,                  -- Foreign key to the countries table
+    state_id INT NOT NULL,                    -- Foreign key to the states table
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- Timestamp for record creation
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Timestamp for last update
+    updated_by INT                            -- User who updated the record
 );
 
 -- States for india----

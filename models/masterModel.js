@@ -912,24 +912,8 @@ const createClient = async (
   name,
   alias,
   pan_no,
-  
-  // address1,
-  // address2,
-  // address3,
-  // pin,
-  // country_id,
-  // state_id,
-
   polestar_bank_account_id,
   gstn,
-
-  // client_ship_to_address1,
-  // client_ship_to_address2,
-  // client_ship_to_address3,
-  // client_ship_to_pin,
-  // client_ship_to_country_id,
-  // client_ship_to_state_id,
-  // client_ship_to_gstn,
   salutation,
   first_name,
   last_name,
@@ -961,23 +945,8 @@ const createClient = async (
     name,
     alias,
     pan_no,
-
-    // address1,
-    // address2,
-    // address3,
-    // pin,
-    // country_id,
-    // state_id,
-
     polestar_bank_account_id,
     gstn,
-    // client_ship_to_address1,
-    // client_ship_to_address2,
-    // client_ship_to_address3,
-    // client_ship_to_pin,
-    // client_ship_to_country_id,
-    // client_ship_to_state_id,
-    // client_ship_to_gstn,
     salutation,
     first_name,
     last_name,
@@ -1146,7 +1115,109 @@ const toggleClientActiveStatusDetails = async (
   }
 };
 
+const createClientBillingInfo = async (address1, address2, address3, pin, countryId, stateId, clientId, updatedBy) => {
+  try {
+    const query = `
+      INSERT INTO client_billing_info (address1, address2, address3, pin, country_id, state_id, client_id, isActive, updated_by, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, CURRENT_TIMESTAMP)
+    `;
+
+    const [result] = await db.execute(query, [
+      address1,
+      address2,
+      address3,
+      pin,
+      countryId,
+      stateId,
+      clientId,
+      updatedBy,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error adding client billing information");
+  }
+};
+
+const updateClientBillingDetails = async (
+  billingId,
+  address1,
+  address2,
+  address3,
+  pin,
+  countryId,
+  stateId,
+  clientId,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE client_billing_info
+      SET address1 = ?, address2 = ?, address3 = ?, pin = ?, country_id = ?, state_id = ?, client_id = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE billing_id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      address1,
+      address2,
+      address3,
+      pin,
+      countryId,
+      stateId,
+      clientId,
+      updatedBy,
+      billingId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error updating client billing information");
+  }
+};
+
+const getClientBillingDetails = async (clientId) => {
+  try {
+    const query = `
+      SELECT 
+        billing_id, address1, address2, address3, pin, country_id, state_id, client_id, isActive, updated_at, updated_by
+      FROM client_billing_info
+    `;
+
+    const [results] = await db.execute(query, [clientId]);
+    return results;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error retrieving client billing information");
+  }
+};
+
+const toggleClientBillingActiveStatusDetails = async (billingId, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE client_billing_info
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE billing_id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      isActive ? 1 : 0,
+      updatedBy,
+      billingId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error toggling client billing active status");
+  }
+};
+
+
 module.exports = {
+  createClientBillingInfo,
+  updateClientBillingDetails,
+  getClientBillingDetails,
+  toggleClientBillingActiveStatusDetails,
+  
   createClient,
   updateClientDetails,
   fetchClients,

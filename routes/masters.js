@@ -38,6 +38,10 @@ const {
   updateClient,
   getClients,
   toggleClientActiveStatus,
+  addClientBillingInfo,
+  updateClientBillingInfo,
+  getClientBillingInfo,
+  toggleClientBillingActiveStatus,
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -57,6 +61,7 @@ router.post(
   toggleIndustryActiveStatus
 );
 router.get("/industryList", authMiddleware, getIndustryList);
+
 router.post("/addProject", authMiddleware, addProject);
 router.post("/updateProject", authMiddleware, updateProject);
 router.get("/projectList", authMiddleware, getProjectList);
@@ -65,6 +70,7 @@ router.post(
   authMiddleware,
   toggleProjectActiveStatus
 );
+
 router.post("/addProduct", authMiddleware, addProduct);
 router.post("/updateProduct", authMiddleware, updateProduct);
 router.get("/productList", authMiddleware, getProductList);
@@ -73,6 +79,7 @@ router.post(
   authMiddleware,
   toggleProductActiveStatus
 );
+
 router.post("/addCurrency", authMiddleware, addCurrency);
 router.post("/updateCurrency", authMiddleware, updateCurrency);
 router.get("/currencyList", authMiddleware, getCurrencyList);
@@ -81,6 +88,7 @@ router.post(
   authMiddleware,
   toggleCurrencyActiveStatus
 );
+
 router.post("/addTaxType", authMiddleware, addTax);
 router.post("/updateTaxType", authMiddleware, updateTax);
 router.get("/taxTypeList", authMiddleware, getTaxList);
@@ -90,6 +98,7 @@ router.post(
   toggleTaxActiveStatus
 );
 router.get("/countriesList", authMiddleware, countriesList);
+
 router.post("/addState", authMiddleware, addState);
 router.post("/updateState", authMiddleware, updateState);
 router.post("/statesList", authMiddleware, getStateList);
@@ -116,5 +125,10 @@ router.post(
   authMiddleware,
   toggleClientActiveStatus
 );
+
+router.post("/addClientBillingInfo", authMiddleware, addClientBillingInfo);
+router.post("/updateClientBillingInfo", authMiddleware, updateClientBillingInfo);
+router.post("/getClientBillingInfo", authMiddleware, getClientBillingInfo);
+router.post("/toggleClientBillingActiveStatus", authMiddleware, toggleClientBillingActiveStatus);
 
 module.exports = router;

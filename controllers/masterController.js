@@ -43,7 +43,12 @@ const {
   createClient,
   updateClientDetails,
   fetchClients,
-  toggleClientActiveStatusDetails
+  toggleClientActiveStatusDetails,
+  
+  createClientBillingInfo,
+  updateClientBillingDetails,
+  getClientBillingDetails,
+  toggleClientBillingActiveStatusDetails,
 } = require("../models/masterModel");
 
 // Comapny Master
@@ -876,25 +881,8 @@ const addClient = async (req, res) => {
     name,
     alias,
     pan_no,
-    
-    // address1,
-    // address2,
-    // address3,
-    // pin,
-    // country_id,
-    // state_id,
-
     polestar_bank_account_id,
     gstn,
-
-    // client_ship_to_address1,
-    // client_ship_to_address2,
-    // client_ship_to_address3,
-    // client_ship_to_pin,
-    // client_ship_to_country_id,
-    // client_ship_to_state_id,
-    // client_ship_to_gstn,
-    
     salutation,
     first_name,
     last_name,
@@ -1064,7 +1052,86 @@ const toggleClientActiveStatus = async (req, res) => {
   }
 };
 
+const addClientBillingInfo = async (req, res) => {
+  const { address1, address2, address3, pin, countryId, stateId, clientId, updatedBy } = req.body;
+
+  try {
+    await createClientBillingInfo(address1, address2, address3, pin, countryId, stateId, clientId, updatedBy);
+    res.status(201).json({
+      statusCode: 201,
+      message: "Client billing information added successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const updateClientBillingInfo = async (req, res) => {
+  const { billingId, address1, address2, address3, pin, countryId, stateId, clientId, updatedBy } = req.body;
+
+  try {
+    await updateClientBillingDetails(billingId, address1, address2, address3, pin, countryId, stateId, clientId, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: "Client billing information updated successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const getClientBillingInfo = async (req, res) => {
+  const { clientId } = req.body;
+
+  try {
+    const billingInfo = await getClientBillingDetails(clientId);
+    res.status(200).json({
+      statusCode: 200,
+      billingInfo,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const toggleClientBillingActiveStatus = async (req, res) => {
+  const { billingId, isActive, updatedBy } = req.body;
+
+  try {
+    await toggleClientBillingActiveStatusDetails(billingId, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: `Billing record ${
+        isActive == 1 ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
 module.exports = {
+  addClientBillingInfo,
+  updateClientBillingInfo,
+  getClientBillingInfo,
+  toggleClientBillingActiveStatus,
+
   addClient,
   updateClient,
   getClients,
