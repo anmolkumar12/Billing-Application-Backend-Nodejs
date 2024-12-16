@@ -352,38 +352,38 @@ CREATE TABLE client_details (
 --client Billing Info creation----
 
 CREATE TABLE client_billing_info (
-    client_id INT AUTO_INCREMENT PRIMARY KEY, -- Primary key for the table
-    address1 VARCHAR(255) NOT NULL,           -- First line of the address
-    address2 VARCHAR(255),                    -- Second line of the address (optional)
-    address3 VARCHAR(255),                    -- Third line of the address (optional)
-    pin VARCHAR(20) NOT NULL,                 -- Postal/ZIP code
-    country_id INT NOT NULL,                  -- Foreign key to the countries table
-    state_id INT NOT NULL,                    -- Foreign key to the states table
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- Timestamp for record creation
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Timestamp for last update
-    updated_by INT                            -- User who updated the record
-);
+  id int NOT NULL AUTO_INCREMENT,
+  client_id int DEFAULT NULL,
+  address1 varchar(255) NOT NULL,
+  address2 varchar(255) DEFAULT NULL,
+  address3 varchar(255) DEFAULT NULL,
+  pin varchar(20) NOT NULL,
+  country_id int NOT NULL,
+  state_id int NOT NULL,
+  created_at datetime DEFAULT CURRENT_TIMESTAMP,
+  updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  updated_by int DEFAULT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 
 --client Shipping Info creation----
 
 CREATE TABLE client_shipping_info (
-    client_id INT AUTO_INCREMENT PRIMARY KEY,          -- Primary key for the table
-    client_ship_to_address1 VARCHAR(255) NOT NULL,     -- First line of the shipping address
-    client_ship_to_address2 VARCHAR(255),              -- Second line of the shipping address (optional)
-    client_ship_to_address3 VARCHAR(255),              -- Third line of the shipping address (optional)
-    client_ship_to_pin VARCHAR(20) NOT NULL,           -- Postal/ZIP code
-    client_ship_to_country_id INT NOT NULL,            -- Foreign key to the countries table
-    client_ship_to_state_id INT NOT NULL,              -- Foreign key to the states table
-    client_ship_to_gstn VARCHAR(50),                   -- GST number for the client shipping address
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,     -- Timestamp for record creation
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Timestamp for last update
-    updated_by INT                                     -- User who updated the record
-);
-
--- Add foreign key constraints
-ALTER TABLE client_shipping_info
-ADD CONSTRAINT fk_ship_country FOREIGN KEY (client_ship_to_country_id) REFERENCES countries(id),
-ADD CONSTRAINT fk_ship_state FOREIGN KEY (client_ship_to_state_id) REFERENCES states(state_id);
+  id int NOT NULL AUTO_INCREMENT,
+  client_id int DEFAULT NULL,
+  client_ship_to_address1 varchar(255) NOT NULL,
+  client_ship_to_address2 varchar(255) DEFAULT NULL,
+  client_ship_to_address3 varchar(255) DEFAULT NULL,
+  client_ship_to_pin varchar(20) NOT NULL,
+  client_ship_to_country_id int NOT NULL,
+  client_ship_to_state_id int NOT NULL,
+  client_ship_to_gstn varchar(50) DEFAULT NULL,
+  created_at datetime DEFAULT CURRENT_TIMESTAMP,
+  updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  updated_by int DEFAULT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 -- States for india----
