@@ -1177,7 +1177,7 @@ const getClientBillingDetails = async () => {
   try {
     const query = `
       SELECT 
-        billing_id, address1, address2, address3, pin, country_id, state_id, client_id, isActive, updated_at, updated_by
+        id, address1, address2, address3, pin, country_id, state_id, client_id, isActive, updated_at, updated_by
       FROM client_billing_info
     `;
 
@@ -1194,7 +1194,7 @@ const toggleClientBillingActiveStatusDetails = async (billingId, isActive, updat
     const query = `
       UPDATE client_billing_info
       SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
-      WHERE billing_id = ?
+      WHERE id = ?
     `;
 
     const [result] = await db.execute(query, [
@@ -1268,9 +1268,9 @@ const getClientShippingDetails = async () => {
   try {
     const query = `
       SELECT 
-        shipping_id, client_id, client_ship_to_address1, client_ship_to_address2, client_ship_to_address3, 
+        id, client_id, client_ship_to_address1, client_ship_to_address2, client_ship_to_address3, 
         client_ship_to_pin, client_ship_to_country_id, client_ship_to_state_id, client_ship_to_gstn, 
-        created_at, updated_at, updated_by
+        created_at, updated_at, updated_by, isActive
       FROM client_shipping_info
     `;
 
@@ -1287,7 +1287,7 @@ const toggleClientShippingActiveStatusDetails = async (shippingId, isActive, upd
     const query = `
       UPDATE client_shipping_info
       SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
-      WHERE shipping_id = ?
+      WHERE id = ?
     `;
 
     const [result] = await db.execute(query, [
