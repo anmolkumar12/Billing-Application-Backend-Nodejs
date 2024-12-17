@@ -1160,11 +1160,35 @@ const updateClientBillingDetails = async (
 
 const getClientBillingDetails = async () => {
   try {
-    const query = `
-      SELECT 
-        id, address1, address2, address3, pin, country_id, state_id, client_id, isActive, updated_at, updated_by
-      FROM client_billing_info
-    `;
+    // const query = `
+    //   SELECT 
+    //     id, address1, address2, address3, pin, country_id, state_id, client_id, isActive, updated_at, updated_by
+    //   FROM client_billing_info
+    // `;
+const query = `SELECT 
+    cbi.id, 
+    cbi.address1, 
+    cbi.address2, 
+    cbi.address3, 
+    cbi.pin, 
+    cbi.country_id, 
+    cbi.state_id, 
+    cbi.client_id, 
+    cbi.isActive, 
+    cbi.updated_at, 
+    cbi.updated_by,
+    s.state_name, 
+    co.name as country_name, 
+    cd.name AS client_name
+FROM 
+    client_billing_info cbi
+JOIN 
+    states s ON cbi.state_id = s.state_id
+JOIN 
+    countries co ON cbi.country_id = co.id
+JOIN 
+    client_details cd ON cbi.client_id = cd.id;
+`
 
     const [results] = await db.execute(query, []);
     return results;
@@ -1251,14 +1275,40 @@ const updateClientShippingDetails = async (shippingId, clientId, address1, addre
 
 const getClientShippingDetails = async () => {
   try {
-    const query = `
-      SELECT 
-        id, client_id, client_ship_to_address1, client_ship_to_address2, client_ship_to_address3, 
-        client_ship_to_pin, client_ship_to_country_id, client_ship_to_state_id, client_ship_to_gstn, 
-        created_at, updated_at, updated_by, isActive
-      FROM client_shipping_info
-    `;
-
+    // const query = `
+    //   SELECT 
+    //     id, client_id, client_ship_to_address1, client_ship_to_address2, client_ship_to_address3, 
+    //     client_ship_to_pin, client_ship_to_country_id, client_ship_to_state_id, client_ship_to_gstn, 
+    //     created_at, updated_at, updated_by, isActive
+    //   FROM client_shipping_info
+    // `;
+ 
+    const query = `SELECT 
+    csi.id, 
+    csi.client_id, 
+    csi.client_ship_to_address1, 
+    csi.client_ship_to_address2, 
+    csi.client_ship_to_address3, 
+    csi.client_ship_to_pin, 
+    csi.client_ship_to_country_id, 
+    csi.client_ship_to_state_id, 
+    csi.client_ship_to_gstn, 
+    csi.created_at, 
+    csi.updated_at, 
+    csi.updated_by, 
+    csi.isActive,
+    s.state_name, 
+    co.name AS country_name, 
+    cd.name AS client_name
+FROM 
+    client_shipping_info csi
+JOIN 
+    states s ON csi.client_ship_to_state_id = s.state_id
+JOIN 
+    countries co ON csi.client_ship_to_country_id = co.id
+JOIN 
+    client_details cd ON csi.client_id = cd.id;
+`
     const [results] = await db.execute(query, []);
     return results;
   } catch (err) {
