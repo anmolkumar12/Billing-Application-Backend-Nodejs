@@ -974,21 +974,21 @@ const updateClientDetails = async (
   name,
   alias,
   pan_no,
-  address1,
-  address2,
-  address3,
-  pin,
-  country_id,
-  state_id,
+  // address1,
+  // address2,
+  // address3,
+  // pin,
+  // country_id,
+  // state_id,
   polestar_bank_account_id,
   gstn,
-  client_ship_to_address1,
-  client_ship_to_address2,
-  client_ship_to_address3,
-  client_ship_to_pin,
-  client_ship_to_country_id,
-  client_ship_to_state_id,
-  client_ship_to_gstn,
+  // client_ship_to_address1,
+  // client_ship_to_address2,
+  // client_ship_to_address3,
+  // client_ship_to_pin,
+  // client_ship_to_country_id,
+  // client_ship_to_state_id,
+  // client_ship_to_gstn,
   salutation,
   first_name,
   last_name,
@@ -1009,11 +1009,8 @@ const updateClientDetails = async (
 ) => {
   const query = `
     UPDATE client_details
-    SET industry_id = ?, name = ?, alias = ?, pan_no = ?, address1 = ?, address2 = ?, address3 = ?,
-        pin = ?, country_id = ?, state_id = ?, polestar_bank_account_id = ?, gstn = ?,
-        client_ship_to_address1 = ?, client_ship_to_address2 = ?, client_ship_to_address3 = ?,
-        client_ship_to_pin = ?, client_ship_to_country_id = ?, client_ship_to_state_id = ?,
-        client_ship_to_gstn = ?, salutation = ?, first_name = ?, last_name = ?, email = ?, phone = ?,
+    SET industry_id = ?, name = ?, alias = ?, pan_no = ?, polestar_bank_account_id = ?, gstn = ?,
+        salutation = ?, first_name = ?, last_name = ?, email = ?, phone = ?,
         msa_flag = ?, is_performa = ?, msa_start_date = ?, msa_end_date = ?, non_solicitation_clause = ?,
         use_logo_permission = ?, client_category = ?, servicing_type = ?, missing_msa_deadline = ?,
         is_msa_missing = ?, logopath = ?, updated_at = CURRENT_TIMESTAMP, updated_by = ?
@@ -1024,21 +1021,21 @@ const updateClientDetails = async (
     name,
     alias,
     pan_no,
-    address1,
-    address2,
-    address3,
-    pin,
-    country_id,
-    state_id,
+    // address1,
+    // address2,
+    // address3,
+    // pin,
+    // country_id,
+    // state_id,
     polestar_bank_account_id,
     gstn,
-    client_ship_to_address1,
-    client_ship_to_address2,
-    client_ship_to_address3,
-    client_ship_to_pin,
-    client_ship_to_country_id,
-    client_ship_to_state_id,
-    client_ship_to_gstn,
+    // client_ship_to_address1,
+    // client_ship_to_address2,
+    // client_ship_to_address3,
+    // client_ship_to_pin,
+    // client_ship_to_country_id,
+    // client_ship_to_state_id,
+    // client_ship_to_gstn,
     salutation,
     first_name,
     last_name,
@@ -1064,22 +1061,10 @@ const updateClientDetails = async (
 const fetchClients = async () => {
   const query = `SELECT 
   cd.*,
-  c.name AS country_name,
-  s.state_name AS state_name,
-  cs.name AS client_ship_to_country_name,
-  ss.state_name AS client_ship_to_state_name,
   a.account_no AS polestar_bank_account_number,
   i.industryName AS industry_name
 FROM 
-  client_details cd
-LEFT JOIN 
-  countries c ON cd.country_id = c.id
-LEFT JOIN 
-  states s ON cd.state_id = s.state_id
-LEFT JOIN 
-  countries cs ON cd.client_ship_to_country_id = cs.id
-LEFT JOIN 
-  states ss ON cd.client_ship_to_state_id = ss.state_id
+client_details cd
 LEFT JOIN 
   accounts a ON cd.polestar_bank_account_id = a.account_id 
 LEFT JOIN 
