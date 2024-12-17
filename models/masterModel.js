@@ -1111,7 +1111,7 @@ const updateClientBillingDetails = async (
     const query = `
       UPDATE client_billing_info
       SET address1 = ?, address2 = ?, address3 = ?, pin = ?, country_id = ?, state_id = ?, client_id = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
-      WHERE billing_id = ?
+      WHERE id = ?
     `;
 
     const [result] = await db.execute(query, [
@@ -1225,7 +1225,7 @@ const updateClientShippingDetails = async (shippingId, clientId, address1, addre
       SET client_id = ?, client_ship_to_address1 = ?, client_ship_to_address2 = ?, client_ship_to_address3 = ?, 
       client_ship_to_pin = ?, client_ship_to_country_id = ?, client_ship_to_state_id = ?, client_ship_to_gstn = ?, 
       updated_by = ?, updated_at = CURRENT_TIMESTAMP
-      WHERE shipping_id = ?
+      WHERE id = ?
     `;
 
     const [result] = await db.execute(query, [
