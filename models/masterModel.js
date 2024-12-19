@@ -36,7 +36,6 @@ const createCompany = async (
 
     return result; // Return the result of the insert operation (e.g., insert id or success message)
   } catch (err) {
-    console.error(err);
     throw new Error("Error creating company");
   }
 };
@@ -67,9 +66,6 @@ const updateCompanyDetails = async (
       companyId,
     ];
 
-    // Log the values to debug
-    console.log("Sanitized Values:", sanitizedValues);
-
     const query = `
       UPDATE company_info
       SET 
@@ -89,7 +85,6 @@ const updateCompanyDetails = async (
     const [result] = await db.execute(query, sanitizedValues);
     return result;
   } catch (err) {
-    console.error("Database error:", err);
     throw new Error("Error updating company details in the database");
   }
 };
@@ -116,7 +111,6 @@ const activateDeactivateCompanyDetails = async (
 
     return result; // Return the result of the update operation (e.g., number of rows affected)
   } catch (err) {
-    console.error(err);
     throw new Error("Error activating or deactivating company");
   }
 };
@@ -130,7 +124,6 @@ const getCompanies = async () => {
     const [companies] = await db.execute(query);
     return companies; // Return the list of companies
   } catch (err) {
-    console.error(err);
     throw new Error("Error retrieving companies list");
   }
 };
@@ -144,7 +137,6 @@ const getCountries = async () => {
     const [countries] = await db.execute(query);
     return countries; // Return the list of companies
   } catch (err) {
-    console.error(err);
     throw new Error("Error retrieving companies list");
   }
 };
@@ -172,7 +164,6 @@ const createIndustry = async (
     ]);
     return result; // Return the result of the insert operation
   } catch (err) {
-    console.error(err);
     throw new Error("Error adding industry");
   }
 };
@@ -204,7 +195,6 @@ const updateIndustryDetails = async (
     ]);
     return result; // Return the result of the update operation
   } catch (err) {
-    console.error(err);
     throw new Error("Error updating industry");
   }
 };
@@ -229,7 +219,6 @@ const toggleIndustryActiveStatusDetails = async (
     ]);
     return result; // Return the result of the update operation
   } catch (err) {
-    console.error(err);
     throw new Error("Error toggling industry active status");
   }
 };
@@ -253,7 +242,6 @@ const getIndustryListDetails = async () => {
     const [industries] = await db.execute(query);
     return industries; // Return the industries data
   } catch (err) {
-    console.error(err);
     throw new Error("Error retrieving industry list");
   }
 };
@@ -275,7 +263,6 @@ const createProject = async (projectName, projectDescription, updatedBy) => {
     ]);
     return result; // Return the result of the insert operation
   } catch (err) {
-    console.error(err);
     throw new Error("Error adding project");
   }
 };
@@ -305,7 +292,6 @@ const updateProjectDetails = async (
     ]);
     return result; // Return the result of the update operation
   } catch (err) {
-    console.error(err);
     throw new Error("Error updating project");
   }
 };
@@ -328,7 +314,6 @@ const getProjectListDetails = async () => {
     const [projects] = await db.execute(query);
     return projects; // Return the project data
   } catch (err) {
-    console.error(err);
     throw new Error("Error retrieving project list");
   }
 };
@@ -354,7 +339,6 @@ const toggleProjectActiveStatusDetails = async (
     ]);
     return result; // Return the result of the update operation
   } catch (err) {
-    console.error(err);
     throw new Error("Error toggling project active status");
   }
 };
@@ -376,7 +360,6 @@ const createProduct = async (productName, productDescription, updatedBy) => {
     ]);
     return result; // Return the result of the insert operation
   } catch (err) {
-    console.error(err);
     throw new Error("Error adding project");
   }
 };
@@ -406,7 +389,6 @@ const updateProductDetails = async (
     ]);
     return result; // Return the result of the update operation
   } catch (err) {
-    console.error(err);
     throw new Error("Error updating project");
   }
 };
@@ -429,7 +411,6 @@ const getProductListDetails = async () => {
     const [projects] = await db.execute(query);
     return projects; // Return the project data
   } catch (err) {
-    console.error(err);
     throw new Error("Error retrieving project list");
   }
 };
@@ -455,7 +436,6 @@ const toggleProductActiveStatusDetails = async (
     ]);
     return result; // Return the result of the update operation
   } catch (err) {
-    console.error(err);
     throw new Error("Error toggling project active status");
   }
 };
@@ -479,7 +459,6 @@ const createCurrency = async (
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error adding currency");
   }
 };
@@ -507,15 +486,12 @@ const updateCurrencyDetails = async (
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error updating currency");
   }
 };
 
 const toggleCurrencyStatus = async (currencyId, isActive, updatedBy) => {
   try {
-    console.log("currencyId:", currencyId, "isActive:", isActive, "updatedBy:", updatedBy);
-
     const query = `
         UPDATE currency_master
         SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
@@ -528,15 +504,8 @@ const toggleCurrencyStatus = async (currencyId, isActive, updatedBy) => {
       currencyId,
     ]);
 
-    console.log("Update Result:", isActive);
-
-    if (result.affectedRows === 0) {
-      console.warn("No rows were updated. Verify the currencyId exists.");
-    }
-
     return result;
   } catch (err) {
-    console.error("Error toggling currency active status:", err);
     throw new Error("Error toggling currency active status");
   }
 };
@@ -554,7 +523,6 @@ const fetchCurrencyList = async (isActive) => {
     const [result] = await db.execute(query, isActive ? [isActive] : []);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error fetching currency list");
   }
 };
@@ -575,7 +543,6 @@ const createTax = async (taxType, taxPercentage, effectiveDate, updatedBy) => {
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error adding tax");
   }
 };
@@ -603,7 +570,6 @@ const updateTaxDetails = async (
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error updating tax");
   }
 };
@@ -618,7 +584,6 @@ const getTaxListDetails = async () => {
     const [taxes] = await db.execute(query);
     return taxes;
   } catch (err) {
-    console.error(err);
     throw new Error("Error retrieving tax list");
   }
 };
@@ -638,7 +603,6 @@ const toggleTaxActiveStatusDetails = async (taxId, isActive, updatedBy) => {
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error toggling tax active status");
   }
 };
@@ -660,7 +624,6 @@ const createState = async (stateCode, stateName, countryId, updatedBy) => {
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error adding state");
   }
 };
@@ -688,7 +651,6 @@ const updateStateDetails = async (
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error updating state");
   }
 };
@@ -731,7 +693,6 @@ const getStateListDetails = async (countryId) => {
 
     return results;
   } catch (err) {
-    console.error(err);
     throw new Error("Error retrieving state and country details");
   }
 };
@@ -751,7 +712,6 @@ const toggleStateActiveStatusDetails = async (stateId, isActive, updatedBy) => {
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error toggling state active status");
   }
 };
@@ -793,7 +753,6 @@ const createAccount = async (
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error adding account");
   }
 };
@@ -835,7 +794,6 @@ const updateAccountDetails = async (
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error updating account");
   }
 };
@@ -869,7 +827,6 @@ ON
     const [accounts] = await db.execute(query);
     return accounts;
   } catch (err) {
-    console.error(err);
     throw new Error("Error retrieving account list");
   }
 };
@@ -893,7 +850,6 @@ const toggleAccountActiveStatusDetails = async (
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error toggling account active status");
   }
 };
@@ -1059,7 +1015,6 @@ const toggleClientActiveStatusDetails = async (
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error toggling account active status");
   }
 };
@@ -1083,7 +1038,6 @@ const createClientBillingInfo = async (address1, address2, address3, pin, countr
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error adding client billing information");
   }
 };
@@ -1119,7 +1073,6 @@ const updateClientBillingDetails = async (
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error updating client billing information");
   }
 };
@@ -1159,7 +1112,6 @@ JOIN
     const [results] = await db.execute(query, []);
     return results;
   } catch (err) {
-    console.error(err);
     throw new Error("Error retrieving client billing information");
   }
 };
@@ -1179,7 +1131,6 @@ const toggleClientBillingActiveStatusDetails = async (billingId, isActive, updat
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error toggling client billing active status");
   }
 };
@@ -1205,7 +1156,6 @@ const createClientShippingInfo = async (clientId, address1, address2, address3, 
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error adding client shipping information");
   }
 };
@@ -1234,7 +1184,6 @@ const updateClientShippingDetails = async (shippingId, clientId, address1, addre
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error updating client shipping information");
   }
 };
@@ -1278,7 +1227,6 @@ JOIN
     const [results] = await db.execute(query, []);
     return results;
   } catch (err) {
-    console.error(err);
     throw new Error("Error retrieving client shipping information");
   }
 };
@@ -1298,7 +1246,6 @@ const toggleClientShippingActiveStatusDetails = async (shippingId, isActive, upd
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error toggling client shipping active status");
   }
 };
@@ -1317,7 +1264,6 @@ const createTechnology = async (technologyName, description, updatedBy) => {
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error adding technology");
   }
 };
@@ -1343,7 +1289,6 @@ const updateTechnologyDetails = async (
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error updating technology");
   }
 };
@@ -1358,7 +1303,6 @@ const getTechnologyListDetails = async () => {
     const [technologies] = await db.execute(query);
     return technologies;
   } catch (err) {
-    console.error(err);
     throw new Error("Error retrieving technology list");
   }
 };
@@ -1382,7 +1326,6 @@ const toggleTechnologyActiveStatusDetails = async (
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error toggling technology active status");
   }
 };
@@ -1417,7 +1360,6 @@ const createCompanyAddress = async (
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error adding company address");
   }
 };
@@ -1455,7 +1397,6 @@ const updateCompanyAddressDetails = async (
     ]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error updating company address");
   }
 };
@@ -1470,7 +1411,6 @@ const getCompanyAddressListDetails = async () => {
     const [addresses] = await db.execute(query);
     return addresses;
   } catch (err) {
-    console.error(err);
     throw new Error("Error retrieving company address list");
   }
 };
@@ -1486,7 +1426,6 @@ const toggleCompanyAddressActiveStatusDetails = async (id, isActive, updatedBy) 
     const [result] = await db.execute(query, [isActive, updatedBy, id]);
     return result;
   } catch (err) {
-    console.error(err);
     throw new Error("Error toggling company address active status");
   }
 };

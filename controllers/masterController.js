@@ -98,7 +98,6 @@ const addCompany = async (req, res) => {
       message: "Company created successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -177,7 +176,6 @@ const activateDeactivateCompany = async (req, res) => {
       } successfully`,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -193,7 +191,6 @@ const getCompaniesList = async (req, res) => {
       companies,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -212,7 +209,6 @@ const addIndustry = async (req, res) => {
       message: "Industry added successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -244,7 +240,6 @@ const updateIndustry = async (req, res) => {
       message: "Industry updated successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -265,7 +260,6 @@ const toggleIndustryActiveStatus = async (req, res) => {
       } successfully`,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -282,7 +276,6 @@ const getIndustryList = async (req, res) => {
       industries,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -301,7 +294,6 @@ const addProject = async (req, res) => {
       message: "Project added successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -326,7 +318,6 @@ const updateProject = async (req, res) => {
       message: "Project updated successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -343,7 +334,6 @@ const getProjectList = async (req, res) => {
       projects,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -364,7 +354,6 @@ const toggleProjectActiveStatus = async (req, res) => {
       } successfully`,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -384,7 +373,6 @@ const addProduct = async (req, res) => {
       message: "Product added successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -409,7 +397,6 @@ const updateProduct = async (req, res) => {
       message: "Product updated successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -426,7 +413,6 @@ const getProductList = async (req, res) => {
       products,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -447,7 +433,6 @@ const toggleProductActiveStatus = async (req, res) => {
       } successfully`,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -471,7 +456,6 @@ const addCurrency = async (req, res) => {
       message: "Currency added successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -501,7 +485,6 @@ const updateCurrency = async (req, res) => {
       message: "Currency updated successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -521,7 +504,6 @@ const toggleCurrencyActiveStatus = async (req, res) => {
       } successfully`,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -539,7 +521,6 @@ const getCurrencyList = async (req, res) => {
       currencies,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -558,7 +539,6 @@ const addTax = async (req, res) => {
       message: "Tax added successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -582,7 +562,6 @@ const updateTax = async (req, res) => {
       message: "Tax updated successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -598,7 +577,6 @@ const getTaxList = async (req, res) => {
       taxes,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -618,7 +596,6 @@ const toggleTaxActiveStatus = async (req, res) => {
       } successfully`,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -634,7 +611,6 @@ const countriesList = async (req, res) => {
       countries,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -654,7 +630,6 @@ const addState = async (req, res) => {
       message: "State added successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -678,7 +653,6 @@ const updateState = async (req, res) => {
       message: "State updated successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -696,7 +670,6 @@ const getStateList = async (req, res) => {
       states,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -716,7 +689,6 @@ const toggleStateActiveStatus = async (req, res) => {
       } successfully`,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -756,7 +728,6 @@ const addAccount = async (req, res) => {
       message: "Account added successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -798,7 +769,6 @@ const updateAccount = async (req, res) => {
       message: "Account updated successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -814,7 +784,6 @@ const getAccountList = async (req, res) => {
       accounts,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -834,7 +803,6 @@ const toggleAccountActiveStatus = async (req, res) => {
       } successfully`,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -913,7 +881,6 @@ const addClient = async (req, res) => {
       message: "Client added successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error while adding client",
@@ -1015,7 +982,6 @@ const updateClient = async (req, res) => {
       message: "Client updated successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error while updating client",
@@ -1031,7 +997,6 @@ const getClients = async (req, res) => {
       clients,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error while fetching clients",
@@ -1051,7 +1016,6 @@ const toggleClientActiveStatus = async (req, res) => {
       } successfully`,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -1069,7 +1033,6 @@ const addClientBillingInfo = async (req, res) => {
       message: "Client billing information added successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -1087,7 +1050,6 @@ const updateClientBillingInfo = async (req, res) => {
       message: "Client billing information updated successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -1103,7 +1065,6 @@ const getClientBillingInfo = async (req, res) => {
       billingInfo,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -1123,7 +1084,6 @@ const toggleClientBillingActiveStatus = async (req, res) => {
       } successfully`,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -1141,7 +1101,6 @@ const addClientShippingInfo = async (req, res) => {
       message: "Client shipping information added successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -1159,7 +1118,6 @@ const updateClientShippingInfo = async (req, res) => {
       message: "Client shipping information updated successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -1175,7 +1133,6 @@ const getClientShippingInfo = async (req, res) => {
       shippingInfo,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -1193,7 +1150,6 @@ const toggleClientShippingActiveStatus = async (req, res) => {
       message: `Shipping record ${isActive == 1 ? "activated" : "deactivated"} successfully`,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -1211,7 +1167,6 @@ const addTechnology = async (req, res) => {
       message: "Technology added successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -1234,7 +1189,6 @@ const updateTechnology = async (req, res) => {
       message: "Technology updated successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -1250,7 +1204,6 @@ const getTechnologyList = async (req, res) => {
       technologies,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -1270,7 +1223,6 @@ const toggleTechnologyActiveStatus = async (req, res) => {
       } successfully`,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -1308,7 +1260,6 @@ const addCompanyAddress = async (req, res) => {
       message: "Company address added successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -1348,7 +1299,6 @@ const updateCompanyAddress = async (req, res) => {
       message: "Company address updated successfully",
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -1364,7 +1314,6 @@ const getCompanyAddressList = async (req, res) => {
       addresses,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -1384,7 +1333,6 @@ const toggleCompanyAddressActiveStatus = async (req, res) => {
       } successfully`,
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",

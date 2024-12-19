@@ -99,7 +99,6 @@ const changePassword = async (req, res) => {
       message: "Password changed successfully"
     });
   } catch (err) {
-    console.log("errrrrr", err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error"
