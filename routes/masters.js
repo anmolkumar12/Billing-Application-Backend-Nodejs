@@ -64,20 +64,6 @@ const upload = multer({ dest: "uploads/" });
 const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
 
-// Company Addresses API
-router.post("/addCompanyAddress", authMiddleware, addCompanyAddress);
-router.post("/updateCompanyAddress", authMiddleware, updateCompanyAddress);
-router.post("/toggleCompanyAddressActiveStatus", authMiddleware, toggleCompanyAddressActiveStatus);
-router.get("/getCompanyAddressList", authMiddleware, getCompanyAddressList);
-
-
-// Technology API
-router.post("/addTechnology", authMiddleware, addTechnology);
-router.post("/updateTechnology", authMiddleware, updateTechnology);
-router.post("/toggleTechnologyActiveStatus", authMiddleware, toggleTechnologyActiveStatus);
-router.get("/getTechnologyList", authMiddleware, getTechnologyList);
-
-
 // Company API
 router.post("/add-company", authMiddleware, upload.single("file"), addCompany);
 router.post("/edit", authMiddleware, upload.single("file"), updateCompany);
@@ -178,6 +164,20 @@ router.post("/addClientShippingInfo", authMiddleware, addClientShippingInfo);
 router.post("/updateClientShippingInfo", authMiddleware, updateClientShippingInfo);
 router.get("/getClientShippingInfo", authMiddleware, getClientShippingInfo);
 router.post("/toggleClientShippingActiveStatus", authMiddleware, toggleClientShippingActiveStatus);
+
+// Company Addresses API
+router.post("/addCompanyAddress", authMiddleware, addCompanyAddress);
+router.post("/updateCompanyAddress", authMiddleware, updateCompanyAddress);
+router.post("/toggleCompanyAddressActiveStatus", authMiddleware, toggleCompanyAddressActiveStatus);
+router.get("/getCompanyAddressList", authMiddleware, getCompanyAddressList);
+
+
+// Technology API
+router.post("/addTechnology", authMiddleware, addTechnology);
+router.post("/updateTechnology", authMiddleware, updateTechnology);
+router.post("/toggleTechnologyActiveStatus", authMiddleware, toggleTechnologyActiveStatus);
+router.get("/getTechnologyList", authMiddleware, getTechnologyList);
+
 
 
 module.exports = router;
