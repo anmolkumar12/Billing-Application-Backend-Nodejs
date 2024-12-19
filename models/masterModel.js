@@ -16,9 +16,9 @@ const createCompany = async (
   try {
     // SQL query to insert company data into the company_info table
     const query = `
-          INSERT INTO company_info (companyName, Website, CINNO, IECode, PAN, Email, logopath, description, isactive, updated_by,gst_number,
+          INSERT INTO company_info (companyName, Website, CINNO, IECode, Email, logopath, description, isactive, updated_by,
           updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?, CURRENT_TIMESTAMP)
+          VALUES ( ?, ?, ?, ?, ?, ?, ?,?,?, CURRENT_TIMESTAMP)
         `;
 
     // Execute the query with the provided values
@@ -27,13 +27,11 @@ const createCompany = async (
       Website,
       CINNO,
       IECode,
-      PAN,
       Email,
       logopath,
       description,
       isactive,
       updatedBy,
-      gst_number
     ]);
 
     return result; // Return the result of the insert operation (e.g., insert id or success message)
@@ -49,13 +47,11 @@ const updateCompanyDetails = async (
   Website,
   CINNO,
   IECode,
-  PAN,
   Email,
   description,
   isactive,
   logopath,
   updatedBy,
-  gst_number,
 ) => {
   try {
     const sanitizedValues = [
@@ -63,12 +59,10 @@ const updateCompanyDetails = async (
       Website ?? null,
       CINNO ?? null,
       IECode ?? null,
-      PAN ?? null,
       Email ?? null,
       logopath ?? null,
       description ?? null,
       updatedBy ?? null,
-      gst_number ?? null,
       isactive ?? null,
       companyId,
     ];
@@ -83,12 +77,10 @@ const updateCompanyDetails = async (
         Website = ?, 
         CINNO = ?, 
         IECode = ?, 
-        PAN = ?, 
         Email = ?, 
         logopath = ?, 
         description = ?, 
         updated_by = ?, 
-        gst_number = ?,
         updated_at = CURRENT_TIMESTAMP, 
         isactive = ?
       WHERE id = ?

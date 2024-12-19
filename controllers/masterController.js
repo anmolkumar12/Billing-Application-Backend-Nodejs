@@ -74,12 +74,10 @@ const addCompany = async (req, res) => {
     Website,
     CINNO,
     IECode,
-    PAN,
     Email,
     description,
     isactive,
     updatedBy,
-    gst_number
   } = req.body;
   const logopath = req.file ? req.file.path : null; // Get the file path if the logo is uploaded
 
@@ -89,13 +87,11 @@ const addCompany = async (req, res) => {
       Website,
       CINNO,
       IECode,
-      PAN,
       Email,
       description,
       isactive,
       updatedBy,
       logopath,
-      gst_number,
     );
     res.status(201).json({
       statusCode: 201,
