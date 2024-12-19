@@ -895,7 +895,7 @@ const toggleAccountActiveStatusDetails = async (
     `;
 
     const [result] = await db.execute(query, [
-      isActive ? 1 : 0,
+      isActive,
       updatedBy,
       accountId,
     ]);
