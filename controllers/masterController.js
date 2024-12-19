@@ -68,8 +68,7 @@ const addCompany = async (req, res) => {
     description,
     isactive,
     updatedBy,
-    gst_number,
-    address
+    gst_number
   } = req.body;
   const logopath = req.file ? req.file.path : null; // Get the file path if the logo is uploaded
 
@@ -86,7 +85,6 @@ const addCompany = async (req, res) => {
       updatedBy,
       logopath,
       gst_number,
-      address
     );
     res.status(201).json({
       statusCode: 201,
@@ -452,14 +450,13 @@ const toggleProductActiveStatus = async (req, res) => {
 
 // Currency Master
 const addCurrency = async (req, res) => {
-  const { currencyName, currencyDescription, exchangeRate, updatedBy } =
+  const { currencyName, currencyDescription, updatedBy } =
     req.body;
 
   try {
     await createCurrency(
       currencyName,
       currencyDescription,
-      exchangeRate,
       updatedBy
     );
     res.status(201).json({
@@ -480,7 +477,6 @@ const updateCurrency = async (req, res) => {
     currencyId,
     currencyName,
     currencyDescription,
-    exchangeRate,
     isActive,
     updatedBy,
   } = req.body;
@@ -490,7 +486,6 @@ const updateCurrency = async (req, res) => {
       currencyId,
       currencyName,
       currencyDescription,
-      exchangeRate,
       isActive,
       updatedBy
     );

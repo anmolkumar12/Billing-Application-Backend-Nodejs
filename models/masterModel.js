@@ -12,14 +12,13 @@ const createCompany = async (
   updatedBy,
   logopath,
   gst_number,
-  address
 ) => {
   try {
     // SQL query to insert company data into the company_info table
     const query = `
           INSERT INTO company_info (companyName, Website, CINNO, IECode, PAN, Email, logopath, description, isactive, updated_by,gst_number,
-          address, updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?, CURRENT_TIMESTAMP)
+          updated_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?, CURRENT_TIMESTAMP)
         `;
 
     // Execute the query with the provided values
@@ -34,8 +33,7 @@ const createCompany = async (
       description,
       isactive,
       updatedBy,
-      gst_number,
-      address
+      gst_number
     ]);
 
     return result; // Return the result of the insert operation (e.g., insert id or success message)
@@ -58,7 +56,6 @@ const updateCompanyDetails = async (
   logopath,
   updatedBy,
   gst_number,
-  address
 ) => {
   try {
     const sanitizedValues = [
@@ -72,7 +69,6 @@ const updateCompanyDetails = async (
       description ?? null,
       updatedBy ?? null,
       gst_number ?? null,
-      address ?? null,
       isactive ?? null,
       companyId,
     ];
@@ -93,7 +89,6 @@ const updateCompanyDetails = async (
         description = ?, 
         updated_by = ?, 
         gst_number = ?,
-        address = ?,
         updated_at = CURRENT_TIMESTAMP, 
         isactive = ?
       WHERE id = ?
@@ -236,7 +231,7 @@ const toggleIndustryActiveStatusDetails = async (
         `;
 
     const [result] = await db.execute(query, [
-      isActive ? 1 : 0, // Convert boolean to 1/0 for SQL
+      isActive, // Convert boolean to 1/0 for SQL
       updatedBy, // Store the user who updated the status
       industryId, // Specify the industry ID for the update
     ]);
@@ -361,7 +356,7 @@ const toggleProjectActiveStatusDetails = async (
 
     // Execute the query with the provided details
     const [result] = await db.execute(query, [
-      isActive ? 1 : 0, // Convert boolean to 1/0 for SQL
+      isActive, // Convert boolean to 1/0 for SQL
       updatedBy, // Store the user who updated the status
       projectId, // Specify the project ID for the update
     ]);
@@ -462,7 +457,7 @@ const toggleProductActiveStatusDetails = async (
 
     // Execute the query with the provided details
     const [result] = await db.execute(query, [
-      isActive ? 1 : 0, // Convert boolean to 1/0 for SQL
+      isActive, // Convert boolean to 1/0 for SQL
       updatedBy, // Store the user who updated the status
       productId, // Specify the project ID for the update
     ]);
@@ -477,19 +472,17 @@ const toggleProductActiveStatusDetails = async (
 const createCurrency = async (
   currencyName,
   currencyDescription,
-  exchangeRate,
   updatedBy
 ) => {
   try {
     const query = `
-        INSERT INTO currency_master (currencyName, currencyDescription, exchangeRate, isActive, updated_by, updated_at)
-        VALUES (?, ?, ?, 1, ?, CURRENT_TIMESTAMP)
+        INSERT INTO currency_master (currencyName, currencyDescription,  isActive, updated_by, updated_at)
+        VALUES (?, ?, 1, ?, CURRENT_TIMESTAMP)
       `;
 
     const [result] = await db.execute(query, [
       currencyName,
       currencyDescription,
-      exchangeRate,
       updatedBy,
     ]);
     return result;
@@ -503,21 +496,19 @@ const updateCurrencyDetails = async (
   currencyId,
   currencyName,
   currencyDescription,
-  exchangeRate,
   isActive,
   updatedBy
 ) => {
   try {
     const query = `
         UPDATE currency_master
-        SET currencyName = ?, currencyDescription = ?, exchangeRate = ?, isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+        SET currencyName = ?, currencyDescription = ?, isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
       `;
 
     const [result] = await db.execute(query, [
       currencyName,
       currencyDescription,
-      exchangeRate,
       isActive ? 1 : 0,
       updatedBy,
       currencyId,
@@ -531,6 +522,8 @@ const updateCurrencyDetails = async (
 
 const toggleCurrencyStatus = async (currencyId, isActive, updatedBy) => {
   try {
+    console.log("currencyId:", currencyId, "isActive:", isActive, "updatedBy:", updatedBy);
+
     const query = `
         UPDATE currency_master
         SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
@@ -538,13 +531,20 @@ const toggleCurrencyStatus = async (currencyId, isActive, updatedBy) => {
       `;
 
     const [result] = await db.execute(query, [
-      isActive ? 1 : 0,
+      isActive,
       updatedBy,
       currencyId,
     ]);
+
+    console.log("Update Result:", isActive);
+
+    if (result.affectedRows === 0) {
+      console.warn("No rows were updated. Verify the currencyId exists.");
+    }
+
     return result;
   } catch (err) {
-    console.error(err);
+    console.error("Error toggling currency active status:", err);
     throw new Error("Error toggling currency active status");
   }
 };
@@ -640,7 +640,7 @@ const toggleTaxActiveStatusDetails = async (taxId, isActive, updatedBy) => {
     `;
 
     const [result] = await db.execute(query, [
-      isActive ? 1 : 0,
+      isActive,
       updatedBy,
       taxId,
     ]);
@@ -753,7 +753,7 @@ const toggleStateActiveStatusDetails = async (stateId, isActive, updatedBy) => {
     `;
 
     const [result] = await db.execute(query, [
-      isActive ? 1 : 0,
+      isActive,
       updatedBy,
       stateId,
     ]);
