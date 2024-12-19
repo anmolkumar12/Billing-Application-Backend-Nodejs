@@ -1236,6 +1236,7 @@ const addCompanyAddress = async (req, res) => {
     pin,
     GST,
     PAN,
+    companyId,  // Added companyId
     updatedBy,
   } = req.body;
 
@@ -1249,6 +1250,7 @@ const addCompanyAddress = async (req, res) => {
       pin,
       GST,
       PAN,
+      companyId,  // Added companyId
       updatedBy
     );
     res.status(201).json({
@@ -1263,6 +1265,7 @@ const addCompanyAddress = async (req, res) => {
   }
 };
 
+
 const updateCompanyAddress = async (req, res) => {
   const {
     id,
@@ -1274,6 +1277,7 @@ const updateCompanyAddress = async (req, res) => {
     pin,
     GST,
     PAN,
+    companyId,  // Added companyId
     updatedBy,
   } = req.body;
 
@@ -1288,6 +1292,7 @@ const updateCompanyAddress = async (req, res) => {
       pin,
       GST,
       PAN,
+      companyId,  // Added companyId
       updatedBy
     );
     res.status(200).json({

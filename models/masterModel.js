@@ -1339,12 +1339,13 @@ const createCompanyAddress = async (
   pin,
   GST,
   PAN,
+  companyId,  // Added companyId
   updatedBy
 ) => {
   try {
     const query = `
-      INSERT INTO company_addresses (address1, address2, address3, stateId, countryId, pin, GST, PAN, isActive, updated_by, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, CURRENT_TIMESTAMP)
+      INSERT INTO company_addresses (address1, address2, address3, stateId, countryId, pin, GST, PAN, companyId, isActive, updated_by, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, CURRENT_TIMESTAMP)
     `;
 
     const [result] = await db.execute(query, [
@@ -1356,6 +1357,7 @@ const createCompanyAddress = async (
       pin,
       GST,
       PAN,
+      companyId,  // Added companyId
       updatedBy,
     ]);
     return result;
@@ -1374,12 +1376,13 @@ const updateCompanyAddressDetails = async (
   pin,
   GST,
   PAN,
+  companyId,  // Added companyId
   updatedBy
 ) => {
   try {
     const query = `
       UPDATE company_addresses
-      SET address1 = ?, address2 = ?, address3 = ?, stateId = ?, countryId = ?, pin = ?, GST = ?, PAN = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      SET address1 = ?, address2 = ?, address3 = ?, stateId = ?, countryId = ?, pin = ?, GST = ?, PAN = ?, companyId = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
 
@@ -1392,6 +1395,7 @@ const updateCompanyAddressDetails = async (
       pin,
       GST,
       PAN,
+      companyId,  // Added companyId
       updatedBy,
       id,
     ]);
@@ -1403,33 +1407,30 @@ const updateCompanyAddressDetails = async (
 
 const getCompanyAddressListDetails = async () => {
   try {
-    // const query = `
-    //   SELECT id, address1, address2, address3, stateId, countryId, pin, GST, PAN, isActive, updated_at, updated_by
-    //   FROM company_addresses
-    // `;
-    const query=`SELECT 
-  ca.id, 
-  ca.address1, 
-  ca.address2, 
-  ca.address3, 
-  ca.pin, 
-  ca.GST, 
-  ca.PAN, 
-  ca.isActive, 
-  ca.updated_at, 
-  ca.updated_by,
-  s.state_name AS state,
-  c.name AS country,
-  ci.companyName AS company
-FROM 
-  company_addresses AS ca
-LEFT JOIN 
-  states AS s ON ca.stateId = s.state_id
-LEFT JOIN 
-  countries AS c ON ca.countryId = c.id
-LEFT JOIN 
-  company_info AS ci ON ca.PAN = ci.PAN;
-`;
+    const query = `
+      SELECT 
+        ca.id, 
+        ca.address1, 
+        ca.address2, 
+        ca.address3, 
+        ca.pin, 
+        ca.GST, 
+        ca.PAN, 
+        ca.isActive, 
+        ca.updated_at, 
+        ca.updated_by,
+        s.state_name AS state,
+        c.name AS country,
+        ci.companyName AS company
+      FROM 
+        company_addresses AS ca
+      LEFT JOIN 
+        states AS s ON ca.stateId = s.state_id
+      LEFT JOIN 
+        countries AS c ON ca.countryId = c.id
+      LEFT JOIN 
+        company_info AS ci ON ca.companyId = ci.id  -- Updated to use companyId
+    `;
 
     const [addresses] = await db.execute(query);
     return addresses;
@@ -1437,6 +1438,7 @@ LEFT JOIN
     throw new Error("Error retrieving company address list");
   }
 };
+
 
 const toggleCompanyAddressActiveStatusDetails = async (id, isActive, updatedBy) => {
   try {
