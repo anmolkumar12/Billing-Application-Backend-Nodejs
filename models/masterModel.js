@@ -1311,8 +1311,98 @@ const toggleClientShippingActiveStatusDetails = async (shippingId, isActive, upd
   }
 };
 
+const createTechnology = async (technologyName, description, updatedBy) => {
+  try {
+    const query = `
+      INSERT INTO technology_master (technologyName, description, isActive, updated_by, updated_at)
+      VALUES (?, ?, 1, ?, CURRENT_TIMESTAMP)
+    `;
+
+    const [result] = await db.execute(query, [
+      technologyName,
+      description,
+      updatedBy,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error adding technology");
+  }
+};
+
+const updateTechnologyDetails = async (
+  technologyId,
+  technologyName,
+  description,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE technology_master
+      SET technologyName = ?, description = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      technologyName,
+      description,
+      updatedBy,
+      technologyId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error updating technology");
+  }
+};
+
+const getTechnologyListDetails = async () => {
+  try {
+    const query = `
+      SELECT id, technologyName, description, isActive, updated_at, updated_by
+      FROM technology_master
+    `;
+
+    const [technologies] = await db.execute(query);
+    return technologies;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error retrieving technology list");
+  }
+};
+
+const toggleTechnologyActiveStatusDetails = async (
+  technologyId,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE technology_master
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      isActive,
+      updatedBy,
+      technologyId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error toggling technology active status");
+  }
+};
+
+
 
 module.exports = {
+  createTechnology,
+  updateTechnologyDetails,
+  getTechnologyListDetails,
+  toggleTechnologyActiveStatusDetails,
+
   createClientShippingInfo,
   updateClientShippingDetails,
   getClientShippingDetails,

@@ -53,7 +53,12 @@ const {
   createClientShippingInfo,
   updateClientShippingDetails,
   getClientShippingDetails,
-  toggleClientShippingActiveStatusDetails
+  toggleClientShippingActiveStatusDetails,
+
+  createTechnology,
+  updateTechnologyDetails,
+  getTechnologyListDetails,
+  toggleTechnologyActiveStatusDetails,
 } = require("../models/masterModel");
 
 // Comapny Master
@@ -1276,7 +1281,7 @@ module.exports = {
   updateTechnology,
   getTechnologyList,
   toggleTechnologyActiveStatus,
-  
+
   addClientShippingInfo,
   updateClientShippingInfo,
   getClientShippingInfo,
