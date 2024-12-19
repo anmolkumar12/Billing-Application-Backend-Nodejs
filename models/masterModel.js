@@ -1395,9 +1395,117 @@ const toggleTechnologyActiveStatusDetails = async (
   }
 };
 
+const createCompanyAddress = async (
+  address1,
+  address2,
+  address3,
+  stateId,
+  countryId,
+  pin,
+  GST,
+  PAN,
+  updatedBy
+) => {
+  try {
+    const query = `
+      INSERT INTO company_addresses (address1, address2, address3, stateId, countryId, pin, GST, PAN, isActive, updated_by, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, CURRENT_TIMESTAMP)
+    `;
+
+    const [result] = await db.execute(query, [
+      address1,
+      address2,
+      address3,
+      stateId,
+      countryId,
+      pin,
+      GST,
+      PAN,
+      updatedBy,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error adding company address");
+  }
+};
+
+const updateCompanyAddressDetails = async (
+  id,
+  address1,
+  address2,
+  address3,
+  stateId,
+  countryId,
+  pin,
+  GST,
+  PAN,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE company_addresses
+      SET address1 = ?, address2 = ?, address3 = ?, stateId = ?, countryId = ?, pin = ?, GST = ?, PAN = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      address1,
+      address2,
+      address3,
+      stateId,
+      countryId,
+      pin,
+      GST,
+      PAN,
+      updatedBy,
+      id,
+    ]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error updating company address");
+  }
+};
+
+const getCompanyAddressListDetails = async () => {
+  try {
+    const query = `
+      SELECT id, address1, address2, address3, stateId, countryId, pin, GST, PAN, isActive, updated_at, updated_by
+      FROM company_addresses
+    `;
+
+    const [addresses] = await db.execute(query);
+    return addresses;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error retrieving company address list");
+  }
+};
+
+const toggleCompanyAddressActiveStatusDetails = async (id, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE company_addresses
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [isActive, updatedBy, id]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error toggling company address active status");
+  }
+};
 
 
 module.exports = {
+  createCompanyAddress,
+  updateCompanyAddressDetails,
+  getCompanyAddressListDetails,
+  toggleCompanyAddressActiveStatusDetails,
+  
   createTechnology,
   updateTechnologyDetails,
   getTechnologyListDetails,

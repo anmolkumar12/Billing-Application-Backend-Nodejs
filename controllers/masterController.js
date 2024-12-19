@@ -59,6 +59,12 @@ const {
   updateTechnologyDetails,
   getTechnologyListDetails,
   toggleTechnologyActiveStatusDetails,
+
+  createCompanyAddress,
+  updateCompanyAddressDetails,
+  getCompanyAddressListDetails,
+  toggleCompanyAddressActiveStatusDetails,
+  
 } = require("../models/masterModel");
 
 // Comapny Master
@@ -1276,7 +1282,127 @@ const toggleTechnologyActiveStatus = async (req, res) => {
   }
 };
 
+const addCompanyAddress = async (req, res) => {
+  const {
+    address1,
+    address2,
+    address3,
+    stateId,
+    countryId,
+    pin,
+    GST,
+    PAN,
+    updatedBy,
+  } = req.body;
+
+  try {
+    await createCompanyAddress(
+      address1,
+      address2,
+      address3,
+      stateId,
+      countryId,
+      pin,
+      GST,
+      PAN,
+      updatedBy
+    );
+    res.status(201).json({
+      statusCode: 201,
+      message: "Company address added successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const updateCompanyAddress = async (req, res) => {
+  const {
+    id,
+    address1,
+    address2,
+    address3,
+    stateId,
+    countryId,
+    pin,
+    GST,
+    PAN,
+    updatedBy,
+  } = req.body;
+
+  try {
+    await updateCompanyAddressDetails(
+      id,
+      address1,
+      address2,
+      address3,
+      stateId,
+      countryId,
+      pin,
+      GST,
+      PAN,
+      updatedBy
+    );
+    res.status(200).json({
+      statusCode: 200,
+      message: "Company address updated successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const getCompanyAddressList = async (req, res) => {
+  try {
+    const addresses = await getCompanyAddressListDetails();
+    res.status(200).json({
+      statusCode: 200,
+      addresses,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const toggleCompanyAddressActiveStatus = async (req, res) => {
+  const { id, isActive, updatedBy } = req.body;
+
+  try {
+    await toggleCompanyAddressActiveStatusDetails(id, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: `Company address ${
+        isActive == 1 ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+
 module.exports = {
+  addCompanyAddress,
+  updateCompanyAddress,
+  getCompanyAddressList,
+  toggleCompanyAddressActiveStatus,
+
   addTechnology,
   updateTechnology,
   getTechnologyList,

@@ -52,11 +52,24 @@ const {
   updateTechnology,
   getTechnologyList,
   toggleTechnologyActiveStatus,
+
+  addCompanyAddress,
+  updateCompanyAddress,
+  getCompanyAddressList,
+  toggleCompanyAddressActiveStatus,
+  
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
+
+// Company Addresses API
+router.post("/addCompanyAddress", authMiddleware, addCompanyAddress);
+router.post("/updateCompanyAddress", authMiddleware, updateCompanyAddress);
+router.post("/toggleCompanyAddressActiveStatus", authMiddleware, toggleCompanyAddressActiveStatus);
+router.get("/getCompanyAddressList", authMiddleware, getCompanyAddressList);
+
 
 // Technology API
 router.post("/addTechnology", authMiddleware, addTechnology);
