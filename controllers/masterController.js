@@ -1194,8 +1194,89 @@ const toggleClientShippingActiveStatus = async (req, res) => {
   }
 };
 
+const addTechnology = async (req, res) => {
+  const { technologyName, description, updatedBy } = req.body;
+
+  try {
+    await createTechnology(technologyName, description, updatedBy);
+    res.status(201).json({
+      statusCode: 201,
+      message: "Technology added successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const updateTechnology = async (req, res) => {
+  const { technologyId, technologyName, description, updatedBy } = req.body;
+
+  try {
+    await updateTechnologyDetails(
+      technologyId,
+      technologyName,
+      description,
+      updatedBy
+    );
+    res.status(200).json({
+      statusCode: 200,
+      message: "Technology updated successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const getTechnologyList = async (req, res) => {
+  try {
+    const technologies = await getTechnologyListDetails();
+    res.status(200).json({
+      statusCode: 200,
+      technologies,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const toggleTechnologyActiveStatus = async (req, res) => {
+  const { technologyId, isActive, updatedBy } = req.body;
+
+  try {
+    await toggleTechnologyActiveStatusDetails(technologyId, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: `Technology ${
+        isActive == 1 ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
 
 module.exports = {
+  addTechnology,
+  updateTechnology,
+  getTechnologyList,
+  toggleTechnologyActiveStatus,
+  
   addClientShippingInfo,
   updateClientShippingInfo,
   getClientShippingInfo,

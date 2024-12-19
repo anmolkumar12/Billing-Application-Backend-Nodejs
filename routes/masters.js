@@ -47,18 +47,31 @@ const {
   updateClientShippingInfo,
   getClientShippingInfo,
   toggleClientShippingActiveStatus,
+
+  addTechnology,
+  updateTechnology,
+  getTechnologyList,
+  toggleTechnologyActiveStatus,
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
 
+// Technology API
+router.post("/addTechnology", authMiddleware, addTechnology);
+router.post("/updateTechnology", authMiddleware, updateTechnology);
+router.post("/toggleTechnologyActiveStatus", authMiddleware, toggleTechnologyActiveStatus);
+router.get("/getTechnologyList", authMiddleware, getTechnologyList);
 
+
+// Company API
 router.post("/add-company", authMiddleware, upload.single("file"), addCompany);
 router.post("/edit", authMiddleware, upload.single("file"), updateCompany);
 router.post("/activateDeactivate", authMiddleware, activateDeactivateCompany);
 router.get("/getCompaniesList", authMiddleware, getCompaniesList);
 
+// Industry API
 router.post("/addIndustry", authMiddleware, addIndustry);
 router.post("/updateIndustry", authMiddleware, updateIndustry);
 router.post(
@@ -68,52 +81,60 @@ router.post(
 );
 router.get("/industryList", authMiddleware, getIndustryList);
 
+// Project API
 router.post("/addProject", authMiddleware, addProject);
 router.post("/updateProject", authMiddleware, updateProject);
-router.get("/projectList", authMiddleware, getProjectList);
 router.post(
   "/toggleProjectActiveStatus",
   authMiddleware,
   toggleProjectActiveStatus
 );
+router.get("/projectList", authMiddleware, getProjectList);
 
+// Product API
 router.post("/addProduct", authMiddleware, addProduct);
 router.post("/updateProduct", authMiddleware, updateProduct);
-router.get("/productList", authMiddleware, getProductList);
 router.post(
   "/toggleProductActiveStatus",
   authMiddleware,
   toggleProductActiveStatus
 );
+router.get("/productList", authMiddleware, getProductList);
 
+// Currency API
 router.post("/addCurrency", authMiddleware, addCurrency);
 router.post("/updateCurrency", authMiddleware, updateCurrency);
-router.get("/currencyList", authMiddleware, getCurrencyList);
 router.post(
   "/toggleCurrencyActiveStatus",
   authMiddleware,
   toggleCurrencyActiveStatus
 );
+router.get("/currencyList", authMiddleware, getCurrencyList);
 
+// Tax API
 router.post("/addTaxType", authMiddleware, addTax);
 router.post("/updateTaxType", authMiddleware, updateTax);
-router.get("/taxTypeList", authMiddleware, getTaxList);
 router.post(
   "/toggleTaxTypeActiveStatus",
   authMiddleware,
   toggleTaxActiveStatus
 );
+router.get("/taxTypeList", authMiddleware, getTaxList);
+
+// Country API
 router.get("/countriesList", authMiddleware, countriesList);
 
+// State API
 router.post("/addState", authMiddleware, addState);
 router.post("/updateState", authMiddleware, updateState);
-router.post("/statesList", authMiddleware, getStateList);
 router.post(
   "/toggleStateActiveStatus",
   authMiddleware,
   toggleStateActiveStatus
 );
+router.post("/statesList", authMiddleware, getStateList);
 
+// Account API
 router.post("/addAccount", authMiddleware, addAccount);
 router.post("/updateAccountDetails", authMiddleware, updateAccount);
 router.get("/accountsList", authMiddleware, getAccountList);
@@ -123,6 +144,7 @@ router.post(
   toggleAccountActiveStatus
 );
 
+// Client Info
 router.post("/addClient", upload.single("file"), authMiddleware, addClient);
 router.post("/updateClientDetails", upload.single("file"), authMiddleware, updateClient);
 router.get("/clientsList", authMiddleware, getClients);
@@ -132,11 +154,13 @@ router.post(
   toggleClientActiveStatus
 );
 
+// Client Billing Info
 router.post("/addClientBillingInfo", authMiddleware, addClientBillingInfo);
 router.post("/updateClientBillingInfo", authMiddleware, updateClientBillingInfo);
 router.get("/getClientBillingInfo", authMiddleware, getClientBillingInfo);
 router.post("/toggleClientBillingActiveStatus", authMiddleware, toggleClientBillingActiveStatus);
 
+// Client Shipping Info
 router.post("/addClientShippingInfo", authMiddleware, addClientShippingInfo);
 router.post("/updateClientShippingInfo", authMiddleware, updateClientShippingInfo);
 router.get("/getClientShippingInfo", authMiddleware, getClientShippingInfo);
