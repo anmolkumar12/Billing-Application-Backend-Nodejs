@@ -116,9 +116,7 @@ const updateCompany = async (req, res) => {
     Email,
     description,
     isactive,
-    updatedBy,
-    gst_number,
-    address
+    updatedBy
   } = req.body;
 
   const logopath = req.file ? req.file.path : null; // Handle optional file upload for the logo
@@ -145,8 +143,6 @@ const updateCompany = async (req, res) => {
       isactive,
       logopath,
       updatedBy,
-      gst_number,
-      address
     );
 
     // Respond to the client with success
