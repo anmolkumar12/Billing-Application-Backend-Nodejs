@@ -1403,10 +1403,33 @@ const updateCompanyAddressDetails = async (
 
 const getCompanyAddressListDetails = async () => {
   try {
-    const query = `
-      SELECT id, address1, address2, address3, stateId, countryId, pin, GST, PAN, isActive, updated_at, updated_by
-      FROM company_addresses
-    `;
+    // const query = `
+    //   SELECT id, address1, address2, address3, stateId, countryId, pin, GST, PAN, isActive, updated_at, updated_by
+    //   FROM company_addresses
+    // `;
+    const query=`SELECT 
+  ca.id, 
+  ca.address1, 
+  ca.address2, 
+  ca.address3, 
+  ca.pin, 
+  ca.GST, 
+  ca.PAN, 
+  ca.isActive, 
+  ca.updated_at, 
+  ca.updated_by,
+  s.state_name AS state,
+  c.name AS country,
+  ci.companyName AS company
+FROM 
+  company_addresses AS ca
+LEFT JOIN 
+  states AS s ON ca.stateId = s.state_id
+LEFT JOIN 
+  countries AS c ON ca.countryId = c.id
+LEFT JOIN 
+  company_info AS ci ON ca.PAN = ci.PAN;
+`;
 
     const [addresses] = await db.execute(query);
     return addresses;
