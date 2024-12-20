@@ -5,13 +5,11 @@ const createCompany = async (
   Website,
   CINNO,
   IECode,
-  PAN,
   Email,
   description,
   isactive,
   updatedBy,
   logopath,
-  gst_number,
 ) => {
   try {
     // SQL query to insert company data into the company_info table
@@ -36,6 +34,7 @@ const createCompany = async (
 
     return result; // Return the result of the insert operation (e.g., insert id or success message)
   } catch (err) {
+    console.log(err);
     throw new Error("Error creating company");
   }
 };

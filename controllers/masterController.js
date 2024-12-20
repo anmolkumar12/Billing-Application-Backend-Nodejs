@@ -98,6 +98,7 @@ const addCompany = async (req, res) => {
       message: "Company created successfully",
     });
   } catch (err) {
+    console.log("errrrr",err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
