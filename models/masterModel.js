@@ -1645,11 +1645,8 @@ const updateStateDetails = async (
   }
 };
 
-const activateDeactivateStateDetails = async (
-  stateId,
-  isActive,
-  updatedBy
-) => {
+const activateDeactivateStateDetails = async (stateId, isActive, updatedBy) => {
+  console.log("stateId", stateId,"isActive",isActive,"updatedBy",updatedBy);
   try {
     const query = `
       UPDATE state_info
@@ -1658,14 +1655,14 @@ const activateDeactivateStateDetails = async (
     `;
 
     const [result] = await db.execute(query, [
-      isActive, // 1 or 0
-      updatedBy,
-      stateId
+      isActive,        // 1 or 0 for active/inactive
+      updatedBy ?? null, // Use null if updatedBy is undefined
+      stateId          // The state ID to update
     ]);
 
     return result;
   } catch (err) {
-    console.log("Error activating or deactivating state:", err);
+    console.error("Error activating or deactivating state:", err);
     throw new Error("Error activating/deactivating state");
   }
 };
