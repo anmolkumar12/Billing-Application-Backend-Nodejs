@@ -1462,7 +1462,7 @@ const createCountry = async (
   phoneCode,
   addressAdditionalFields,
   bankAccAdditionalFields,
-  isactive,
+  isActive,
   updatedBy
 ) => {
   try {
@@ -1478,7 +1478,7 @@ const createCountry = async (
       phoneCode,
       addressAdditionalFields,
       bankAccAdditionalFields,
-      isactive,
+      isActive,
       updatedBy
     ]);
     
@@ -1497,7 +1497,7 @@ const updateCountryDetails = async (
   phoneCode,
   addressAdditionalFields,
   bankAccAdditionalFields,
-  isactive,
+  isActive,
   updatedBy
 ) => {
   try {
@@ -1509,7 +1509,7 @@ const updateCountryDetails = async (
       addressAdditionalFields ?? null,
       bankAccAdditionalFields ?? null,
       updatedBy ?? null,
-      isactive ?? null,
+      isActive ?? null,
       countryId
     ];
 
@@ -1573,13 +1573,125 @@ const getCountries = async () => {
   }
 };
 
+// State
+const createState = async (
+  countryId,
+  stateName,
+  stateCode,
+  gstCode,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      INSERT INTO state_info (countryId, stateName, stateCode, gstCode, isactive, updated_by, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+    
+    const [result] = await db.execute(query, [
+      countryId,
+      stateName,
+      stateCode,
+      gstCode,
+      isActive,
+      updatedBy
+    ]);
+    
+    return result;
+  } catch (err) {
+    console.log("Error creating state:", err);
+    throw new Error("Error creating state");
+  }
+};
 
+const updateStateDetails = async (
+  stateId,
+  countryId,
+  stateName,
+  stateCode,
+  gstCode,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const sanitizedValues = [
+      countryId ?? null,
+      stateName ?? null,
+      stateCode ?? null,
+      gstCode ?? null,
+      isActive ?? null,
+      updatedBy ?? null,
+      stateId
+    ];
+
+    const query = `
+      UPDATE state_info
+      SET 
+        countryId = ?, 
+        stateName = ?, 
+        stateCode = ?, 
+        gstCode = ?, 
+        isactive = ?, 
+        updated_by = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, sanitizedValues);
+    return result;
+  } catch (err) {
+    console.log("Error updating state:", err);
+    throw new Error("Error updating state details");
+  }
+};
+
+const activateDeactivateStateDetails = async (
+  stateId,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE state_info
+      SET isactive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      isActive, // 1 or 0
+      updatedBy,
+      stateId
+    ]);
+
+    return result;
+  } catch (err) {
+    console.log("Error activating or deactivating state:", err);
+    throw new Error("Error activating/deactivating state");
+  }
+};
+
+const getStates = async () => {
+  try {
+    const query = `SELECT * FROM state_info`;
+
+    const [states] = await db.execute(query);
+    return states;
+  } catch (err) {
+    console.log("Error retrieving states list:", err);
+    throw new Error("Error retrieving states list");
+  }
+};
 
 module.exports = {
   createCountry,
   updateCountryDetails,
   activateDeactivateCountryDetails,
-  getCountries
+  getCountries,
+
+  createState,
+  updateStateDetails,
+  activateDeactivateStateDetails,
+  getStates
   // createCompanyAddress,
   // updateCompanyAddressDetails,
   // getCompanyAddressListDetails,

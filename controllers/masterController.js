@@ -67,7 +67,12 @@ const {
   createCountry,
   updateCountryDetails,
   activateDeactivateCountryDetails,
-  getCountries
+  getCountries,
+  
+  createState,
+  updateStateDetails,
+  activateDeactivateStateDetails,
+  getStates
 } = require("../models/masterModel");
 
 // Comapny Master
@@ -1352,7 +1357,7 @@ const addCountry = async (req, res) => {
     phoneCode,
     addressAdditionalFields,
     bankAccAdditionalFields,
-    isactive,
+    isActive,
     updatedBy,
   } = req.body;
   
@@ -1364,7 +1369,7 @@ const addCountry = async (req, res) => {
       phoneCode,
       addressAdditionalFields,
       bankAccAdditionalFields,
-      isactive,
+      isActive,
       updatedBy
     );
     
@@ -1390,7 +1395,7 @@ const updateCountry = async (req, res) => {
     phoneCode,
     addressAdditionalFields,
     bankAccAdditionalFields,
-    isactive,
+    isActive,
     updatedBy,
   } = req.body;
 
@@ -1410,7 +1415,7 @@ const updateCountry = async (req, res) => {
       phoneCode,
       addressAdditionalFields,
       bankAccAdditionalFields,
-      isactive,
+      isActive,
       updatedBy
     );
     
@@ -1458,11 +1463,123 @@ const getCountriesList = async (req, res) => {
   }
 };
 
+// State
+const addState = async (req, res) => {
+  const {
+    countryId,          // Country ID (foreign key referencing country_info table)
+    stateName,          // The name of the state (e.g., "California")
+    stateCode,          // The unique code for the state (e.g., "CA")
+    gstCode,            // GST code for the state (if applicable)
+    isActive,           // Status: Active or Inactive
+    updatedBy,          // User who is updating this information
+  } = req.body;
+
+  try {
+    await createState(
+      countryId,
+      stateName,
+      stateCode,
+      gstCode,
+      isActive,
+      updatedBy
+    );
+    
+    res.status(201).json({
+      statusCode: 201,
+      message: "State created successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const updateState = async (req, res) => {
+  const {
+    stateId,            // ID of the state to update
+    countryId,          // Country ID (foreign key referencing country_info table)
+    stateName,          // The name of the state (e.g., "California")
+    stateCode,          // The unique code for the state (e.g., "CA")
+    gstCode,            // GST code for the state (if applicable)
+    isActive,           // Status: Active or Inactive
+    updatedBy,          // User who is updating this information
+  } = req.body;
+
+  if (!stateId) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "State ID is required",
+    });
+  }
+
+  try {
+    await updateStateDetails(
+      stateId,
+      countryId,
+      stateName,
+      stateCode,
+      gstCode,
+      isActive,
+      updatedBy
+    );
+    
+    res.status(200).json({
+      statusCode: 200,
+      message: "State updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating state details",
+    });
+  }
+};
+
+const activateDeactivateState = async (req, res) => {
+  const { stateId, isActive, updatedBy } = req.body;
+
+  try {
+    await activateDeactivateStateDetails(stateId, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: `State ${isActive == 1 ? "activated" : "deactivated"} successfully`,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const getStatesList = async (req, res) => {
+  try {
+    const states = await getStates();
+    res.status(200).json({
+      statusCode: 200,
+      states,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+
 module.exports = {
   addCountry,
   updateCountry,
   activateDeactivateCountry,
-  getCountriesList
+  getCountriesList,
+
+  addState,
+  updateState,
+  activateDeactivateState,
+  getStatesList
   // addCompanyAddress,
   // updateCompanyAddress,
   // getCompanyAddressList,

@@ -60,7 +60,11 @@ const {
   addCountry,
   updateCountry,
   activateDeactivateCountry,
-  getCountriesList
+  getCountriesList,
+  addState,
+  updateState,
+  activateDeactivateState,
+  getStatesList
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -72,6 +76,12 @@ router.post("/addCountry", authMiddleware, addCountry);
 router.post("/updateCountry", authMiddleware, updateCountry);
 router.post("/activateDeactivateCountry", authMiddleware, activateDeactivateCountry);
 router.get("/getCountriesList", authMiddleware, getCountriesList);
+
+// State
+router.post("/addState", authMiddleware, addState);
+router.post("/updateState", authMiddleware, updateState);
+router.post("/activateDeactivateState", authMiddleware, activateDeactivateState);
+router.get("/getStatesList", authMiddleware, getStatesList);
 
 // Company API
 // router.post("/add-company", authMiddleware, upload.single("file"), addCompany);

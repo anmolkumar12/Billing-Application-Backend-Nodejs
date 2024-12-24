@@ -19,3 +19,14 @@ CREATE TABLE country_info (
   updated_by INT,                      -- ID of the user who last updated the record
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp of last update
 );
+
+CREATE TABLE state_info (
+  id INT AUTO_INCREMENT PRIMARY KEY,       -- State ID
+  country_id INT NOT NULL,                 -- Country ID (foreign key to country_info table)
+  stateName VARCHAR(100) NOT NULL,         -- State name (e.g., "California")
+  stateCode VARCHAR(50) NOT NULL,          -- Unique State Code (e.g., "CA")
+  gstCode VARCHAR(20),                    -- GST Code (if applicable)
+  isactive BOOLEAN DEFAULT 1,              -- Active status (1 for active, 0 for inactive)
+  updated_by INT,                          -- User who last updated the record
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp of last update
+);
