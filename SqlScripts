@@ -30,3 +30,14 @@ CREATE TABLE state_info (
   updated_by INT,                          -- User who last updated the record
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp of last update
 );
+
+CREATE TABLE region_info (
+  id INT AUTO_INCREMENT PRIMARY KEY,         -- Unique identifier for the region
+  countryId INT NOT NULL,                    -- ID of the country the region belongs to
+  regionName VARCHAR(255) NOT NULL,           -- Name of the region
+  regionCode VARCHAR(50),                    -- Code for the region (optional)
+  stateIds VARCHAR(255),                     -- Comma-separated list of state IDs
+  isactive BOOLEAN DEFAULT TRUE,             -- Whether the region is active or not (1 = active, 0 = inactive)
+  updated_by INT,                            -- ID of the user who last updated the region
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Timestamp for when the region was last updated
+);

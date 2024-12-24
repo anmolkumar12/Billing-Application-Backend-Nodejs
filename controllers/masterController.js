@@ -1,78 +1,17 @@
-const {
-  // createCompany,
-  // updateCompanyDetails,
-  // getCompanies,
-  // activateDeactivateCompanyDetails,
-
-  // createIndustry,
-  // updateIndustryDetails,
-  // toggleIndustryActiveStatusDetails,
-  // getIndustryListDetails,
-
-  // createProject,
-  // updateProjectDetails,
-  // getProjectListDetails,
-  // toggleProjectActiveStatusDetails,
-
-  // createProduct,
-  // updateProductDetails,
-  // getProductListDetails,
-  // toggleProductActiveStatusDetails,
-
-  // createCurrency,
-  // updateCurrencyDetails,
-  // toggleCurrencyStatus,
-  // fetchCurrencyList,
-
-  // createTax,
-  // updateTaxDetails,
-  // getTaxListDetails,
-  // toggleTaxActiveStatusDetails,
-
-  // getCountries,
-  // createState,
-  // updateStateDetails,
-  // getStateListDetails,
-  // toggleStateActiveStatusDetails,
-
-  // createAccount,
-  // updateAccountDetails,
-  // getAccountListDetails,
-  // toggleAccountActiveStatusDetails,
-
-  // createClient,
-  // updateClientDetails,
-  // fetchClients,
-  // toggleClientActiveStatusDetails,
-  
-  // createClientBillingInfo,
-  // updateClientBillingDetails,
-  // getClientBillingDetails,
-  // toggleClientBillingActiveStatusDetails,
-
-  // createClientShippingInfo,
-  // updateClientShippingDetails,
-  // getClientShippingDetails,
-  // toggleClientShippingActiveStatusDetails,
-
-  // createTechnology,
-  // updateTechnologyDetails,
-  // getTechnologyListDetails,
-  // toggleTechnologyActiveStatusDetails,
-
-  // createCompanyAddress,
-  // updateCompanyAddressDetails,
-  // getCompanyAddressListDetails,
-  // toggleCompanyAddressActiveStatusDetails,
-  createCountry,
+const {  createCountry,
   updateCountryDetails,
   activateDeactivateCountryDetails,
   getCountries,
-  
+
   createState,
   updateStateDetails,
   activateDeactivateStateDetails,
-  getStates
+  getStates,
+
+  createRegion,
+  updateRegionDetails,
+  activateDeactivateRegionDetails,
+  getRegions
 } = require("../models/masterModel");
 
 // Comapny Master
@@ -444,92 +383,82 @@ const {
 // };
 
 // Currency Master
-const addCurrency = async (req, res) => {
-  const { currencyName, currencyDescription, updatedBy } =
-    req.body;
+// const addCurrency = async (req, res) => {
+//   const { currencyName, currencyDescription, updatedBy } = req.body;
 
-  try {
-    await createCurrency(
-      currencyName,
-      currencyDescription,
-      updatedBy
-    );
-    res.status(201).json({
-      statusCode: 201,
-      message: "Currency added successfully",
-    });
-  } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error",
-    });
-  }
-};
+//   try {
+//     await createCurrency(currencyName, currencyDescription, updatedBy);
+//     res.status(201).json({
+//       statusCode: 201,
+//       message: "Currency added successfully",
+//     });
+//   } catch (err) {
+//     res.status(500).json({
+//       statusCode: 500,
+//       message: "Server error",
+//     });
+//   }
+// };
 
-const updateCurrency = async (req, res) => {
-  const {
-    currencyId,
-    currencyName,
-    currencyDescription,
-    isActive,
-    updatedBy,
-  } = req.body;
+// const updateCurrency = async (req, res) => {
+//   const { currencyId, currencyName, currencyDescription, isActive, updatedBy } =
+//     req.body;
 
-  try {
-    await updateCurrencyDetails(
-      currencyId,
-      currencyName,
-      currencyDescription,
-      isActive,
-      updatedBy
-    );
-    res.status(200).json({
-      statusCode: 200,
-      message: "Currency updated successfully",
-    });
-  } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error",
-    });
-  }
-};
+//   try {
+//     await updateCurrencyDetails(
+//       currencyId,
+//       currencyName,
+//       currencyDescription,
+//       isActive,
+//       updatedBy
+//     );
+//     res.status(200).json({
+//       statusCode: 200,
+//       message: "Currency updated successfully",
+//     });
+//   } catch (err) {
+//     res.status(500).json({
+//       statusCode: 500,
+//       message: "Server error",
+//     });
+//   }
+// };
 
-const toggleCurrencyActiveStatus = async (req, res) => {
-  const { currencyId, isActive, updatedBy } = req.body;
+// const toggleCurrencyActiveStatus = async (req, res) => {
+//   const { currencyId, isActive, updatedBy } = req.body;
 
-  try {
-    await toggleCurrencyStatus(currencyId, isActive, updatedBy);
-    res.status(200).json({
-      statusCode: 200,
-      message: `Currency ${
-        isActive == 1 ? "activated" : "deactivated"
-      } successfully`,
-    });
-  } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error",
-    });
-  }
-};
+//   try {
+//     await toggleCurrencyStatus(currencyId, isActive, updatedBy);
+//     res.status(200).json({
+//       statusCode: 200,
+//       message: `Currency ${
+//         isActive == 1 ? "activated" : "deactivated"
+//       } successfully`,
+//     });
+//   } catch (err) {
+//     res.status(500).json({
+//       statusCode: 500,
+//       message: "Server error",
+//     });
+//   }
+// };
 
-const getCurrencyList = async (req, res) => {
-  const { isActive } = req.query; // Optional query parameter to filter by active status (1 or 0)
+// const getCurrencyList = async (req, res) => {
+//   const { isActive } = req.query; // Optional query parameter to filter by active status (1 or 0)
 
-  try {
-    const currencies = await fetchCurrencyList(isActive);
-    res.status(200).json({
-      statusCode: 200,
-      currencies,
-    });
-  } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error",
-    });
-  }
-};
+//   try {
+//     const currencies = await fetchCurrencyList(isActive);
+//     res.status(200).json({
+//       statusCode: 200,
+//       currencies,
+//     });
+//   } catch (err) {
+//     res.status(500).json({
+//       statusCode: 500,
+//       message: "Server error",
+//     });
+//   }
+// };
 
 // Tax Master:
 // const addTax = async (req, res) => {
@@ -1272,7 +1201,6 @@ const getCurrencyList = async (req, res) => {
 //   }
 // };
 
-
 // const updateCompanyAddress = async (req, res) => {
 //   const {
 //     id,
@@ -1360,7 +1288,7 @@ const addCountry = async (req, res) => {
     isActive,
     updatedBy,
   } = req.body;
-  
+
   try {
     await createCountry(
       code,
@@ -1372,7 +1300,7 @@ const addCountry = async (req, res) => {
       isActive,
       updatedBy
     );
-    
+
     res.status(201).json({
       statusCode: 201,
       message: "Country created successfully",
@@ -1418,7 +1346,7 @@ const updateCountry = async (req, res) => {
       isActive,
       updatedBy
     );
-    
+
     res.status(200).json({
       statusCode: 200,
       message: "Country updated successfully",
@@ -1438,7 +1366,9 @@ const activateDeactivateCountry = async (req, res) => {
     await activateDeactivateCountryDetails(countryId, isActive, updatedBy);
     res.status(200).json({
       statusCode: 200,
-      message: `Country ${isActive == 1 ? "activated" : "deactivated"} successfully`,
+      message: `Country ${
+        isActive == 1 ? "activated" : "deactivated"
+      } successfully`,
     });
   } catch (err) {
     res.status(500).json({
@@ -1466,12 +1396,12 @@ const getCountriesList = async (req, res) => {
 // State
 const addState = async (req, res) => {
   const {
-    countryId,          // Country ID (foreign key referencing country_info table)
-    stateName,          // The name of the state (e.g., "California")
-    stateCode,          // The unique code for the state (e.g., "CA")
-    gstCode,            // GST code for the state (if applicable)
-    isActive,           // Status: Active or Inactive
-    updatedBy,          // User who is updating this information
+    countryId, // Country ID (foreign key referencing country_info table)
+    stateName, // The name of the state (e.g., "California")
+    stateCode, // The unique code for the state (e.g., "CA")
+    gstCode, // GST code for the state (if applicable)
+    isActive, // Status: Active or Inactive
+    updatedBy, // User who is updating this information
   } = req.body;
 
   try {
@@ -1483,7 +1413,7 @@ const addState = async (req, res) => {
       isActive,
       updatedBy
     );
-    
+
     res.status(201).json({
       statusCode: 201,
       message: "State created successfully",
@@ -1498,13 +1428,13 @@ const addState = async (req, res) => {
 
 const updateState = async (req, res) => {
   const {
-    stateId,            // ID of the state to update
-    countryId,          // Country ID (foreign key referencing country_info table)
-    stateName,          // The name of the state (e.g., "California")
-    stateCode,          // The unique code for the state (e.g., "CA")
-    gstCode,            // GST code for the state (if applicable)
-    isActive,           // Status: Active or Inactive
-    updatedBy,          // User who is updating this information
+    stateId, // ID of the state to update
+    countryId, // Country ID (foreign key referencing country_info table)
+    stateName, // The name of the state (e.g., "California")
+    stateCode, // The unique code for the state (e.g., "CA")
+    gstCode, // GST code for the state (if applicable)
+    isActive, // Status: Active or Inactive
+    updatedBy, // User who is updating this information
   } = req.body;
 
   if (!stateId) {
@@ -1524,7 +1454,7 @@ const updateState = async (req, res) => {
       isActive,
       updatedBy
     );
-    
+
     res.status(200).json({
       statusCode: 200,
       message: "State updated successfully",
@@ -1544,7 +1474,9 @@ const activateDeactivateState = async (req, res) => {
     await activateDeactivateStateDetails(stateId, isActive, updatedBy);
     res.status(200).json({
       statusCode: 200,
-      message: `State ${isActive == 1 ? "activated" : "deactivated"} successfully`,
+      message: `State ${
+        isActive == 1 ? "activated" : "deactivated"
+      } successfully`,
     });
   } catch (err) {
     res.status(500).json({
@@ -1555,10 +1487,10 @@ const activateDeactivateState = async (req, res) => {
 };
 
 const getStatesList = async (req, res) => {
-  const { countryId } = req.query;  // Get countryId from query params if provided
+  const { countryId } = req.query; // Get countryId from query params if provided
 
   try {
-    const states = await getStates(countryId);  // Pass countryId to the function
+    const states = await getStates(countryId); // Pass countryId to the function
 
     res.status(200).json({
       statusCode: 200,
@@ -1573,7 +1505,117 @@ const getStatesList = async (req, res) => {
   }
 };
 
+// Regions
+const addRegion = async (req, res) => {
+  const {
+    countryId, // Country ID (foreign key referencing country_info table)
+    regionName, // The name of the region (e.g., "Midwest")
+    regionCode, // The unique code for the region (e.g., "MW")
+    stateIds, // State ID (foreign key referencing state_info table)
+    isActive, // Status: Active or Inactive
+    updatedBy, // User who is updating this information
+  } = req.body;
 
+  try {
+    await createRegion(
+      countryId,
+      regionName,
+      regionCode,
+      stateIds,
+      isActive,
+      updatedBy
+    );
+
+    res.status(201).json({
+      statusCode: 201,
+      message: "Region created successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const updateRegion = async (req, res) => {
+  const {
+    regionId, // ID of the region to update
+    countryId, // Country ID (foreign key referencing country_info table)
+    regionName, // The name of the region (e.g., "Midwest")
+    regionCode, // The unique code for the region (e.g., "MW")
+    stateId, // State ID (foreign key referencing state_info table)
+    isActive, // Status: Active or Inactive
+    updatedBy, // User who is updating this information
+  } = req.body;
+
+  if (!regionId) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Region ID is required",
+    });
+  }
+
+  try {
+    await updateRegionDetails(
+      regionId,
+      countryId,
+      regionName,
+      regionCode,
+      stateId,
+      isActive,
+      updatedBy
+    );
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Region updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating region details",
+    });
+  }
+};
+
+const activateDeactivateRegion = async (req, res) => {
+  const { regionId, isActive, updatedBy } = req.body;
+
+  try {
+    await activateDeactivateRegionDetails(regionId, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: `Region ${
+        isActive == 1 ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const getRegionsList = async (req, res) => {
+  const { countryId, stateId } = req.query; // Get countryId and stateId from query params if provided
+
+  try {
+    const regions = await getRegions(countryId, stateId); // Pass countryId and stateId to the function
+
+    res.status(200).json({
+      statusCode: 200,
+      regions,
+    });
+  } catch (err) {
+    console.log("Error:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
 
 module.exports = {
   addCountry,
@@ -1584,71 +1626,10 @@ module.exports = {
   addState,
   updateState,
   activateDeactivateState,
-  getStatesList
-  // addCompanyAddress,
-  // updateCompanyAddress,
-  // getCompanyAddressList,
-  // toggleCompanyAddressActiveStatus,
+  getStatesList,
 
-  // addTechnology,
-  // updateTechnology,
-  // getTechnologyList,
-  // toggleTechnologyActiveStatus,
-
-  // addClientShippingInfo,
-  // updateClientShippingInfo,
-  // getClientShippingInfo,
-  // toggleClientShippingActiveStatus,
-
-  // addClientBillingInfo,
-  // updateClientBillingInfo,
-  // getClientBillingInfo,
-  // toggleClientBillingActiveStatus,
-
-  // addClient,
-  // updateClient,
-  // getClients,
-  // toggleClientActiveStatus,
-
-  // addAccount,
-  // updateAccount,
-  // getAccountList,
-  // toggleAccountActiveStatus,
-
-  // addState,
-  // updateState,
-  // getStateList,
-  // toggleStateActiveStatus,
-
-  // addCompany,
-  // updateCompany,
-  // activateDeactivateCompany,
-  // getCompaniesList,
-
-  // addIndustry,
-  // updateIndustry,
-  // toggleIndustryActiveStatus,
-  // getIndustryList,
-
-  // addProject,
-  // updateProject,
-  // getProjectList,
-  // toggleProjectActiveStatus,
-
-  // addProduct,
-  // updateProduct,
-  // getProductList,
-  // toggleProductActiveStatus,
-
-  // addCurrency,
-  // updateCurrency,
-  // toggleCurrencyActiveStatus,
-  // getCurrencyList,
-
-  // addTax,
-  // updateTax,
-  // getTaxList,
-  // toggleTaxActiveStatus,
-
-  // countriesList,
+  addRegion,
+  updateRegion,
+  activateDeactivateRegion,
+  getRegionsList,
 };

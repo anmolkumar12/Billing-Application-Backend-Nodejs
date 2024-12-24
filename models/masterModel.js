@@ -1688,6 +1688,128 @@ const getStates = async (countryId = null) => {
   }
 };
 
+// Region
+const createRegion = async (
+  countryId,
+  regionName,
+  regionCode,
+  stateIds,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      INSERT INTO region_info (countryId, regionName, regionCode, stateIds, isactive, updated_by, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+
+    const [result] = await db.execute(query, [
+      countryId,
+      regionName,
+      regionCode,
+      stateIds,
+      isActive,
+      updatedBy
+    ]);
+
+    return result;
+  } catch (err) {
+    console.log("Error creating region:", err);
+    throw new Error("Error creating region");
+  }
+};
+
+const updateRegionDetails = async (
+  regionId,
+  countryId,
+  regionName,
+  regionCode,
+  stateIds,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const sanitizedValues = [
+      countryId ?? null,
+      regionName ?? null,
+      regionCode ?? null,
+      stateIds ?? null,
+      isActive ?? null,
+      updatedBy ?? null,
+      regionId
+    ];
+
+    const query = `
+      UPDATE region_info
+      SET 
+        countryId = ?, 
+        regionName = ?, 
+        regionCode = ?, 
+        stateIds = ?, 
+        isactive = ?, 
+        updated_by = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, sanitizedValues);
+    return result;
+  } catch (err) {
+    console.log("Error updating region:", err);
+    throw new Error("Error updating region details");
+  }
+};
+
+const activateDeactivateRegionDetails = async (regionId, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE region_info
+      SET isactive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      isActive,        // 1 or 0 for active/inactive
+      updatedBy ?? null, // Use null if updatedBy is undefined
+      regionId          // The region ID to update
+    ]);
+
+    return result;
+  } catch (err) {
+    console.error("Error activating or deactivating region:", err);
+    throw new Error("Error activating/deactivating region");
+  }
+};
+
+const getRegions = async (countryId = null, stateId = null) => {
+  try {
+    // Define the base query
+    let query = `SELECT * FROM region_info`;
+    const queryParams = [];
+
+    // If countryId or stateId is provided, filter by them
+    if (countryId || stateId) {
+      query += " WHERE ";
+      if (countryId) {
+        query += `countryId = ?`;
+        queryParams.push(countryId);
+      }
+      if (stateId) {
+        if (countryId) query += " AND ";
+        query += `stateId = ?`;
+        queryParams.push(stateId);
+      }
+    }
+
+    // Execute the query with the appropriate parameters
+    const [regions] = await db.execute(query, queryParams);
+    return regions;
+  } catch (err) {
+    console.log("Error retrieving regions list:", err);
+    throw new Error("Error retrieving regions list");
+  }
+};
+
 module.exports = {
   createCountry,
   updateCountryDetails,
@@ -1697,7 +1819,12 @@ module.exports = {
   createState,
   updateStateDetails,
   activateDeactivateStateDetails,
-  getStates
+  getStates,
+
+  createRegion,
+  updateRegionDetails,
+  activateDeactivateRegionDetails,
+  getRegions
   // createCompanyAddress,
   // updateCompanyAddressDetails,
   // getCompanyAddressListDetails,
