@@ -18,6 +18,7 @@ const signup = async (req, res) => {
       message: "User created successfully"
     });
   } catch (err) {
+    console.log("users", err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error"
