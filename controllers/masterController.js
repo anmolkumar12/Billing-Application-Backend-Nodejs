@@ -1555,19 +1555,24 @@ const activateDeactivateState = async (req, res) => {
 };
 
 const getStatesList = async (req, res) => {
+  const { countryId } = req.query;  // Get countryId from query params if provided
+
   try {
-    const states = await getStates();
+    const states = await getStates(countryId);  // Pass countryId to the function
+
     res.status(200).json({
       statusCode: 200,
       states,
     });
   } catch (err) {
+    console.log("Error:", err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
     });
   }
 };
+
 
 
 module.exports = {

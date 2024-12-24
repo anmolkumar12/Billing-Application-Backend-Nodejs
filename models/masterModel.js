@@ -1667,11 +1667,20 @@ const activateDeactivateStateDetails = async (stateId, isActive, updatedBy) => {
   }
 };
 
-const getStates = async () => {
+const getStates = async (countryId = null) => {
   try {
-    const query = `SELECT * FROM state_info`;
+    // Define the base query
+    let query = `SELECT * FROM state_info`;
+    const queryParams = [];
 
-    const [states] = await db.execute(query);
+    // If countryId is provided, filter by countryId
+    if (countryId) {
+      query += ` WHERE country_id = ?`;
+      queryParams.push(countryId);
+    }
+
+    // Execute the query with the appropriate parameters
+    const [states] = await db.execute(query, queryParams);
     return states;
   } catch (err) {
     console.log("Error retrieving states list:", err);
