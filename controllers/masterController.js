@@ -1599,10 +1599,10 @@ const activateDeactivateRegion = async (req, res) => {
 };
 
 const getRegionsList = async (req, res) => {
-  const { countryId, stateId } = req.query; // Get countryId and stateId from query params if provided
+  const { countryId } = req.query; // Get countryId and stateId from query params if provided
 
   try {
-    const regions = await getRegions(countryId, stateId); // Pass countryId and stateId to the function
+    const regions = await getRegions(countryId); // Pass countryId and stateId to the function
 
     res.status(200).json({
       statusCode: 200,

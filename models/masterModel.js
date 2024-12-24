@@ -1781,24 +1781,25 @@ const activateDeactivateRegionDetails = async (regionId, isActive, updatedBy) =>
   }
 };
 
-const getRegions = async (countryId = null, stateId = null) => {
+const getRegions = async (countryId = null) => {
   try {
-    // Define the base query
-    let query = `SELECT * FROM region_info`;
+    // Define the base query with a join to fetch country name
+    let query = `
+      SELECT 
+        region_info.*, 
+        country_info.name AS countryName
+      FROM 
+        region_info
+      LEFT JOIN 
+        country_info 
+      ON 
+        region_info.countryId = country_info.id`;
     const queryParams = [];
 
-    // If countryId or stateId is provided, filter by them
-    if (countryId || stateId) {
-      query += " WHERE ";
-      if (countryId) {
-        query += `countryId = ?`;
-        queryParams.push(countryId);
-      }
-      if (stateId) {
-        if (countryId) query += " AND ";
-        query += `stateId = ?`;
-        queryParams.push(stateId);
-      }
+    // If countryId is provided, filter by it
+    if (countryId) {
+      query += " WHERE region_info.countryId = ?";
+      queryParams.push(countryId);
     }
 
     // Execute the query with the appropriate parameters
@@ -1809,6 +1810,7 @@ const getRegions = async (countryId = null, stateId = null) => {
     throw new Error("Error retrieving regions list");
   }
 };
+
 
 module.exports = {
   createCountry,
