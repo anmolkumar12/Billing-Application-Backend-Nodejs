@@ -1669,13 +1669,23 @@ const activateDeactivateStateDetails = async (stateId, isActive, updatedBy) => {
 
 const getStates = async (countryId = null) => {
   try {
-    // Define the base query
-    let query = `SELECT * FROM state_info`;
+    // Define the base query with an INNER JOIN to include countryName
+    let query = `
+      SELECT 
+        s.*, 
+        c.name 
+      FROM 
+        state_info s
+      INNER JOIN 
+        country_info c 
+      ON 
+        s.countryId = c.id
+    `;
     const queryParams = [];
 
     // If countryId is provided, filter by countryId
     if (countryId) {
-      query += ` WHERE country_id = ?`;
+      query += ` WHERE s.countryId = ?`;
       queryParams.push(countryId);
     }
 
@@ -1687,6 +1697,7 @@ const getStates = async (countryId = null) => {
     throw new Error("Error retrieving states list");
   }
 };
+
 
 // Region
 const createRegion = async (
