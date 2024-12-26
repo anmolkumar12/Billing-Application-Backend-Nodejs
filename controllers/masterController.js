@@ -11,7 +11,11 @@ const {  createCountry,
   createRegion,
   updateRegionDetails,
   activateDeactivateRegionDetails,
-  getRegions
+  getRegions,
+
+  createCompany,
+  getCompanyById,
+  updateCompanyDetails,
 } = require("../models/masterModel");
 
 // Comapny Master
@@ -1617,6 +1621,116 @@ const getRegionsList = async (req, res) => {
   }
 };
 
+// Company
+const addCompany = async (req, res) => {
+  const {
+    companyName,
+    Website,
+    CINNO,
+    IECode,
+    Email,
+    description,
+    isActive,
+    updatedBy,
+    independent, // 0 or 1 to define whether the company is independent
+    parentCompanyId,
+  } = req.body;
+
+  // Access the files from req.files
+  const logoPath = req.files.logo ? req.files.logo[0].path : null;  // Handle logo
+  const digitalSignPath = req.files.digitalSign ? req.files.digitalSign[0].path : null;  // Handle digital signature
+
+  try {
+    await createCompany(
+      companyName,
+      Website,
+      CINNO,
+      IECode,
+      Email,
+      description,
+      isActive,
+      updatedBy,
+      logoPath,
+      independent,
+      parentCompanyId,
+      digitalSignPath
+    );
+    res.status(201).json({
+      statusCode: 201,
+      message: "Company created successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const updateCompany = async (req, res) => {
+  const {
+    companyId,
+    companyName,
+    Website,
+    CINNO,
+    IECode,
+    Email,
+    description,
+    isActive,
+    updatedBy,
+    independent, // 0 or 1 to define whether the company is independent
+    parentCompanyId,
+  } = req.body;
+
+  // Access the files from req.files
+  const logoPath = req.files.logo ? req.files.logo[0].path : null;  // Handle logo
+  const digitalSignPath = req.files.digitalSign ? req.files.digitalSign[0].path : null;  // Handle digital signature
+
+  if (!companyId) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Company ID is required",
+    });
+  }
+
+  try {
+    // Fetch existing company data from the database to retain old file paths if no new files are provided
+    const company = await getCompanyById(companyId); // Fetch the current data from the database
+
+    // If no new logo or digital signature file, retain the old values
+    const updatedLogoPath = logoPath || company.logoPath; // Default to old logo if no new file
+    const updatedDigitalSignPath = digitalSignPath || company.digitalSignPath; // Default to old digitalSignPath if no new file
+
+    const result = await updateCompanyDetails(
+      companyId,
+      companyName,
+      Website,
+      CINNO,
+      IECode,
+      Email,
+      description,
+      isActive,
+      updatedLogoPath,
+      updatedBy,
+      independent,
+      parentCompanyId,
+      updatedDigitalSignPath
+    );
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Company updated successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating company details",
+    });
+  }
+};
+
 module.exports = {
   addCountry,
   updateCountry,
@@ -1632,4 +1746,7 @@ module.exports = {
   updateRegion,
   activateDeactivateRegion,
   getRegionsList,
+
+  addCompany,
+  updateCompany
 };

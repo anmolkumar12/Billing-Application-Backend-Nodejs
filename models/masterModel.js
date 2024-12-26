@@ -1792,35 +1792,6 @@ const activateDeactivateRegionDetails = async (regionId, isActive, updatedBy) =>
   }
 };
 
-// const getRegions = async (countryId = null) => {
-//   try {
-//     // Define the base query with a join to fetch country name
-//     let query = `
-//       SELECT 
-//         region_info.*, 
-//         country_info.name AS countryName
-//       FROM 
-//         region_info
-//       LEFT JOIN 
-//         country_info 
-//       ON 
-//         region_info.countryId = country_info.id`;
-//     const queryParams = [];
-
-//     // If countryId is provided, filter by it
-//     if (countryId) {
-//       query += " WHERE region_info.countryId = ?";
-//       queryParams.push(countryId);
-//     }
-
-//     // Execute the query with the appropriate parameters
-//     const [regions] = await db.execute(query, queryParams);
-//     return regions;
-//   } catch (err) {
-//     console.log("Error retrieving regions list:", err);
-//     throw new Error("Error retrieving regions list");
-//   }
-// };
 const getRegions = async (countryId = null) => {
   try {
     // Define the base query with joins to fetch country name and state names
@@ -1863,11 +1834,126 @@ const getRegions = async (countryId = null) => {
   }
 };
 
-
-
 // Company
+const createCompany = async (
+  companyName,
+  Website,
+  CINNO,
+  IECode,
+  Email,
+  description,
+  isActive,
+  updatedBy,
+  logopath,
+  independent, // 0 or 1 to define whether the company is independent
+  parentCompanyId,
+  digitalSignPath
+) => {
+  try {
+    const query = `
+      INSERT INTO company_info (
+        companyName, Website, CINNO, IECode, Email, logopath, description, isactive, updated_by, 
+        independent, parentCompanyId, digitalSignPath, updated_at
+      ) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
 
+    const [result] = await db.execute(query, [
+      companyName,
+      Website,
+      CINNO,
+      IECode,
+      Email,
+      logopath,
+      description,
+      isActive,
+      updatedBy,
+      independent,
+      parentCompanyId,
+      digitalSignPath,
+    ]);
 
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error creating company");
+  }
+};
+
+const getCompanyById = async (companyId) => {
+  try {
+    const query = "SELECT logoPath, digitalSignPath FROM company_info WHERE id = ?";
+    const [rows] = await db.execute(query, [companyId]);
+    
+    if (rows.length > 0) {
+      return rows[0]; // Return the first matching row
+    }
+    
+    throw new Error("Company not found");
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error fetching company details");
+  }
+};
+
+const updateCompanyDetails = async (
+  companyId,
+  companyName,
+  Website,
+  CINNO,
+  IECode,
+  Email,
+  description,
+  isActive,
+  logopath,
+  updatedBy,
+  independent, // 0 or 1 to define whether the company is independent
+  parentCompanyId,
+  digitalSignPath
+) => {
+  try {
+    const sanitizedValues = [
+      companyName ?? null,
+      Website ?? null,
+      CINNO ?? null,
+      IECode ?? null,
+      Email ?? null,
+      logopath ?? null, // Updated logo path (if new)
+      description ?? null,
+      updatedBy ?? null,
+      isActive ?? null,
+      independent ?? null,
+      parentCompanyId ?? null,
+      digitalSignPath ?? null, // Updated digital signature path (if new)
+      companyId,
+    ];
+
+    const query = `
+      UPDATE company_info
+      SET 
+        companyName = ?, 
+        Website = ?, 
+        CINNO = ?, 
+        IECode = ?, 
+        Email = ?, 
+        logopath = ?, 
+        description = ?, 
+        updated_by = ?, 
+        isactive = ?, 
+        independent = ?, 
+        parentCompanyId = ?, 
+        digitalSignPath = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, sanitizedValues);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error updating company details");
+  }
+};
 
 module.exports = {
   createCountry,
@@ -1883,65 +1969,9 @@ module.exports = {
   createRegion,
   updateRegionDetails,
   activateDeactivateRegionDetails,
-  getRegions
-  // createCompanyAddress,
-  // updateCompanyAddressDetails,
-  // getCompanyAddressListDetails,
-  // toggleCompanyAddressActiveStatusDetails,
-  
-  // createTechnology,
-  // updateTechnologyDetails,
-  // getTechnologyListDetails,
-  // toggleTechnologyActiveStatusDetails,
+  getRegions,
 
-  // createClientShippingInfo,
-  // updateClientShippingDetails,
-  // getClientShippingDetails,
-  // toggleClientShippingActiveStatusDetails,
-
-  // createClientBillingInfo,
-  // updateClientBillingDetails,
-  // getClientBillingDetails,
-  // toggleClientBillingActiveStatusDetails,
-  
-  // createClient,
-  // updateClientDetails,
-  // fetchClients,
-  // toggleClientActiveStatusDetails,
-
-  // createAccount,
-  // updateAccountDetails,
-  // getAccountListDetails,
-  // toggleAccountActiveStatusDetails,
-
-  // createState,
-  // updateStateDetails,
-  // getStateListDetails,
-  // toggleStateActiveStatusDetails,
-  // createCompany,
-  // updateCompanyDetails,
-  // activateDeactivateCompanyDetails,
-  // getCompanies,
-  // createIndustry,
-  // updateIndustryDetails,
-  // toggleIndustryActiveStatusDetails,
-  // getIndustryListDetails,
-  // createProject,
-  // updateProjectDetails,
-  // getProjectListDetails,
-  // toggleProjectActiveStatusDetails,
-  // createProduct,
-  // updateProductDetails,
-  // getProductListDetails,
-  // toggleProductActiveStatusDetails,
-  // createCurrency,
-  // updateCurrencyDetails,
-  // toggleCurrencyStatus,
-  // fetchCurrencyList,
-
-  // createTax,
-  // updateTaxDetails,
-  // getTaxListDetails,
-  // toggleTaxActiveStatusDetails,
-  // getCountries,
+  createCompany,
+  getCompanyById,
+  updateCompanyDetails
 };
