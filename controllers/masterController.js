@@ -1487,7 +1487,7 @@ const activateDeactivateState = async (req, res) => {
 };
 
 const getStatesList = async (req, res) => {
-  const { countryId } = req.body; // Get countryId from query params if provided
+  const { countryId } = req.body; 
 
   try {
     const states = await getStates(countryId); // Pass countryId to the function
@@ -1599,7 +1599,7 @@ const activateDeactivateRegion = async (req, res) => {
 };
 
 const getRegionsList = async (req, res) => {
-  const { countryId } = req.query; // Get countryId and stateId from query params if provided
+  const { countryId } = req.body; // Get countryId and stateId from query params if provided
 
   try {
     const regions = await getRegions(countryId); // Pass countryId and stateId to the function
