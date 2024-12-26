@@ -1487,7 +1487,7 @@ const activateDeactivateState = async (req, res) => {
 };
 
 const getStatesList = async (req, res) => {
-  const { countryId } = req.query; // Get countryId from query params if provided
+  const { countryId } = req.body; // Get countryId from query params if provided
 
   try {
     const states = await getStates(countryId); // Pass countryId to the function
