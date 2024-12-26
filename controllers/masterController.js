@@ -16,6 +16,7 @@ const {  createCountry,
   createCompany,
   getCompanyById,
   updateCompanyDetails,
+  activateDeactivateCompanyDetails
 } = require("../models/masterModel");
 
 // Comapny Master
@@ -1731,6 +1732,25 @@ const updateCompany = async (req, res) => {
   }
 };
 
+const activateDeactivateCompany = async (req, res) => {
+  const { companyId, isActive, updatedBy } = req.body;
+
+  try {
+    await activateDeactivateCompanyDetails(companyId, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: `Company ${isActive == 1 ? "activated" : "deactivated"} successfully`,
+    });
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while activating/deactivating company",
+    });
+  }
+};
+
+
 module.exports = {
   addCountry,
   updateCountry,
@@ -1748,5 +1768,6 @@ module.exports = {
   getRegionsList,
 
   addCompany,
-  updateCompany
+  updateCompany,
+  activateDeactivateCompany
 };

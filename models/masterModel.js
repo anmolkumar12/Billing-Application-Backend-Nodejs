@@ -1955,6 +1955,27 @@ const updateCompanyDetails = async (
   }
 };
 
+const activateDeactivateCompanyDetails = async (companyId, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE company_info
+      SET isactive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      isActive,        // 1 or 0 for active/inactive
+      updatedBy ?? null, // Use null if updatedBy is undefined
+      companyId        // The company ID to update
+    ]);
+
+    return result;
+  } catch (err) {
+    console.error("Error activating or deactivating company:", err);
+    throw new Error("Error activating/deactivating company");
+  }
+};
+
 module.exports = {
   createCountry,
   updateCountryDetails,
@@ -1973,5 +1994,6 @@ module.exports = {
 
   createCompany,
   getCompanyById,
-  updateCompanyDetails
+  updateCompanyDetails,
+  activateDeactivateCompanyDetails,
 };
