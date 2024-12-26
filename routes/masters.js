@@ -36,6 +36,6 @@ router.post("/getStatesList", authMiddleware, getStatesList);
 router.post("/addRegion", authMiddleware, addRegion);
 router.post("/updateRegion", authMiddleware, updateRegion);
 router.post("/activateDeactivateRegion", authMiddleware, activateDeactivateRegion);
-router.get("/getRegionsList", authMiddleware, getRegionsList);
+router.post("/getRegionsList", authMiddleware, getRegionsList);
 
 module.exports = router;
