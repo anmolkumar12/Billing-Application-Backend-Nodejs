@@ -22,7 +22,7 @@ CREATE TABLE country_info (
 
 CREATE TABLE state_info (
   id INT AUTO_INCREMENT PRIMARY KEY,       -- State ID
-  country_id INT NOT NULL,                 -- Country ID (foreign key to country_info table)
+  countryId INT NOT NULL,                 -- Country ID (foreign key to country_info table)
   stateName VARCHAR(100) NOT NULL,         -- State name (e.g., "California")
   stateCode VARCHAR(50) NOT NULL,          -- Unique State Code (e.g., "CA")
   gstCode VARCHAR(20),                    -- GST Code (if applicable)
