@@ -17,7 +17,8 @@ const {
 
   addCompany,
   updateCompany,
-  activateDeactivateCompany
+  activateDeactivateCompany,
+  getCompaniesList
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -46,6 +47,5 @@ router.post("/getRegionsList", authMiddleware, getRegionsList);
 router.post("/addCompany", authMiddleware, upload.fields([{ name: 'logo', maxCount: 1 },{ name: 'digitalSign', maxCount: 1 }]), addCompany);
 router.post("/updateCompany", authMiddleware, upload.fields([{ name: 'logo', maxCount: 1 },{ name: 'digitalSign', maxCount: 1 }]), updateCompany);
 router.post("/activateDeactivateCompany", authMiddleware, activateDeactivateCompany)
-// router.post("/activateDeactivateRegion", authMiddleware, activateDeactivateRegion);
-// router.post("/getRegionsList", authMiddleware, getRegionsList);
+router.post("/getCompaniesList", authMiddleware, getCompaniesList);
 module.exports = router;

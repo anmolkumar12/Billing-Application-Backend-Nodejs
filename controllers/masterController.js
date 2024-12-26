@@ -16,134 +16,9 @@ const {  createCountry,
   createCompany,
   getCompanyById,
   updateCompanyDetails,
-  activateDeactivateCompanyDetails
+  activateDeactivateCompanyDetails,
+  getCompanies
 } = require("../models/masterModel");
-
-// Comapny Master
-// const addCompany = async (req, res) => {
-//   const {
-//     companyName,
-//     Website,
-//     CINNO,
-//     IECode,
-//     Email,
-//     description,
-//     isactive,
-//     updatedBy,
-//   } = req.body;
-//   const logopath = req.file ? req.file.path : null; // Get the file path if the logo is uploaded
-
-//   try {
-//     await createCompany(
-//       companyName,
-//       Website,
-//       CINNO,
-//       IECode,
-//       Email,
-//       description,
-//       isactive,
-//       updatedBy,
-//       logopath,
-//     );
-//     res.status(201).json({
-//       statusCode: 201,
-//       message: "Company created successfully",
-//     });
-//   } catch (err) {
-//     console.log("errrrr",err);
-//     res.status(500).json({
-//       statusCode: 500,
-//       message: "Server error",
-//     });
-//   }
-// };
-
-// const updateCompany = async (req, res) => {
-//   const {
-//     companyId,
-//     companyName,
-//     Website,
-//     CINNO,
-//     IECode,
-//     Email,
-//     description,
-//     isactive,
-//     updatedBy
-//   } = req.body;
-
-//   const logopath = req.file ? req.file.path : null; // Handle optional file upload for the logo
-
-//   // Validate critical inputs
-//   if (!companyId) {
-//     return res.status(400).json({
-//       statusCode: 400,
-//       message: "Company ID is required",
-//     });
-//   }
-
-//   try {
-//     // Call the model function to update the company details
-//     const result = await updateCompanyDetails(
-//       companyId,
-//       companyName,
-//       Website,
-//       CINNO,
-//       IECode,
-//       Email,
-//       description,
-//       isactive,
-//       logopath,
-//       updatedBy,
-//     );
-
-//     // Respond to the client with success
-//     res.status(200).json({
-//       statusCode: 200,
-//       message: "Company updated successfully",
-//     });
-//   } catch (err) {
-//     // Log the error and respond with server error
-//     res.status(500).json({
-//       statusCode: 500,
-//       message: "Server error while updating company details",
-//     });
-//   }
-// };
-
-// const activateDeactivateCompany = async (req, res) => {
-//   const { companyId, isActive, updatedBy } = req.body; // `isActive` will be a boolean or 0/1
-
-//   try {
-//     // Call the model function to activate or deactivate the company
-//     await activateDeactivateCompanyDetails(companyId, isActive, updatedBy);
-//     res.status(200).json({
-//       statusCode: 200,
-//       message: `Company ${
-//         isActive == 1 ? "activated" : "deactivated"
-//       } successfully`,
-//     });
-//   } catch (err) {
-//     res.status(500).json({
-//       statusCode: 500,
-//       message: "Server error",
-//     });
-//   }
-// };
-
-// const getCompaniesList = async (req, res) => {
-//   try {
-//     const companies = await getCompanies();
-//     res.status(200).json({
-//       statusCode: 200,
-//       companies,
-//     });
-//   } catch (err) {
-//     res.status(500).json({
-//       statusCode: 500,
-//       message: "Server error",
-//     });
-//   }
-// };
 
 // Industry Master
 // const addIndustry = async (req, res) => {
@@ -1750,6 +1625,23 @@ const activateDeactivateCompany = async (req, res) => {
   }
 };
 
+const getCompaniesList = async (req, res) => {
+  try {
+    const companies = await getCompanies(); // Fetch all companies without isActive filter
+
+    res.status(200).json({
+      statusCode: 200,
+      companies,
+    });
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while fetching companies list",
+    });
+  }
+};
+
 
 module.exports = {
   addCountry,
@@ -1769,5 +1661,6 @@ module.exports = {
 
   addCompany,
   updateCompany,
-  activateDeactivateCompany
+  activateDeactivateCompany,
+  getCompaniesList
 };

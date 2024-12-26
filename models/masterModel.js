@@ -1976,6 +1976,30 @@ const activateDeactivateCompanyDetails = async (companyId, isActive, updatedBy) 
   }
 };
 
+const getCompanies = async () => {
+  try {
+    // Define the base query to fetch all company details, including parent company info
+    const query = `
+      SELECT 
+        company_info.*, 
+        parent_company.companyName AS parentCompanyName
+      FROM 
+        company_info
+      LEFT JOIN 
+        company_info AS parent_company
+      ON 
+        company_info.parentCompanyId = parent_company.id`;
+
+    // Execute the query with no additional filtering
+    const [companies] = await db.execute(query);
+    return companies;
+  } catch (err) {
+    console.error("Error retrieving companies list:", err);
+    throw new Error("Error retrieving companies list");
+  }
+};
+
+
 module.exports = {
   createCountry,
   updateCountryDetails,
@@ -1996,4 +2020,5 @@ module.exports = {
   getCompanyById,
   updateCompanyDetails,
   activateDeactivateCompanyDetails,
+  getCompanies
 };
