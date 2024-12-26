@@ -1792,19 +1792,54 @@ const activateDeactivateRegionDetails = async (regionId, isActive, updatedBy) =>
   }
 };
 
+// const getRegions = async (countryId = null) => {
+//   try {
+//     // Define the base query with a join to fetch country name
+//     let query = `
+//       SELECT 
+//         region_info.*, 
+//         country_info.name AS countryName
+//       FROM 
+//         region_info
+//       LEFT JOIN 
+//         country_info 
+//       ON 
+//         region_info.countryId = country_info.id`;
+//     const queryParams = [];
+
+//     // If countryId is provided, filter by it
+//     if (countryId) {
+//       query += " WHERE region_info.countryId = ?";
+//       queryParams.push(countryId);
+//     }
+
+//     // Execute the query with the appropriate parameters
+//     const [regions] = await db.execute(query, queryParams);
+//     return regions;
+//   } catch (err) {
+//     console.log("Error retrieving regions list:", err);
+//     throw new Error("Error retrieving regions list");
+//   }
+// };
 const getRegions = async (countryId = null) => {
   try {
-    // Define the base query with a join to fetch country name
+    // Define the base query with joins to fetch country name and state names
     let query = `
       SELECT 
         region_info.*, 
-        country_info.name AS countryName
+        country_info.name AS countryName,
+        IFNULL(GROUP_CONCAT(state_info.stateName), 'No States') AS stateNames
       FROM 
         region_info
       LEFT JOIN 
         country_info 
       ON 
-        region_info.countryId = country_info.id`;
+        region_info.countryId = country_info.id
+      LEFT JOIN 
+        state_info 
+      ON 
+        region_info.stateIds IS NOT NULL AND FIND_IN_SET(state_info.id, region_info.stateIds) > 0`;
+
     const queryParams = [];
 
     // If countryId is provided, filter by it
@@ -1812,6 +1847,12 @@ const getRegions = async (countryId = null) => {
       query += " WHERE region_info.countryId = ?";
       queryParams.push(countryId);
     }
+
+    // Group by region to aggregate state names
+    query += " GROUP BY region_info.id";
+
+    // Debugging query output for validation
+    console.log("Executing query:", query, "with params:", queryParams);
 
     // Execute the query with the appropriate parameters
     const [regions] = await db.execute(query, queryParams);
@@ -1821,6 +1862,8 @@ const getRegions = async (countryId = null) => {
     throw new Error("Error retrieving regions list");
   }
 };
+
+
 
 // Company
 
