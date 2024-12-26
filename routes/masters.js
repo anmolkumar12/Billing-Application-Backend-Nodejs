@@ -30,7 +30,7 @@ router.get("/getCountriesList", authMiddleware, getCountriesList);
 router.post("/addState", authMiddleware, addState);
 router.post("/updateState", authMiddleware, updateState);
 router.post("/activateDeactivateState", authMiddleware, activateDeactivateState);
-router.get("/getStatesList", authMiddleware, getStatesList);
+router.post("/getStatesList", authMiddleware, getStatesList);
 
 // Region
 router.post("/addRegion", authMiddleware, addRegion);
