@@ -2087,13 +2087,16 @@ const getLocations = async (companyId = null) => {
       SELECT 
         company_location_info.*, 
         country_info.name AS countryName,
-        state_info.stateName AS stateName
+        state_info.stateName AS stateName,
+        company_info.companyName  -- Include the company name here
       FROM 
         company_location_info
       LEFT JOIN 
         country_info ON company_location_info.countryId = country_info.id
       LEFT JOIN 
         state_info ON company_location_info.stateId = state_info.id
+      LEFT JOIN 
+        company_info ON company_location_info.companyId = company_info.id  -- Join with company_info table
     `;
 
     const queryParams = [];
