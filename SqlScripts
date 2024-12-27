@@ -76,3 +76,14 @@ CREATE TABLE company_location_info (
   FOREIGN KEY (stateId) REFERENCES state_info(id) ON DELETE CASCADE -- Foreign key to state_info
 );
 
+CREATE TABLE bank_account_type_info (
+  id INT AUTO_INCREMENT PRIMARY KEY,             -- Unique ID for each bank account type
+  countryId INT NOT NULL,                        -- Country ID (foreign key to country_info table)
+  accountTypeName VARCHAR(255) NOT NULL,         -- Name of the bank account type (e.g., "Saving", "Current")
+  description TEXT,                              -- Description of the account type
+  isActive TINYINT(1) DEFAULT 1,                 -- Status of the account type (active/inactive), default is active
+  updated_by INT,                                -- User ID who last updated the record (foreign key to user table)
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp of the last update
+  FOREIGN KEY (countryId) REFERENCES country_info(id) ON DELETE CASCADE, -- Foreign key to country_info
+  FOREIGN KEY (updated_by) REFERENCES user_info(id) ON DELETE SET NULL  -- Foreign key to user_info, updated by
+);
