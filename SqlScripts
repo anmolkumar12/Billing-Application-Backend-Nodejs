@@ -59,18 +59,20 @@ CREATE TABLE company_info (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE address_info (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  companyId INT NOT NULL,
-  countryId INT NOT NULL,
-  stateId INT,
-  addressLine1 VARCHAR(255),
-  addressLine2 VARCHAR(255),
-  addressLine3 VARCHAR(255),
-  additional_address_details TEXT, -- Extra details for address based on country
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (companyId) REFERENCES company_info(id) ON DELETE CASCADE,
-  FOREIGN KEY (countryId) REFERENCES country_info(id) ON DELETE CASCADE,
-  FOREIGN KEY (stateId) REFERENCES state_info(id) ON DELETE SET NULL
+CREATE TABLE company_location_info (
+  id INT AUTO_INCREMENT PRIMARY KEY,             -- Unique ID for each company location
+  companyId INT NOT NULL,                        -- Company ID (foreign key to company_info table)
+  countryId INT NOT NULL,                        -- Country ID (foreign key to country_info table)
+  stateId INT NOT NULL,                          -- State ID (foreign key to state_info table)
+  address1 VARCHAR(255) NOT NULL,                -- Primary address line
+  address2 VARCHAR(255),                         -- Secondary address line
+  address3 VARCHAR(255),                         -- Tertiary address line
+  additionalAddressDetails TEXT,                 -- Additional details for the address, specific to the country
+  isActive TINYINT(1) DEFAULT 1,                 -- Status of the location (active/inactive), default is active
+  updated_by INT,                                -- User ID who last updated the record (foreign key to user table)
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp of the last update
+  FOREIGN KEY (companyId) REFERENCES company_info(id) ON DELETE CASCADE, -- Foreign key to company_info
+  FOREIGN KEY (countryId) REFERENCES country_info(id) ON DELETE CASCADE, -- Foreign key to country_info
+  FOREIGN KEY (stateId) REFERENCES state_info(id) ON DELETE CASCADE -- Foreign key to state_info
 );
+
