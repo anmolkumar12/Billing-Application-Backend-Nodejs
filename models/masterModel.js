@@ -2133,6 +2133,122 @@ const activateDeactivateLocation = async (locationId, isActive, updatedBy) => {
   }
 };
 
+// Account Type Master
+const insertBankAccountType = async (
+  countryId,
+  accountTypeName,
+  description,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      INSERT INTO bank_account_type_info (countryId, accountTypeName, description, isActive, updated_by, updated_at)
+      VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+
+    const [result] = await db.execute(query, [
+      countryId,
+      accountTypeName,
+      description,
+      isActive,
+      updatedBy
+    ]);
+
+    return result;
+  } catch (err) {
+    console.log("Error inserting bank account type:", err);
+    throw new Error("Error inserting bank account type");
+  }
+};
+
+const updateBankAccountTypeDetails = async (
+  accountTypeId,
+  countryId,
+  accountTypeName,
+  description,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const sanitizedValues = [
+      countryId ?? null,
+      accountTypeName ?? null,
+      description ?? null,
+      isActive ?? null,
+      updatedBy ?? null,
+      accountTypeId
+    ];
+
+    const query = `
+      UPDATE bank_account_type_info
+      SET 
+        countryId = ?, 
+        accountTypeName = ?, 
+        description = ?, 
+        isActive = ?, 
+        updated_by = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, sanitizedValues);
+    return result;
+  } catch (err) {
+    console.log("Error updating bank account type:", err);
+    throw new Error("Error updating bank account type details");
+  }
+};
+
+const activateDeactivateAccountType = async (accountTypeId, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE bank_account_type_info
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      isActive,          // 1 for active, 0 for inactive
+      updatedBy ?? null, // Updated by user, default to null if not provided
+      accountTypeId      // The bank account type ID to update
+    ]);
+
+    return result;
+  } catch (err) {
+    console.error("Error activating or deactivating bank account type:", err);
+    throw new Error("Error activating/deactivating bank account type");
+  }
+};
+
+const getBankAccountTypesList = async (countryId = null) => {
+  try {
+    let query = `
+      SELECT 
+        bank_account_type_info.*, 
+        country_info.name AS countryName
+      FROM 
+        bank_account_type_info
+      LEFT JOIN 
+        country_info ON bank_account_type_info.countryId = country_info.id
+    `;
+
+    const queryParams = [];
+
+    // If countryId is provided, filter by it
+    if (countryId) {
+      query += " WHERE bank_account_type_info.countryId = ?";
+      queryParams.push(countryId);
+    }
+
+    const [accountTypes] = await db.execute(query, queryParams);
+    return accountTypes;
+  } catch (err) {
+    console.log("Error retrieving bank account types:", err);
+    throw new Error("Error retrieving bank account types list");
+  }
+};
+
 
 module.exports = {
   createCountry,
@@ -2159,5 +2275,10 @@ module.exports = {
   insertCompanyLocation,
   updateLocationDetails,
   getLocations,
-  activateDeactivateLocation
+  activateDeactivateLocation,
+
+  insertBankAccountType,
+  updateBankAccountTypeDetails,
+  activateDeactivateAccountType,
+  getBankAccountTypesList
 };

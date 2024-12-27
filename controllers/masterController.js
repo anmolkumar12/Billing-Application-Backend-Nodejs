@@ -22,7 +22,12 @@ const {  createCountry,
   insertCompanyLocation,
   updateLocationDetails,
   getLocations,
-  activateDeactivateLocation
+  activateDeactivateLocation,
+
+  insertBankAccountType,
+  updateBankAccountTypeDetails,
+  activateDeactivateAccountType,
+  getBankAccountTypesList
 } = require("../models/masterModel");
 
 // Industry Master
@@ -1772,6 +1777,122 @@ const activateDeactivateCompanyLocation = async (req, res) => {
   }
 };
 
+// Account Type Master
+const createBankAccountType = async (req, res) => {
+  const {
+    countryId,          // Country ID (foreign key referencing country_info table)
+    accountTypeName,    // Name of the bank account type (e.g., "Saving", "Current")
+    description,        // Description of the account type
+    isActive,           // Status: Active (1) or Inactive (0)
+    updatedBy           // User who is updating this information
+  } = req.body;
+
+  try {
+    await insertBankAccountType(
+      countryId,
+      accountTypeName,
+      description,
+      isActive,
+      updatedBy
+    );
+
+    res.status(201).json({
+      statusCode: 201,
+      message: "Bank Account Type created successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const updateBankAccountType = async (req, res) => {
+  const {
+    accountTypeId,      // ID of the bank account type to update
+    countryId,          // Country ID
+    accountTypeName,    // Name of the bank account type
+    description,        // Description of the account type
+    isActive,           // Status: Active (1) or Inactive (0)
+    updatedBy           // User who is updating this information
+  } = req.body;
+
+  if (!accountTypeId) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Account Type ID is required",
+    });
+  }
+
+  try {
+    await updateBankAccountTypeDetails(
+      accountTypeId,
+      countryId,
+      accountTypeName,
+      description,
+      isActive,
+      updatedBy
+    );
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Bank Account Type updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating bank account type",
+    });
+  }
+};
+
+const activateDeactivateBankAccountType = async (req, res) => {
+  const { accountTypeId, isActive, updatedBy } = req.body;
+
+  if (!accountTypeId) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Account Type ID is required",
+    });
+  }
+
+  try {
+    await activateDeactivateAccountType(accountTypeId, isActive, updatedBy);
+
+    res.status(200).json({
+      statusCode: 200,
+      message: `Bank Account Type ${
+        isActive === 1 ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while activating/deactivating bank account type",
+    });
+  }
+};
+
+const getBankAccountTypes = async (req, res) => {
+  const { countryId } = req.body; // Get countryId from query params
+
+  try {
+    const accountTypes = await getBankAccountTypesList(countryId);
+
+    res.status(200).json({
+      statusCode: 200,
+      accountTypes,
+    });
+  } catch (err) {
+    console.log("Error:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
 
 module.exports = {
   addCountry,
@@ -1797,5 +1918,10 @@ module.exports = {
   createCompanyLocation,
   updateCompanyLocation,
   getCompanyLocations,
-  activateDeactivateCompanyLocation
+  activateDeactivateCompanyLocation,
+
+  createBankAccountType,
+  updateBankAccountType,
+  activateDeactivateBankAccountType,
+  getBankAccountTypes
 };

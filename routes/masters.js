@@ -23,7 +23,12 @@ const {
   createCompanyLocation,
   updateCompanyLocation,
   getCompanyLocations,
-  activateDeactivateCompanyLocation
+  activateDeactivateCompanyLocation,
+
+  createBankAccountType,
+  updateBankAccountType,
+  activateDeactivateBankAccountType,
+  getBankAccountTypes
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -55,8 +60,16 @@ router.post("/activateDeactivateCompany", authMiddleware, activateDeactivateComp
 router.post("/getCompaniesList", authMiddleware, getCompaniesList);
 
 // Company location master
-router.post("/addCompany", authMiddleware, createCompanyLocation);
-router.post("/updateCompany", authMiddleware, updateCompanyLocation);
+router.post("/createCompanyLocation", authMiddleware, createCompanyLocation);
+router.post("/updateCompanyLocation", authMiddleware, updateCompanyLocation);
 router.post("/activateDeactivateCompanyLocation", authMiddleware, activateDeactivateCompanyLocation);
 router.post("/getCompanyLocations", authMiddleware, getCompanyLocations)
+
+// Account Type Master
+router.post("/createBankAccountType", authMiddleware, createBankAccountType);
+router.post("/updateBankAccountType", authMiddleware, updateBankAccountType);
+router.post("/activateDeactivateBankAccountType", authMiddleware, activateDeactivateBankAccountType);
+router.post("/getBankAccountTypes", authMiddleware, getBankAccountTypes)
+
+
 module.exports = router;
