@@ -1999,6 +1999,140 @@ const getCompanies = async () => {
   }
 };
 
+// Compnay location master
+const insertCompanyLocation = async (
+  companyId,
+  countryId,
+  stateId,
+  address1,
+  address2,
+  address3,
+  additionalAddressDetails,
+  updatedBy
+) => {
+  try {
+    const query = `
+      INSERT INTO company_location_info (companyId, countryId, stateId, address1, address2, address3, additionalAddressDetails, updated_by, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+
+    const [result] = await db.execute(query, [
+      companyId,
+      countryId,
+      stateId,
+      address1,
+      address2,
+      address3,
+      additionalAddressDetails,
+      updatedBy
+    ]);
+
+    return result;
+  } catch (err) {
+    console.log("Error inserting company location:", err);
+    throw new Error("Error inserting company location");
+  }
+};
+
+const updateLocationDetails = async (
+  locationId,
+  companyId,
+  countryId,
+  stateId,
+  address1,
+  address2,
+  address3,
+  additionalAddressDetails,
+  updatedBy
+) => {
+  try {
+    const sanitizedValues = [
+      companyId ?? null,
+      countryId ?? null,
+      stateId ?? null,
+      address1 ?? null,
+      address2 ?? null,
+      address3 ?? null,
+      additionalAddressDetails ?? null,
+      updatedBy ?? null,
+      locationId
+    ];
+
+    const query = `
+      UPDATE company_location_info
+      SET 
+        companyId = ?, 
+        countryId = ?, 
+        stateId = ?, 
+        address1 = ?, 
+        address2 = ?, 
+        address3 = ?, 
+        additionalAddressDetails = ?, 
+        updated_by = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, sanitizedValues);
+    return result;
+  } catch (err) {
+    console.log("Error updating company location:", err);
+    throw new Error("Error updating company location details");
+  }
+};
+
+const getLocations = async (companyId = null) => {
+  try {
+    let query = `
+      SELECT 
+        company_location_info.*, 
+        country_info.name AS countryName,
+        state_info.stateName AS stateName
+      FROM 
+        company_location_info
+      LEFT JOIN 
+        country_info ON company_location_info.countryId = country_info.id
+      LEFT JOIN 
+        state_info ON company_location_info.stateId = state_info.id
+    `;
+
+    const queryParams = [];
+
+    // If companyId is provided, filter by it
+    if (companyId) {
+      query += " WHERE company_location_info.companyId = ?";
+      queryParams.push(companyId);
+    }
+
+    const [locations] = await db.execute(query, queryParams);
+    return locations;
+  } catch (err) {
+    console.log("Error retrieving company locations:", err);
+    throw new Error("Error retrieving company locations list");
+  }
+};
+
+const activateDeactivateLocation = async (locationId, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE company_location_info
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      isActive,          // 1 for active, 0 for inactive
+      updatedBy ?? null, // Updated by user, default to null if not provided
+      locationId        // The location ID to update
+    ]);
+
+    return result;
+  } catch (err) {
+    console.error("Error activating or deactivating company location:", err);
+    throw new Error("Error activating/deactivating company location");
+  }
+};
+
 
 module.exports = {
   createCountry,
@@ -2020,5 +2154,10 @@ module.exports = {
   getCompanyById,
   updateCompanyDetails,
   activateDeactivateCompanyDetails,
-  getCompanies
+  getCompanies,
+
+  insertCompanyLocation,
+  updateLocationDetails,
+  getLocations,
+  activateDeactivateLocation
 };

@@ -17,7 +17,12 @@ const {  createCountry,
   getCompanyById,
   updateCompanyDetails,
   activateDeactivateCompanyDetails,
-  getCompanies
+  getCompanies,
+
+  insertCompanyLocation,
+  updateLocationDetails,
+  getLocations,
+  activateDeactivateLocation
 } = require("../models/masterModel");
 
 // Industry Master
@@ -1642,6 +1647,131 @@ const getCompaniesList = async (req, res) => {
   }
 };
 
+// Company Location Master
+const createCompanyLocation = async (req, res) => {
+  const {
+    companyId,         // Company ID (foreign key referencing company_info table)
+    countryId,         // Country ID (foreign key referencing country_info table)
+    stateId,           // State ID (foreign key referencing state_info table)
+    address1, address2, address3, // Address fields
+    additionalAddressDetails,     // Text for additional address details based on country
+    updatedBy          // User updating the company location
+  } = req.body;
+
+  try {
+    await insertCompanyLocation(
+      companyId,
+      countryId,
+      stateId,
+      address1,
+      address2,
+      address3,
+      additionalAddressDetails,
+      updatedBy
+    );
+
+    res.status(201).json({
+      statusCode: 201,
+      message: "Company Location created successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const updateCompanyLocation = async (req, res) => {
+  const {
+    locationId,        // ID of the company location to update
+    companyId,         // Company ID
+    countryId,         // Country ID
+    stateId,           // State ID
+    address1, address2, address3, // Address fields
+    additionalAddressDetails,     // Additional address details
+    updatedBy          // User updating the company location
+  } = req.body;
+
+  if (!locationId) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Location ID is required",
+    });
+  }
+
+  try {
+    await updateLocationDetails(
+      locationId,
+      companyId,
+      countryId,
+      stateId,
+      address1,
+      address2,
+      address3,
+      additionalAddressDetails,
+      updatedBy
+    );
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Company Location updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating company location",
+    });
+  }
+};
+
+const getCompanyLocations = async (req, res) => {
+  const { companyId } = req.body; // Get companyId from query params
+
+  try {
+    // If companyId is provided, filter by companyId; otherwise, fetch all locations
+    const locations = await getLocations(companyId);
+
+    res.status(200).json({
+      statusCode: 200,
+      locations,
+    });
+  } catch (err) {
+    console.log("Error:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const activateDeactivateCompanyLocation = async (req, res) => {
+  const { locationId, isActive, updatedBy } = req.body;
+
+  if (!locationId) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Location ID is required",
+    });
+  }
+
+  try {
+    await activateDeactivateLocation(locationId, isActive, updatedBy);
+
+    res.status(200).json({
+      statusCode: 200,
+      message: `Company location ${
+        isActive === 1 ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while activating/deactivating company location",
+    });
+  }
+};
+
 
 module.exports = {
   addCountry,
@@ -1662,5 +1792,10 @@ module.exports = {
   addCompany,
   updateCompany,
   activateDeactivateCompany,
-  getCompaniesList
+  getCompaniesList,
+
+  createCompanyLocation,
+  updateCompanyLocation,
+  getCompanyLocations,
+  activateDeactivateCompanyLocation
 };
