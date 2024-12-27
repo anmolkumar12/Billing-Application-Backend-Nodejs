@@ -29,7 +29,7 @@ const router = express.Router();
 router.post("/addCountry", authMiddleware, addCountry);
 router.post("/updateCountry", authMiddleware, updateCountry);
 router.post("/activateDeactivateCountry", authMiddleware, activateDeactivateCountry);
-router.get("/getCountriesList", authMiddleware, getCountriesList);
+router.post("/getCountriesList", authMiddleware, getCountriesList);
 
 // State
 router.post("/addState", authMiddleware, addState);
