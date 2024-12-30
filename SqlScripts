@@ -120,3 +120,14 @@ CREATE TABLE industry_master_info (
   FOREIGN KEY (productionTypeId) REFERENCES production_type_info(id),
   FOREIGN KEY (updated_by) REFERENCES users(id) -- assuming you have a `users` table for `updated_by`
 );
+CREATE TABLE group_industry_info (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  groupIndustryName VARCHAR(255) NOT NULL,
+  industryIds VARCHAR(255) NOT NULL,
+  -- Store comma-separated Industry IDs here
+  updated_by INT NOT NULL,
+  isActive TINYINT(1) DEFAULT 1,
+  -- 1 for active, 0 for inactive
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (updated_by) REFERENCES users(id) -- assuming a users table for updated_by
+);

@@ -44,6 +44,11 @@ const {
   updateIndustryMasterDetails,
   updateIndustryMasterStatus,
   getIndustryMastersList,
+
+  insertGroupIndustry,
+  updateGroupIndustryDetails,
+  updateGroupIndustryStatus,
+  getGroupIndustriesList,
 } = require("../models/masterModel");
 
 // Country
@@ -1140,6 +1145,120 @@ const getIndustryMasters = async (req, res) => {
   }
 };
 
+// Industries Group
+const createGroupIndustry = async (req, res) => {
+  const {
+    groupIndustryName, // Name of Group Industry
+    industryIds, // Comma-separated Industry IDs (string)
+    updatedBy, // User who updated
+    isActive = 1, // Default value is 1 (active)
+  } = req.body;
+
+  try {
+    // Insert the group industry along with the comma-separated industry IDs
+    await insertGroupIndustry(
+      groupIndustryName,
+      industryIds,
+      updatedBy,
+      isActive
+    );
+
+    res.status(201).json({
+      statusCode: 201,
+      message: "Group Industry created successfully",
+    });
+  } catch (err) {
+    console.error("Error creating group industry:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while creating group industry",
+    });
+  }
+};
+
+const updateGroupIndustry = async (req, res) => {
+  const {
+    groupIndustryId, // ID of the group industry record to update
+    groupIndustryName, // Updated Name of Group Industry
+    industryIds, // Updated comma-separated industry IDs (string)
+    updatedBy, // User who updated
+    isActive, // Active status (1 or 0)
+  } = req.body;
+
+  if (!groupIndustryId) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Group Industry ID is required",
+    });
+  }
+
+  try {
+    // Update the group industry details with the new industry IDs
+    await updateGroupIndustryDetails(
+      groupIndustryId,
+      groupIndustryName,
+      industryIds,
+      updatedBy,
+      isActive
+    );
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Group Industry updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating group industry",
+    });
+  }
+};
+
+const activateOrDeactivateGroupIndustry = async (req, res) => {
+  const { groupIndustryId, isActive, updatedBy } = req.body;
+
+  if (!groupIndustryId || isActive === undefined) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Group Industry ID and isActive are required",
+    });
+  }
+
+  try {
+    await updateGroupIndustryStatus(groupIndustryId, isActive, updatedBy);
+
+    res.status(200).json({
+      statusCode: 200,
+      message: `Group Industry ${
+        isActive ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    console.error("Error updating Group Industry status:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating Group Industry status",
+    });
+  }
+};
+
+const getGroupIndustries = async (req, res) => {
+  try {
+    const groupIndustries = await getGroupIndustriesList();
+
+    res.status(200).json({
+      statusCode: 200,
+      groupIndustries,
+    });
+  } catch (err) {
+    console.error("Error retrieving Group Industries:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while fetching Group Industries",
+    });
+  }
+};
+
 module.exports = {
   addCountry,
   updateCountry,
@@ -1185,4 +1304,9 @@ module.exports = {
   updateIndustryMaster,
   activateOrDeactivateIndustryMaster,
   getIndustryMasters,
+
+  createGroupIndustry,
+  updateGroupIndustry,
+  activateOrDeactivateGroupIndustry,
+  getGroupIndustries,
 };

@@ -44,6 +44,11 @@ createIndustryMaster,
 updateIndustryMaster,
 activateOrDeactivateIndustryMaster,
 getIndustryMasters,
+
+createGroupIndustry,
+updateGroupIndustry,
+activateOrDeactivateGroupIndustry,
+getGroupIndustries,
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -104,5 +109,10 @@ router.post("/updateIndustryMaster", authMiddleware, updateIndustryMaster);
 router.post("/activateOrDeactivateIndustryMaster", authMiddleware, activateOrDeactivateIndustryMaster);
 router.post("/getIndustryMasters", authMiddleware, getIndustryMasters)
 
+// Group Industry Master
+router.post("/createGroupIndustry", authMiddleware, createGroupIndustry);
+router.post("/updateGroupIndustry", authMiddleware, updateGroupIndustry);
+router.post("/activateOrDeactivateGroupIndustry", authMiddleware, activateOrDeactivateGroupIndustry);
+router.post("/getGroupIndustries", authMiddleware, getGroupIndustries)
 
 module.exports = router;

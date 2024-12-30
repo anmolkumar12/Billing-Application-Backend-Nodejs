@@ -1167,6 +1167,101 @@ const getIndustryMastersList = async () => {
   }
 };
 
+// Industries Group
+const insertGroupIndustry = async (
+  groupIndustryName,
+  industryIds,
+  updatedBy,
+  isActive
+) => {
+  try {
+    const query = `
+      INSERT INTO group_industry_info 
+      (groupIndustryName, industryIds, updated_by, isActive, updated_at)
+      VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+
+    await db.execute(query, [
+      groupIndustryName,
+      industryIds, // Directly use the comma-separated string here
+      updatedBy,
+      isActive,
+    ]);
+  } catch (err) {
+    console.error("Error inserting group industry:", err);
+    throw new Error("Error inserting group industry");
+  }
+};
+
+const updateGroupIndustryDetails = async (
+  groupIndustryId,
+  groupIndustryName,
+  industryIds,
+  updatedBy,
+  isActive
+) => {
+  try {
+    const query = `
+      UPDATE group_industry_info
+      SET groupIndustryName = ?, industryIds = ?, updated_by = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    await db.execute(query, [
+      groupIndustryName,
+      industryIds, // Directly update the comma-separated industryIds
+      updatedBy,
+      isActive,
+      groupIndustryId,
+    ]);
+  } catch (err) {
+    console.error("Error updating group industry:", err);
+    throw new Error("Error updating group industry");
+  }
+};
+
+const updateGroupIndustryStatus = async (
+  groupIndustryId,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE group_industry_info
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      isActive,
+      updatedBy,
+      groupIndustryId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error("Error updating Group Industry status:", err);
+    throw new Error("Error updating Group Industry status");
+  }
+};
+
+const getGroupIndustriesList = async () => {
+  try {
+    const query = `
+      SELECT group_industry_info.*, 
+             (SELECT GROUP_CONCAT(industry_master_info.industryName) 
+              FROM industry_master_info 
+              WHERE FIND_IN_SET(industry_master_info.id, group_industry_info.industryIds)) AS industryNames
+      FROM group_industry_info
+    `;
+
+    const [groupIndustries] = await db.execute(query);
+    return groupIndustries;
+  } catch (err) {
+    console.error("Error retrieving Group Industries:", err);
+    throw new Error("Error retrieving Group Industries");
+  }
+};
+
 module.exports = {
   createCountry,
   updateCountryDetails,
@@ -1213,4 +1308,9 @@ module.exports = {
   updateIndustryMasterDetails,
   updateIndustryMasterStatus,
   getIndustryMastersList,
+
+  insertGroupIndustry,
+  updateGroupIndustryDetails,
+  updateGroupIndustryStatus,
+  getGroupIndustriesList,
 };
