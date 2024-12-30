@@ -6,7 +6,6 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 CREATE TABLE country_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   code VARCHAR(10) NOT NULL,
@@ -20,7 +19,6 @@ CREATE TABLE country_info (
   updated_by INT,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp of last update
 );
-
 CREATE TABLE state_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   countryId INT NOT NULL,
@@ -31,7 +29,6 @@ CREATE TABLE state_info (
   updated_by INT,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp of last update
 );
-
 CREATE TABLE region_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   countryId INT NOT NULL,
@@ -42,7 +39,6 @@ CREATE TABLE region_info (
   updated_by INT,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Timestamp for when the region was last updated
 );
-
 CREATE TABLE company_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   countryId INT NOT NULL,
@@ -59,7 +55,6 @@ CREATE TABLE company_info (
   updated_by INT NOT NULL,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
 CREATE TABLE company_location_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   companyId INT NOT NULL,
@@ -76,7 +71,6 @@ CREATE TABLE company_location_info (
   FOREIGN KEY (countryId) REFERENCES country_info(id) ON DELETE CASCADE,
   FOREIGN KEY (stateId) REFERENCES state_info(id) ON DELETE CASCADE
 );
-
 CREATE TABLE bank_account_type_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   countryId INT NOT NULL,
@@ -89,7 +83,6 @@ CREATE TABLE bank_account_type_info (
   FOREIGN KEY (updated_by) REFERENCES user_info(id) ON DELETE
   SET NULL
 );
-
 CREATE TABLE IF NOT EXISTS company_account_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   companyId INT NOT NULL,
@@ -106,4 +99,24 @@ CREATE TABLE IF NOT EXISTS company_account_info (
   FOREIGN KEY (companyId) REFERENCES company_info(id),
   FOREIGN KEY (countryId) REFERENCES country_info(id),
   FOREIGN KEY (bankAccountTypeId) REFERENCES bank_account_type_info(id)
-)
+) CREATE TABLE production_type_info (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  productionTypeName VARCHAR(255) NOT NULL,
+  updated_by INT NOT NULL,
+  isActive TINYINT(1) DEFAULT 1,
+  -- 1 for active, 0 for inactive
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (updated_by) REFERENCES users(id) -- assuming you have a `users` table for `updated_by`
+);
+CREATE TABLE industry_master_info (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  industryName VARCHAR(255) NOT NULL,
+  productionTypeId INT NOT NULL,
+  -- Foreign Key to the production_type_info table
+  updated_by INT NOT NULL,
+  isActive TINYINT(1) DEFAULT 1,
+  -- 1 for active, 0 for inactive
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (productionTypeId) REFERENCES production_type_info(id),
+  FOREIGN KEY (updated_by) REFERENCES users(id) -- assuming you have a `users` table for `updated_by`
+);

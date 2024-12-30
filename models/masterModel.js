@@ -971,6 +971,202 @@ const getCompanyAccountsList = async (companyId = null) => {
   }
 };
 
+// Production Type Master
+const insertProductionType = async (
+  productionTypeName,
+  updatedBy,
+  isActive
+) => {
+  try {
+    const query = `
+      INSERT INTO production_type_info 
+      (productionTypeName, updated_by, isActive, updated_at)
+      VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+
+    const [result] = await db.execute(query, [
+      productionTypeName,
+      updatedBy,
+      isActive,
+    ]);
+
+    return result;
+  } catch (err) {
+    console.error("Error inserting production type:", err);
+    throw new Error("Error inserting production type");
+  }
+};
+
+const updateProductionTypeDetails = async (
+  productionTypeId,
+  productionTypeName,
+  updatedBy,
+  isActive
+) => {
+  try {
+    const sanitizedValues = [
+      productionTypeName ?? null,
+      updatedBy ?? null,
+      isActive ?? null, // Update isActive field
+      productionTypeId,
+    ];
+
+    const query = `
+      UPDATE production_type_info
+      SET 
+        productionTypeName = ?, 
+        updated_by = ?, 
+        isActive = ?,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, sanitizedValues);
+    return result;
+  } catch (err) {
+    console.error("Error updating production type:", err);
+    throw new Error("Error updating production type details");
+  }
+};
+
+const updateProductionTypeStatus = async (
+  productionTypeId,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE production_type_info
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      isActive,
+      updatedBy,
+      productionTypeId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error("Error updating production type status:", err);
+    throw new Error("Error updating production type status");
+  }
+};
+
+const getProductionTypesList = async () => {
+  try {
+    const query = `SELECT * FROM production_type_info`;
+    const [productionTypes] = await db.execute(query);
+    return productionTypes;
+  } catch (err) {
+    console.error("Error retrieving production types:", err);
+    throw new Error("Error retrieving production types list");
+  }
+};
+
+// Industry Master
+const insertIndustryMaster = async (
+  industryName,
+  productionTypeId,
+  updatedBy,
+  isActive
+) => {
+  try {
+    const query = `
+      INSERT INTO industry_master_info 
+      (industryName, productionTypeId, updated_by, isActive, updated_at)
+      VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+
+    const [result] = await db.execute(query, [
+      industryName,
+      productionTypeId,
+      updatedBy,
+      isActive,
+    ]);
+
+    return result;
+  } catch (err) {
+    console.error("Error inserting industry master:", err);
+    throw new Error("Error inserting industry master");
+  }
+};
+
+const updateIndustryMasterDetails = async (
+  industryMasterId,
+  industryName,
+  productionTypeId,
+  updatedBy,
+  isActive
+) => {
+  try {
+    const query = `
+      UPDATE industry_master_info
+      SET 
+        industryName = ?, 
+        productionTypeId = ?, 
+        updated_by = ?, 
+        isActive = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      industryName,
+      productionTypeId,
+      updatedBy,
+      isActive,
+      industryMasterId,
+    ]);
+
+    return result;
+  } catch (err) {
+    console.error("Error updating industry master:", err);
+    throw new Error("Error updating industry master details");
+  }
+};
+
+const updateIndustryMasterStatus = async (
+  industryMasterId,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE industry_master_info
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      isActive,
+      updatedBy,
+      industryMasterId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error("Error updating industry master status:", err);
+    throw new Error("Error updating industry master status");
+  }
+};
+
+const getIndustryMastersList = async () => {
+  try {
+    const query = `
+      SELECT industry_master_info.*, 
+             production_type_info.productionTypeName
+      FROM industry_master_info
+      LEFT JOIN production_type_info 
+      ON industry_master_info.productionTypeId = production_type_info.id
+    `;
+    const [industryMasters] = await db.execute(query);
+    return industryMasters;
+  } catch (err) {
+    console.error("Error retrieving industry masters:", err);
+    throw new Error("Error retrieving industry masters");
+  }
+};
+
 module.exports = {
   createCountry,
   updateCountryDetails,
@@ -1007,4 +1203,14 @@ module.exports = {
   updateCompanyAccountDetails,
   activateDeactivateCompanyAccountDetails,
   getCompanyAccountsList,
+
+  insertProductionType,
+  updateProductionTypeDetails,
+  updateProductionTypeStatus,
+  getProductionTypesList,
+
+  insertIndustryMaster,
+  updateIndustryMasterDetails,
+  updateIndustryMasterStatus,
+  getIndustryMastersList,
 };

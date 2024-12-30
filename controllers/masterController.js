@@ -34,6 +34,16 @@ const {
   updateCompanyAccountDetails,
   activateDeactivateCompanyAccountDetails,
   getCompanyAccountsList,
+
+  insertProductionType,
+  updateProductionTypeDetails,
+  updateProductionTypeStatus,
+  getProductionTypesList,
+
+  insertIndustryMaster,
+  updateIndustryMasterDetails,
+  updateIndustryMasterStatus,
+  getIndustryMastersList,
 } = require("../models/masterModel");
 
 // Country
@@ -917,6 +927,219 @@ const getCompanyAccounts = async (req, res) => {
   }
 };
 
+// Production Type Master
+const createProductionType = async (req, res) => {
+  const {
+    productionTypeName, // Production Type Name
+    updatedBy, // User updating the information
+    isActive = 1, // Default value is 1 (active)
+  } = req.body;
+
+  try {
+    await insertProductionType(productionTypeName, updatedBy, isActive);
+
+    res.status(201).json({
+      statusCode: 201,
+      message: "Production Type created successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while creating production type",
+    });
+  }
+};
+
+const updateProductionType = async (req, res) => {
+  const {
+    productionTypeId, // ID of the production type to update
+    productionTypeName, // Updated Production Type Name
+    updatedBy, // User updating the information
+    isActive, // isActive status (1 or 0)
+  } = req.body;
+
+  if (!productionTypeId) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Production Type ID is required",
+    });
+  }
+
+  try {
+    await updateProductionTypeDetails(
+      productionTypeId,
+      productionTypeName,
+      updatedBy,
+      isActive
+    );
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Production Type updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating production type",
+    });
+  }
+};
+
+const activateOrDeactivateProductionType = async (req, res) => {
+  const { productionTypeId, isActive, updatedBy } = req.body;
+
+  if (!productionTypeId || isActive === undefined) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Production Type ID and isActive are required",
+    });
+  }
+
+  try {
+    // Toggle isActive based on the value of isActive (0 or 1)
+    await updateProductionTypeStatus(productionTypeId, isActive, updatedBy);
+
+    res.status(200).json({
+      statusCode: 200,
+      message: `Production Type ${
+        isActive ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating production type status",
+    });
+  }
+};
+
+const getProductionTypes = async (req, res) => {
+  try {
+    const productionTypes = await getProductionTypesList();
+
+    res.status(200).json({
+      statusCode: 200,
+      productionTypes,
+    });
+  } catch (err) {
+    console.error("Error retrieving production types:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while fetching production types",
+    });
+  }
+};
+
+// Industry Master
+const createIndustryMaster = async (req, res) => {
+  const {
+    industryName, // Industry Name
+    productionTypeId, // Tag/Select Production Type
+    updatedBy, // User updating the record
+    isActive = 1, // Default value is 1 (active)
+  } = req.body;
+
+  try {
+    await insertIndustryMaster(
+      industryName,
+      productionTypeId,
+      updatedBy,
+      isActive
+    );
+
+    res.status(201).json({
+      statusCode: 201,
+      message: "Industry Master created successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while creating industry master",
+    });
+  }
+};
+
+const updateIndustryMaster = async (req, res) => {
+  const {
+    industryMasterId, // ID of the industry master record to update
+    industryName, // Updated Industry Name
+    productionTypeId, // Updated Production Type ID
+    updatedBy, // User who updated
+    isActive, // Active status (1 or 0)
+  } = req.body;
+
+  if (!industryMasterId) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Industry Master ID is required",
+    });
+  }
+
+  try {
+    await updateIndustryMasterDetails(
+      industryMasterId,
+      industryName,
+      productionTypeId,
+      updatedBy,
+      isActive
+    );
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Industry Master updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating industry master",
+    });
+  }
+};
+
+const activateOrDeactivateIndustryMaster = async (req, res) => {
+  const { industryMasterId, isActive, updatedBy } = req.body;
+
+  if (!industryMasterId || isActive === undefined) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Industry Master ID and isActive are required",
+    });
+  }
+
+  try {
+    await updateIndustryMasterStatus(industryMasterId, isActive, updatedBy);
+
+    res.status(200).json({
+      statusCode: 200,
+      message: `Industry Master ${
+        isActive ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating industry master status",
+    });
+  }
+};
+
+const getIndustryMasters = async (req, res) => {
+  try {
+    const industryMasters = await getIndustryMastersList();
+
+    res.status(200).json({
+      statusCode: 200,
+      industryMasters,
+    });
+  } catch (err) {
+    console.error("Error retrieving industry masters:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while fetching industry masters",
+    });
+  }
+};
+
 module.exports = {
   addCountry,
   updateCountry,
@@ -952,4 +1175,14 @@ module.exports = {
   updateCompanyAccount,
   activateDeactivateCompanyAccount,
   getCompanyAccounts,
+
+  createProductionType,
+  updateProductionType,
+  activateOrDeactivateProductionType,
+  getProductionTypes,
+
+  createIndustryMaster,
+  updateIndustryMaster,
+  activateOrDeactivateIndustryMaster,
+  getIndustryMasters,
 };

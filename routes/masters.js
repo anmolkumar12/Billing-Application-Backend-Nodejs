@@ -33,7 +33,17 @@ const {
 createCompanyAccount,
 updateCompanyAccount,
 activateDeactivateCompanyAccount,
-getCompanyAccounts
+getCompanyAccounts,
+
+createProductionType,
+updateProductionType,
+activateOrDeactivateProductionType,
+getProductionTypes,
+
+createIndustryMaster,
+updateIndustryMaster,
+activateOrDeactivateIndustryMaster,
+getIndustryMasters,
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -81,5 +91,18 @@ router.post("/createCompanyAccount", authMiddleware, createCompanyAccount);
 router.post("/updateCompanyAccount", authMiddleware, updateCompanyAccount);
 router.post("/activateDeactivateCompanyAccount", authMiddleware, activateDeactivateCompanyAccount);
 router.post("/getCompanyAccounts", authMiddleware, getCompanyAccounts)
+
+// Account Type Master
+router.post("/createProductionType", authMiddleware, createProductionType);
+router.post("/updateProductionType", authMiddleware, updateProductionType);
+router.post("/activateOrDeactivateProductionType", authMiddleware, activateOrDeactivateProductionType);
+router.post("/getProductionTypes", authMiddleware, getProductionTypes)
+
+// Industry Type Master
+router.post("/createIndustryMaster", authMiddleware, createIndustryMaster);
+router.post("/updateIndustryMaster", authMiddleware, updateIndustryMaster);
+router.post("/activateOrDeactivateIndustryMaster", authMiddleware, activateOrDeactivateIndustryMaster);
+router.post("/getIndustryMasters", authMiddleware, getIndustryMasters)
+
 
 module.exports = router;
