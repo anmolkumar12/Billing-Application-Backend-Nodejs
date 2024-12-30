@@ -943,13 +943,13 @@ const getCompanyAccountsList = async (companyId = null) => {
     let query = `
       SELECT 
         company_account_info.*, 
-        company_info.name as companyName,
+        company_info.companyName,
         bank_account_type_info.accountTypeName,
         country_info.name AS countryName
       FROM 
         company_account_info
       LEFT JOIN 
-        company_master ON company_account_info.companyId = company_master.id
+        company_info ON company_account_info.companyId = company_info.id
       LEFT JOIN 
         bank_account_type_info ON company_account_info.bankAccountTypeId = bank_account_type_info.id
       LEFT JOIN 
@@ -1322,7 +1322,7 @@ const updateIndustryHeadDetails = async (
 
     await db.execute(query, [
       industryHeadName,
-      industryIds, // Comma-separated industry IDs
+      industryIds,
       isRegionWise,
       isRegionWise ? countryId : null,
       isRegionWise ? regionId : null,
