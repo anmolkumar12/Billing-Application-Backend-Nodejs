@@ -28,7 +28,12 @@ const {
   createBankAccountType,
   updateBankAccountType,
   activateDeactivateBankAccountType,
-  getBankAccountTypes
+  getBankAccountTypes,
+
+createCompanyAccount,
+updateCompanyAccount,
+activateDeactivateCompanyAccount,
+getCompanyAccounts
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -71,5 +76,10 @@ router.post("/updateBankAccountType", authMiddleware, updateBankAccountType);
 router.post("/activateDeactivateBankAccountType", authMiddleware, activateDeactivateBankAccountType);
 router.post("/getBankAccountTypes", authMiddleware, getBankAccountTypes)
 
+// Account Type Master
+router.post("/createCompanyAccount", authMiddleware, createCompanyAccount);
+router.post("/updateCompanyAccount", authMiddleware, updateCompanyAccount);
+router.post("/activateDeactivateCompanyAccount", authMiddleware, activateDeactivateCompanyAccount);
+router.post("/getCompanyAccounts", authMiddleware, getCompanyAccounts)
 
 module.exports = router;
