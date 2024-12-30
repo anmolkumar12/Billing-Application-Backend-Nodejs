@@ -1432,4 +1432,9 @@ module.exports = {
   updateGroupIndustryDetails,
   updateGroupIndustryStatus,
   getGroupIndustriesList,
+
+  insertIndustryHead,
+  updateIndustryHeadDetails,
+  updateIndustryHeadStatus,
+  getIndustryHeadsList,
 };

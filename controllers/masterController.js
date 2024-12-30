@@ -49,6 +49,11 @@ const {
   updateGroupIndustryDetails,
   updateGroupIndustryStatus,
   getGroupIndustriesList,
+
+  insertIndustryHead,
+  updateIndustryHeadDetails,
+  updateIndustryHeadStatus,
+  getIndustryHeadsList,
 } = require("../models/masterModel");
 
 // Country
@@ -1145,7 +1150,7 @@ const getIndustryMasters = async (req, res) => {
   }
 };
 
-// Industries Group
+// Industries Group Master
 const createGroupIndustry = async (req, res) => {
   const {
     groupIndustryName, // Name of Group Industry
@@ -1259,7 +1264,7 @@ const getGroupIndustries = async (req, res) => {
   }
 };
 
-// Create Industry Head Master
+// Industryhead Master
 const createIndustryHead = async (req, res) => {
   const {
     industryHeadName,
