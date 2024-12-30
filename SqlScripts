@@ -6,130 +6,88 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 CREATE TABLE country_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   code VARCHAR(10) NOT NULL,
-  -- ISO country code (e.g., US, IN)
   name VARCHAR(100) NOT NULL,
-  -- Country name (e.g., United States)
   language VARCHAR(100),
-  -- Main language (e.g., English)
   phoneCode VARCHAR(10),
-  -- Phone dialing code (e.g., +1)
   addressAdditionalFields TEXT,
-  -- Additional address information (optional)
   bankAccAdditionalFields TEXT,
-  -- Additional bank account information (optional)
+  companyAddtionalFields TEXT,
   isactive BOOLEAN DEFAULT 1,
-  -- Active status (1 for active, 0 for inactive)
   updated_by INT,
-  -- ID of the user who last updated the record
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp of last update
 );
+
 CREATE TABLE state_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  -- State ID
   countryId INT NOT NULL,
-  -- Country ID (foreign key to country_info table)
   stateName VARCHAR(100) NOT NULL,
-  -- State name (e.g., "California")
   stateCode VARCHAR(50) NOT NULL,
-  -- Unique State Code (e.g., "CA")
   gstCode VARCHAR(20),
-  -- GST Code (if applicable)
   isactive BOOLEAN DEFAULT 1,
-  -- Active status (1 for active, 0 for inactive)
   updated_by INT,
-  -- User who last updated the record
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp of last update
 );
+
 CREATE TABLE region_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  -- Unique identifier for the region
   countryId INT NOT NULL,
-  -- ID of the country the region belongs to
   regionName VARCHAR(255) NOT NULL,
-  -- Name of the region
   regionCode VARCHAR(50),
-  -- Code for the region (optional)
   stateIds VARCHAR(255),
-  -- Comma-separated list of state IDs
   isactive BOOLEAN DEFAULT TRUE,
-  -- Whether the region is active or not (1 = active, 0 = inactive)
   updated_by INT,
-  -- ID of the user who last updated the region
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Timestamp for when the region was last updated
 );
+
 CREATE TABLE company_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   companyName VARCHAR(255) NOT NULL,
   Website VARCHAR(255),
-  CINNO VARCHAR(255),
-  IECode VARCHAR(255),
   Email VARCHAR(255),
   independent TINYINT(1) DEFAULT 0,
-  -- 0 = Independent, 1 = Subsidiary
   parentCompanyId INT DEFAULT NULL,
-  -- References the parent company if any
   logopath VARCHAR(255),
   digitalSignPath VARCHAR(255),
-  -- Optional field for the digital sign or image
   description TEXT,
   isactive TINYINT(1) DEFAULT 1,
-  -- 1 = Active, 0 = Inactive
   updated_by INT NOT NULL,
-  -- Assuming this will store the user id of the person who updated the record
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
 CREATE TABLE company_location_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  -- Unique ID for each company location
   companyId INT NOT NULL,
-  -- Company ID (foreign key to company_info table)
   countryId INT NOT NULL,
-  -- Country ID (foreign key to country_info table)
   stateId INT NOT NULL,
-  -- State ID (foreign key to state_info table)
   address1 VARCHAR(255) NOT NULL,
-  -- Primary address line
   address2 VARCHAR(255),
-  -- Secondary address line
   address3 VARCHAR(255),
-  -- Tertiary address line
   additionalAddressDetails TEXT,
-  -- Additional details for the address, specific to the country
   isActive TINYINT(1) DEFAULT 1,
-  -- Status of the location (active/inactive), default is active
   updated_by INT,
-  -- User ID who last updated the record (foreign key to user table)
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  -- Timestamp of the last update
   FOREIGN KEY (companyId) REFERENCES company_info(id) ON DELETE CASCADE,
-  -- Foreign key to company_info
   FOREIGN KEY (countryId) REFERENCES country_info(id) ON DELETE CASCADE,
-  -- Foreign key to country_info
-  FOREIGN KEY (stateId) REFERENCES state_info(id) ON DELETE CASCADE -- Foreign key to state_info
+  FOREIGN KEY (stateId) REFERENCES state_info(id) ON DELETE CASCADE
 );
+
 CREATE TABLE bank_account_type_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  -- Unique ID for each bank account type
   countryId INT NOT NULL,
-  -- Country ID (foreign key to country_info table)
   accountTypeName VARCHAR(255) NOT NULL,
-  -- Name of the bank account type (e.g., "Saving", "Current")
   description TEXT,
-  -- Description of the account type
   isActive TINYINT(1) DEFAULT 1,
-  -- Status of the account type (active/inactive), default is active
   updated_by INT,
-  -- User ID who last updated the record (foreign key to user table)
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  -- Timestamp of the last update
   FOREIGN KEY (countryId) REFERENCES country_info(id) ON DELETE CASCADE,
-  -- Foreign key to country_info
   FOREIGN KEY (updated_by) REFERENCES user_info(id) ON DELETE
-  SET NULL -- Foreign key to user_info, updated by
+  SET NULL
 );
+
 CREATE TABLE IF NOT EXISTS company_account_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   companyId INT NOT NULL,

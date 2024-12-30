@@ -8,12 +8,13 @@ const createCountry = async (
   phoneCode,
   addressAdditionalFields,
   bankAccAdditionalFields,
+  companyAddtionalFields,
   isActive,
   updatedBy
 ) => {
   try {
     const query = `
-      INSERT INTO country_info (code, name, language, phoneCode, addressAdditionalFields, bankAccAdditionalFields, isactive, updated_by, updated_at)
+      INSERT INTO country_info (code, name, language, phoneCode, addressAdditionalFields, bankAccAdditionalFields, companyAddtionalFields, isactive, updated_by, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
@@ -24,6 +25,7 @@ const createCountry = async (
       phoneCode,
       addressAdditionalFields,
       bankAccAdditionalFields,
+      companyAddtionalFields,
       isActive,
       updatedBy,
     ]);
@@ -43,6 +45,7 @@ const updateCountryDetails = async (
   phoneCode,
   addressAdditionalFields,
   bankAccAdditionalFields,
+  companyAddtionalFields,
   isActive,
   updatedBy
 ) => {
@@ -54,6 +57,7 @@ const updateCountryDetails = async (
       phoneCode ?? null,
       addressAdditionalFields ?? null,
       bankAccAdditionalFields ?? null,
+      companyAddtionalFields ?? null,
       updatedBy ?? null,
       isActive ?? null,
       countryId,
@@ -68,6 +72,7 @@ const updateCountryDetails = async (
         phoneCode = ?, 
         addressAdditionalFields = ?, 
         bankAccAdditionalFields = ?, 
+        companyAddtionalFields = ?,
         updated_by = ?, 
         updated_at = CURRENT_TIMESTAMP, 
         isactive = ?
@@ -387,8 +392,6 @@ const getRegions = async (countryId = null) => {
 const createCompany = async (
   companyName,
   Website,
-  CINNO,
-  IECode,
   Email,
   description,
   isActive,
@@ -401,17 +404,15 @@ const createCompany = async (
   try {
     const query = `
       INSERT INTO company_info (
-        companyName, Website, CINNO, IECode, Email, logopath, description, isactive, updated_by, 
+        companyName, Website, Email, logopath, description, isactive, updated_by, 
         independent, parentCompanyId, digitalSignPath, updated_at
       ) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     const [result] = await db.execute(query, [
       companyName,
       Website,
-      CINNO,
-      IECode,
       Email,
       logopath,
       description,
@@ -450,8 +451,6 @@ const updateCompanyDetails = async (
   companyId,
   companyName,
   Website,
-  CINNO,
-  IECode,
   Email,
   description,
   isActive,
@@ -465,8 +464,6 @@ const updateCompanyDetails = async (
     const sanitizedValues = [
       companyName ?? null,
       Website ?? null,
-      CINNO ?? null,
-      IECode ?? null,
       Email ?? null,
       logopath ?? null, // Updated logo path (if new)
       description ?? null,
@@ -483,8 +480,6 @@ const updateCompanyDetails = async (
       SET 
         companyName = ?, 
         Website = ?, 
-        CINNO = ?, 
-        IECode = ?, 
         Email = ?, 
         logopath = ?, 
         description = ?, 

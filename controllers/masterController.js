@@ -45,6 +45,7 @@ const addCountry = async (req, res) => {
     phoneCode,
     addressAdditionalFields,
     bankAccAdditionalFields,
+    companyAddtionalFields,
     isActive,
     updatedBy,
   } = req.body;
@@ -57,6 +58,7 @@ const addCountry = async (req, res) => {
       phoneCode,
       addressAdditionalFields,
       bankAccAdditionalFields,
+      companyAddtionalFields,
       isActive,
       updatedBy
     );
@@ -83,6 +85,7 @@ const updateCountry = async (req, res) => {
     phoneCode,
     addressAdditionalFields,
     bankAccAdditionalFields,
+    companyAddtionalFields,
     isActive,
     updatedBy,
   } = req.body;
@@ -103,6 +106,7 @@ const updateCountry = async (req, res) => {
       phoneCode,
       addressAdditionalFields,
       bankAccAdditionalFields,
+      companyAddtionalFields,
       isActive,
       updatedBy
     );
@@ -382,8 +386,6 @@ const addCompany = async (req, res) => {
   const {
     companyName,
     Website,
-    CINNO,
-    IECode,
     Email,
     description,
     isActive,
@@ -402,8 +404,6 @@ const addCompany = async (req, res) => {
     await createCompany(
       companyName,
       Website,
-      CINNO,
-      IECode,
       Email,
       description,
       isActive,
@@ -431,8 +431,6 @@ const updateCompany = async (req, res) => {
     companyId,
     companyName,
     Website,
-    CINNO,
-    IECode,
     Email,
     description,
     isActive,
@@ -466,8 +464,6 @@ const updateCompany = async (req, res) => {
       companyId,
       companyName,
       Website,
-      CINNO,
-      IECode,
       Email,
       description,
       isActive,
