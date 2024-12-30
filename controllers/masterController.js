@@ -308,7 +308,7 @@ const updateRegion = async (req, res) => {
     countryId, // Country ID (foreign key referencing country_info table)
     regionName, // The name of the region (e.g., "Midwest")
     regionCode, // The unique code for the region (e.g., "MW")
-    stateId, // State ID (foreign key referencing state_info table)
+    stateIds, // State ID (foreign key referencing state_info table)
     isActive, // Status: Active or Inactive
     updatedBy, // User who is updating this information
   } = req.body;
@@ -326,7 +326,7 @@ const updateRegion = async (req, res) => {
       countryId,
       regionName,
       regionCode,
-      stateId,
+      stateIds,
       isActive,
       updatedBy
     );
