@@ -810,7 +810,7 @@ const getBankAccountTypesList = async (countryId = null) => {
   }
 };
 
-// Helper Functions
+// Company Account Master
 const insertCompanyAccount = async (
   companyId,
   isDefaultAccount,
