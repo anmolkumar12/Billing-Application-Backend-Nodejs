@@ -384,6 +384,7 @@ const getRegionsList = async (req, res) => {
 // Company
 const addCompany = async (req, res) => {
   const {
+    countryId,
     companyName,
     Website,
     Email,
@@ -403,6 +404,7 @@ const addCompany = async (req, res) => {
 
   try {
     await createCompany(
+      countryId,
       companyName,
       Website,
       Email,
@@ -430,6 +432,7 @@ const addCompany = async (req, res) => {
 
 const updateCompany = async (req, res) => {
   const {
+    countryId,
     companyId,
     companyName,
     Website,
@@ -464,6 +467,7 @@ const updateCompany = async (req, res) => {
     const updatedDigitalSignPath = digitalSignPath || company.digitalSignPath; // Default to old digitalSignPath if no new file
 
     const result = await updateCompanyDetails(
+      countryId,
       companyId,
       companyName,
       Website,

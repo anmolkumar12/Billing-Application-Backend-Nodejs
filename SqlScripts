@@ -45,6 +45,7 @@ CREATE TABLE region_info (
 
 CREATE TABLE company_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
+  countryId INT NOT NULL,
   companyName VARCHAR(255) NOT NULL,
   Website VARCHAR(255),
   Email VARCHAR(255),

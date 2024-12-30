@@ -390,6 +390,7 @@ const getRegions = async (countryId = null) => {
 
 // Company
 const createCompany = async (
+  countryId,
   companyName,
   Website,
   Email,
@@ -405,13 +406,14 @@ const createCompany = async (
   try {
     const query = `
       INSERT INTO company_info (
-        companyName, Website, Email, logopath, description, companyAddtionalFields, isactive, updated_by, 
+       countryId, companyName, Website, Email, logopath, description, companyAddtionalFields, isactive, updated_by, 
         independent, parentCompanyId, digitalSignPath, updated_at
       ) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     const [result] = await db.execute(query, [
+      countryId,
       companyName,
       Website,
       Email,
@@ -450,6 +452,7 @@ const getCompanyById = async (companyId) => {
 };
 
 const updateCompanyDetails = async (
+  countryId,
   companyId,
   companyName,
   Website,
@@ -465,6 +468,7 @@ const updateCompanyDetails = async (
 ) => {
   try {
     const sanitizedValues = [
+      countryId ?? null,
       companyName ?? null,
       Website ?? null,
       Email ?? null,
@@ -482,6 +486,7 @@ const updateCompanyDetails = async (
     const query = `
       UPDATE company_info
       SET 
+      countryId = ?,
         companyName = ?, 
         Website = ?, 
         Email = ?, 
@@ -532,17 +537,22 @@ const activateDeactivateCompanyDetails = async (
 
 const getCompanies = async () => {
   try {
-    // Define the base query to fetch all company details, including parent company info
+    // Define the base query to fetch all company details, including parent company info and country name
     const query = `
       SELECT 
         company_info.*, 
-        parent_company.companyName AS parentCompanyName
+        parent_company.companyName AS parentCompanyName,
+        country_info.name AS countryName
       FROM 
         company_info
       LEFT JOIN 
         company_info AS parent_company
       ON 
-        company_info.parentCompanyId = parent_company.id`;
+        company_info.parentCompanyId = parent_company.id
+      LEFT JOIN 
+        country_info
+      ON 
+        company_info.countryId = country_info.id`;
 
     // Execute the query with no additional filtering
     const [companies] = await db.execute(query);
