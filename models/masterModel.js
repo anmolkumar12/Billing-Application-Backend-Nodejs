@@ -394,6 +394,7 @@ const createCompany = async (
   Website,
   Email,
   description,
+  companyAddtionalFields,
   isActive,
   updatedBy,
   logopath,
@@ -404,10 +405,10 @@ const createCompany = async (
   try {
     const query = `
       INSERT INTO company_info (
-        companyName, Website, Email, logopath, description, isactive, updated_by, 
+        companyName, Website, Email, logopath, description, companyAddtionalFields, isactive, updated_by, 
         independent, parentCompanyId, digitalSignPath, updated_at
       ) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     const [result] = await db.execute(query, [
@@ -416,6 +417,7 @@ const createCompany = async (
       Email,
       logopath,
       description,
+      companyAddtionalFields,
       isActive,
       updatedBy,
       independent,
@@ -453,6 +455,7 @@ const updateCompanyDetails = async (
   Website,
   Email,
   description,
+  companyAddtionalFields,
   isActive,
   logopath,
   updatedBy,
@@ -467,6 +470,7 @@ const updateCompanyDetails = async (
       Email ?? null,
       logopath ?? null, // Updated logo path (if new)
       description ?? null,
+      companyAddtionalFields ?? null,
       updatedBy ?? null,
       isActive ?? null,
       independent ?? null,
@@ -483,6 +487,7 @@ const updateCompanyDetails = async (
         Email = ?, 
         logopath = ?, 
         description = ?, 
+        companyAddtionalFields = ?,
         updated_by = ?, 
         isactive = ?, 
         independent = ?, 

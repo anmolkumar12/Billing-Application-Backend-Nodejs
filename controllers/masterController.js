@@ -388,6 +388,7 @@ const addCompany = async (req, res) => {
     Website,
     Email,
     description,
+    companyAddtionalFields,
     isActive,
     updatedBy,
     independent, // 0 or 1 to define whether the company is independent
@@ -406,6 +407,7 @@ const addCompany = async (req, res) => {
       Website,
       Email,
       description,
+      companyAddtionalFields,
       isActive,
       updatedBy,
       logoPath,
@@ -433,6 +435,7 @@ const updateCompany = async (req, res) => {
     Website,
     Email,
     description,
+    companyAddtionalFields,
     isActive,
     updatedBy,
     independent, // 0 or 1 to define whether the company is independent
@@ -466,6 +469,7 @@ const updateCompany = async (req, res) => {
       Website,
       Email,
       description,
+      companyAddtionalFields,
       isActive,
       updatedLogoPath,
       updatedBy,
