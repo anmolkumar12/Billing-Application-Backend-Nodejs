@@ -1259,6 +1259,143 @@ const getGroupIndustries = async (req, res) => {
   }
 };
 
+// Create Industry Head Master
+const createIndustryHead = async (req, res) => {
+  const {
+    industryHeadName,
+    industryIds,
+    isRegionWise,
+    countryId,
+    regionId,
+    stateId,
+    startDate,
+    endDate,
+    updatedBy,
+    isActive = 1,
+  } = req.body;
+
+  try {
+    await insertIndustryHead(
+      industryHeadName,
+      industryIds,
+      isRegionWise,
+      countryId,
+      regionId,
+      stateId,
+      startDate,
+      endDate,
+      updatedBy,
+      isActive
+    );
+
+    res.status(201).json({
+      statusCode: 201,
+      message: "Industry Head created successfully",
+    });
+  } catch (err) {
+    console.error("Error creating industry head:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while creating industry head",
+    });
+  }
+};
+
+const updateIndustryHead = async (req, res) => {
+  const {
+    industryHeadId,
+    industryHeadName,
+    industryIds,
+    isRegionWise,
+    countryId,
+    regionId,
+    stateId,
+    startDate,
+    endDate,
+    updatedBy,
+    isActive,
+  } = req.body;
+
+  if (!industryHeadId) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Industry Head ID is required",
+    });
+  }
+
+  try {
+    await updateIndustryHeadDetails(
+      industryHeadId,
+      industryHeadName,
+      industryIds,
+      isRegionWise,
+      countryId,
+      regionId,
+      stateId,
+      startDate,
+      endDate,
+      updatedBy,
+      isActive
+    );
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Industry Head updated successfully",
+    });
+  } catch (err) {
+    console.error("Error updating industry head:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating industry head",
+    });
+  }
+};
+
+const activateOrDeactivateIndustryHead = async (req, res) => {
+  const { industryHeadId, isActive, updatedBy } = req.body;
+
+  if (!industryHeadId || isActive === undefined) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Industry Head ID and isActive are required",
+    });
+  }
+
+  try {
+    await updateIndustryHeadStatus(industryHeadId, isActive, updatedBy);
+
+    res.status(200).json({
+      statusCode: 200,
+      message: `Industry Head ${
+        isActive ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    console.error("Error updating Industry Head status:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating Industry Head status",
+    });
+  }
+};
+
+const getIndustryHeads = async (req, res) => {
+  try {
+    const industryHeads = await getIndustryHeadsList();
+
+    res.status(200).json({
+      statusCode: 200,
+      industryHeads,
+    });
+  } catch (err) {
+    console.error("Error retrieving Industry Heads:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while fetching Industry Heads",
+    });
+  }
+};
+
 module.exports = {
   addCountry,
   updateCountry,
@@ -1309,4 +1446,9 @@ module.exports = {
   updateGroupIndustry,
   activateOrDeactivateGroupIndustry,
   getGroupIndustries,
+
+  createIndustryHead,
+  updateIndustryHead,
+  activateOrDeactivateIndustryHead,
+  getIndustryHeads,
 };

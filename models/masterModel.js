@@ -943,7 +943,7 @@ const getCompanyAccountsList = async (companyId = null) => {
     let query = `
       SELECT 
         company_account_info.*, 
-        company_master.companyName,
+        company_info.name as companyName,
         bank_account_type_info.accountTypeName,
         country_info.name AS countryName
       FROM 
@@ -1259,6 +1259,125 @@ const getGroupIndustriesList = async () => {
   } catch (err) {
     console.error("Error retrieving Group Industries:", err);
     throw new Error("Error retrieving Group Industries");
+  }
+};
+
+// Industry Head Master
+const insertIndustryHead = async (
+  industryHeadName,
+  industryIds,
+  isRegionWise,
+  countryId,
+  regionId,
+  stateId,
+  startDate,
+  endDate,
+  updatedBy,
+  isActive
+) => {
+  try {
+    const query = `
+      INSERT INTO industry_head_master 
+      (industryHeadName, industryIds, isRegionWise, countryId, regionId, stateId, startDate, endDate, updated_by, isActive, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+
+    await db.execute(query, [
+      industryHeadName,
+      industryIds,
+      isRegionWise,
+      isRegionWise ? countryId : null,
+      isRegionWise ? regionId : null,
+      !isRegionWise ? stateId : null,
+      startDate,
+      endDate,
+      updatedBy,
+      isActive,
+    ]);
+  } catch (err) {
+    console.error("Error inserting industry head:", err);
+    throw new Error("Error inserting industry head");
+  }
+};
+
+const updateIndustryHeadDetails = async (
+  industryHeadId,
+  industryHeadName,
+  industryIds,
+  isRegionWise,
+  countryId,
+  regionId,
+  stateId,
+  startDate,
+  endDate,
+  updatedBy,
+  isActive
+) => {
+  try {
+    const query = `
+      UPDATE industry_head_master
+      SET industryHeadName = ?, industryIds = ?, isRegionWise = ?, countryId = ?, regionId = ?, stateId = ?, startDate = ?, endDate = ?, updated_by = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    await db.execute(query, [
+      industryHeadName,
+      industryIds, // Comma-separated industry IDs
+      isRegionWise,
+      isRegionWise ? countryId : null,
+      isRegionWise ? regionId : null,
+      !isRegionWise ? stateId : null,
+      startDate,
+      endDate,
+      updatedBy,
+      isActive,
+      industryHeadId,
+    ]);
+  } catch (err) {
+    console.error("Error updating industry head:", err);
+    throw new Error("Error updating industry head");
+  }
+};
+
+const updateIndustryHeadStatus = async (
+  industryHeadId,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE industry_head_master
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      isActive,
+      updatedBy,
+      industryHeadId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error("Error updating Industry Head status:", err);
+    throw new Error("Error updating Industry Head status");
+  }
+};
+
+const getIndustryHeadsList = async () => {
+  try {
+    const query = `
+      SELECT industry_head_master.*, 
+             (SELECT GROUP_CONCAT(industry_master_info.industryName) 
+              FROM industry_master_info 
+              WHERE FIND_IN_SET(industry_master_info.id, industry_head_master.industryIds)) AS industryNames
+      FROM industry_head_master
+    `;
+
+    const [industryHeads] = await db.execute(query);
+    return industryHeads;
+  } catch (err) {
+    console.error("Error retrieving Industry Heads:", err);
+    throw new Error("Error retrieving Industry Heads");
   }
 };
 
