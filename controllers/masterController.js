@@ -54,6 +54,11 @@ const {
   updateIndustryHeadDetails,
   updateIndustryHeadStatus,
   getIndustryHeadsList,
+
+  insertSalesManager,
+  updateSalesManagerDetails,
+  updateSalesManagerStatus,
+  getSalesManagersList,
 } = require("../models/masterModel");
 
 // Country
@@ -1401,6 +1406,131 @@ const getIndustryHeads = async (req, res) => {
   }
 };
 
+// Sales Manager Master
+const createSalesManager = async (req, res) => {
+  const {
+    name,
+    code,
+    industryHeadIds,
+    fromDate,
+    description,
+    updatedBy,
+    isActive = 1,
+  } = req.body;
+
+  try {
+    await insertSalesManager(
+      name,
+      code,
+      industryHeadIds,
+      fromDate,
+      description,
+      updatedBy,
+      isActive
+    );
+
+    res.status(201).json({
+      statusCode: 201,
+      message: "Sales Manager created successfully",
+    });
+  } catch (err) {
+    console.error("Error creating sales manager:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while creating sales manager",
+    });
+  }
+};
+
+const updateSalesManager = async (req, res) => {
+  const {
+    salesManagerId,
+    name,
+    code,
+    industryHeadIds,
+    fromDate,
+    description,
+    updatedBy,
+    isActive,
+  } = req.body;
+
+  if (!salesManagerId) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Sales Manager ID is required",
+    });
+  }
+
+  try {
+    await updateSalesManagerDetails(
+      salesManagerId,
+      name,
+      code,
+      industryHeadIds,
+      fromDate,
+      description,
+      updatedBy,
+      isActive
+    );
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Sales Manager updated successfully",
+    });
+  } catch (err) {
+    console.error("Error updating sales manager:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating sales manager",
+    });
+  }
+};
+
+const activateOrDeactivateSalesManager = async (req, res) => {
+  const { salesManagerId, isActive, updatedBy } = req.body;
+
+  if (!salesManagerId || isActive === undefined) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Sales Manager ID and isActive are required",
+    });
+  }
+
+  try {
+    await updateSalesManagerStatus(salesManagerId, isActive, updatedBy);
+
+    res.status(200).json({
+      statusCode: 200,
+      message: `Sales Manager ${
+        isActive ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    console.error("Error updating Sales Manager status:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating Sales Manager status",
+    });
+  }
+};
+
+const getSalesManagers = async (req, res) => {
+  try {
+    const salesManagers = await getSalesManagersList();
+
+    res.status(200).json({
+      statusCode: 200,
+      salesManagers,
+    });
+  } catch (err) {
+    console.error("Error retrieving Sales Managers:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while fetching Sales Managers",
+    });
+  }
+};
+
 module.exports = {
   addCountry,
   updateCountry,
@@ -1456,4 +1586,9 @@ module.exports = {
   updateIndustryHead,
   activateOrDeactivateIndustryHead,
   getIndustryHeads,
+
+  createSalesManager,
+  updateSalesManager,
+  activateOrDeactivateSalesManager,
+  getSalesManagers,
 };

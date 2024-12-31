@@ -1392,23 +1392,107 @@ const getIndustryHeadsList = async () => {
   }
 };
 
-// const getIndustryHeadsList = async () => {
-//   try {
-//     const query = `
-//       SELECT industry_head_master.*, 
-//              (SELECT GROUP_CONCAT(industry_master_info.industryName) 
-//               FROM industry_master_info 
-//               WHERE FIND_IN_SET(industry_master_info.id, industry_head_master.industryIds)) AS industryNames
-//       FROM industry_head_master
-//     `;
+// Database Queries
+const insertSalesManager = async (
+  name,
+  code,
+  industryHeadIds,
+  fromDate,
+  description,
+  updatedBy,
+  isActive
+) => {
+  try {
+    const query = `
+      INSERT INTO sales_manager_master 
+      (name, code, industryHeadIds, fromDate, description, updated_by, isActive, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
 
-//     const [industryHeads] = await db.execute(query);
-//     return industryHeads;
-//   } catch (err) {
-//     console.error("Error retrieving Industry Heads:", err);
-//     throw new Error("Error retrieving Industry Heads");
-//   }
-// };
+    await db.execute(query, [
+      name,
+      code,
+      industryHeadIds,
+      fromDate,
+      description,
+      updatedBy,
+      isActive,
+    ]);
+  } catch (err) {
+    console.error("Error inserting sales manager:", err);
+    throw new Error("Error inserting sales manager");
+  }
+};
+
+const updateSalesManagerDetails = async (
+  salesManagerId,
+  name,
+  code,
+  industryHeadIds,
+  fromDate,
+  description,
+  updatedBy,
+  isActive
+) => {
+  try {
+    const query = `
+      UPDATE sales_manager_master
+      SET name = ?, code = ?, industryHeadIds = ?, fromDate = ?, description = ?, updated_by = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    await db.execute(query, [
+      name,
+      code,
+      industryHeadIds,
+      fromDate,
+      description,
+      updatedBy,
+      isActive,
+      salesManagerId,
+    ]);
+  } catch (err) {
+    console.error("Error updating sales manager:", err);
+    throw new Error("Error updating sales manager");
+  }
+};
+
+const updateSalesManagerStatus = async (
+  salesManagerId,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE sales_manager_master
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    await db.execute(query, [isActive, updatedBy, salesManagerId]);
+  } catch (err) {
+    console.error("Error updating Sales Manager status:", err);
+    throw new Error("Error updating Sales Manager status");
+  }
+};
+
+const getSalesManagersList = async () => {
+  try {
+    const query = `
+      SELECT sales_manager_master.*, 
+             (SELECT GROUP_CONCAT(industry_head_master.industryHeadName) 
+              FROM industry_head_master 
+              WHERE FIND_IN_SET(industry_head_master.id, sales_manager_master.industryHeadIds)) AS industryHeadNames
+      FROM sales_manager_master
+    `;
+
+    const [salesManagers] = await db.execute(query);
+    return salesManagers;
+  } catch (err) {
+    console.error("Error retrieving Sales Managers:", err);
+    throw new Error("Error retrieving Sales Managers");
+  }
+};
 
 module.exports = {
   createCountry,
@@ -1466,4 +1550,9 @@ module.exports = {
   updateIndustryHeadDetails,
   updateIndustryHeadStatus,
   getIndustryHeadsList,
+
+insertSalesManager,
+updateSalesManagerDetails,
+updateSalesManagerStatus,
+getSalesManagersList
 };
