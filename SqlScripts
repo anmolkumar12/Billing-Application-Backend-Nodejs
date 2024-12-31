@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS company_account_info (
 CREATE TABLE industry_master_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   industryName VARCHAR(255) NOT NULL,
-  productionTypeId INT NOT NULL,
+  productionTypeIds VARCHAR(255) NOT NULLL,
   updated_by INT NOT NULL,
   isActive TINYINT(1) DEFAULT 1,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

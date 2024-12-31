@@ -1067,20 +1067,20 @@ const getProductionTypesList = async () => {
 // Industry Master
 const insertIndustryMaster = async (
   industryName,
-  productionTypeId,
+  productionTypeIds,
   updatedBy,
   isActive
 ) => {
   try {
     const query = `
       INSERT INTO industry_master_info 
-      (industryName, productionTypeId, updated_by, isActive, updated_at)
+      (industryName, productionTypeIds, updated_by, isActive, updated_at)
       VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     const [result] = await db.execute(query, [
       industryName,
-      productionTypeId,
+      productionTypeIds,
       updatedBy,
       isActive,
     ]);
@@ -1095,7 +1095,7 @@ const insertIndustryMaster = async (
 const updateIndustryMasterDetails = async (
   industryMasterId,
   industryName,
-  productionTypeId,
+  productionTypeIds,
   updatedBy,
   isActive
 ) => {
@@ -1104,7 +1104,7 @@ const updateIndustryMasterDetails = async (
       UPDATE industry_master_info
       SET 
         industryName = ?, 
-        productionTypeId = ?, 
+        productionTypeIds = ?, 
         updated_by = ?, 
         isActive = ?, 
         updated_at = CURRENT_TIMESTAMP
@@ -1113,7 +1113,7 @@ const updateIndustryMasterDetails = async (
 
     const [result] = await db.execute(query, [
       industryName,
-      productionTypeId,
+      productionTypeIds,
       updatedBy,
       isActive,
       industryMasterId,
@@ -1154,10 +1154,11 @@ const getIndustryMastersList = async () => {
   try {
     const query = `
       SELECT industry_master_info.*, 
-             production_type_info.productionTypeName
+             GROUP_CONCAT(production_type_info.productionTypeName) AS productionTypeNames
       FROM industry_master_info
       LEFT JOIN production_type_info 
-      ON industry_master_info.productionTypeId = production_type_info.id
+      ON FIND_IN_SET(production_type_info.id, industry_master_info.productionTypeId)
+      GROUP BY industry_master_info.id;
     `;
     const [industryMasters] = await db.execute(query);
     return industryMasters;
@@ -1166,6 +1167,7 @@ const getIndustryMastersList = async () => {
     throw new Error("Error retrieving industry masters");
   }
 };
+
 
 // Industries Group
 const insertGroupIndustry = async (

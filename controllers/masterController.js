@@ -1044,7 +1044,7 @@ const getProductionTypes = async (req, res) => {
 const createIndustryMaster = async (req, res) => {
   const {
     industryName, // Industry Name
-    productionTypeId, // Tag/Select Production Type
+    productionTypeIds, // Tag/Select Production Type
     updatedBy, // User updating the record
     isActive = 1, // Default value is 1 (active)
   } = req.body;
@@ -1052,7 +1052,7 @@ const createIndustryMaster = async (req, res) => {
   try {
     await insertIndustryMaster(
       industryName,
-      productionTypeId,
+      productionTypeIds,
       updatedBy,
       isActive
     );
@@ -1073,7 +1073,7 @@ const updateIndustryMaster = async (req, res) => {
   const {
     industryMasterId, // ID of the industry master record to update
     industryName, // Updated Industry Name
-    productionTypeId, // Updated Production Type ID
+    productionTypeIds, // Updated Production Type ID
     updatedBy, // User who updated
     isActive, // Active status (1 or 0)
   } = req.body;
@@ -1089,7 +1089,7 @@ const updateIndustryMaster = async (req, res) => {
     await updateIndustryMasterDetails(
       industryMasterId,
       industryName,
-      productionTypeId,
+      productionTypeIds,
       updatedBy,
       isActive
     );
