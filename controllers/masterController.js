@@ -74,6 +74,11 @@ const {
   updateTechnologySubgroupDetails,
   activateDeactivateSubgroup,
   getAllTechnologySubgroups,
+
+  insertTechnologyName,
+  updateTechnologyNameDetails,
+  activateDeactivateTechnologyNameStatus,
+  getAllTechnologyNames,
 } = require("../models/masterModel");
 
 // Country
@@ -1871,6 +1876,121 @@ const getTechnologySubgroups = async (req, res) => {
   }
 };
 
+// Technology Master
+const createTechnologyName = async (req, res) => {
+  const {
+    techGroupIds,
+    techSubgroupIds,
+    techName,
+    description,
+    isActive,
+    updatedBy,
+  } = req.body;
+
+  try {
+    await insertTechnologyName(
+      techGroupIds,
+      techSubgroupIds,
+      techName,
+      description,
+      isActive,
+      updatedBy
+    );
+    res.status(201).json({
+      statusCode: 201,
+      message: "Technology Name created successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const updateTechnologyName = async (req, res) => {
+  const {
+    id,
+    techGroupIds,
+    techSubgroupIds,
+    techName,
+    description,
+    isActive,
+    updatedBy,
+  } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Technology Name ID is required",
+    });
+  }
+
+  try {
+    await updateTechnologyNameDetails(
+      id,
+      techGroupIds,
+      techSubgroupIds,
+      techName,
+      description,
+      isActive,
+      updatedBy
+    );
+    res.status(200).json({
+      statusCode: 200,
+      message: "Technology Name updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating technology name",
+    });
+  }
+};
+
+const activateDeactivateTechnologyName = async (req, res) => {
+  const { id, isActive, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Technology Name ID is required",
+    });
+  }
+
+  try {
+    await activateDeactivateTechnologyNameStatus(id, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: `Technology Name ${
+        isActive === 1 ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while activating/deactivating technology name",
+    });
+  }
+};
+
+const getTechnologyNames = async (req, res) => {
+  try {
+    const subgroups = await getAllTechnologyNames();
+
+    res.status(200).json({
+      statusCode: 200,
+      subgroups,
+    });
+  } catch (err) {
+    console.error("Error fetching technology subgroups:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Internal Server Error",
+    });
+  }
+};
+
 module.exports = {
   addCountry,
   updateCountry,
@@ -1946,4 +2066,9 @@ module.exports = {
   updateTechnologySubgroup,
   activateDeactivateTechnologySubgroup,
   getTechnologySubgroups,
+
+  createTechnologyName,
+  updateTechnologyName,
+  activateDeactivateTechnologyName,
+  getTechnologyNames,
 };

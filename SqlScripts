@@ -178,3 +178,13 @@ CREATE TABLE technology_subgroup_info (
   updated_by INT,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+CREATE TABLE technology_name_info (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  techGroupIds VARCHAR(255),
+  techSubgroupIds VARCHAR(255),
+  techName VARCHAR(255) NOT NULL,
+  description TEXT,
+  isActive BOOLEAN DEFAULT TRUE,
+  updatedBy INT,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

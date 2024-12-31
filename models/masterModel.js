@@ -1767,6 +1767,114 @@ const getAllTechnologySubgroups = async () => {
   }
 };
 
+// Technology Master
+const insertTechnologyName = async (
+  techGroupIds,
+  techSubgroupIds,
+  techName,
+  description,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      INSERT INTO technology_name_info (techGroupIds, techSubgroupIds, techName, description, isActive, updatedBy, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+    const [result] = await db.execute(query, [
+      techGroupIds,
+      techSubgroupIds,
+      techName,
+      description,
+      isActive,
+      updatedBy,
+    ]);
+    return result;
+  } catch (err) {
+    console.log("Error inserting technology name:", err);
+    throw new Error("Error inserting technology name");
+  }
+};
+
+const updateTechnologyNameDetails = async (
+  id,
+  techGroupIds,
+  techSubgroupIds,
+  techName,
+  description,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE technology_name_info
+      SET 
+        techGroupIds = ?, 
+        techSubgroupIds = ?, 
+        techName = ?, 
+        description = ?, 
+        isActive = ?, 
+        updatedBy = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [
+      techGroupIds,
+      techSubgroupIds,
+      techName,
+      description,
+      isActive,
+      updatedBy,
+      id,
+    ]);
+    return result;
+  } catch (err) {
+    console.log("Error updating technology name:", err);
+    throw new Error("Error updating technology name details");
+  }
+};
+
+const activateDeactivateTechnologyNameStatus = async (
+  id,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE technology_name_info
+      SET isActive = ?, updatedBy = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [isActive, updatedBy, id]);
+    return result;
+  } catch (err) {
+    console.log("Error activating or deactivating technology name:", err);
+    throw new Error("Error activating/deactivating technology name");
+  }
+};
+
+const getAllTechnologyNames = async () => {
+  try {
+    const query = `
+      SELECT 
+        technology_name_info.*, 
+        (SELECT GROUP_CONCAT(technology_group_info.name) 
+         FROM technology_group_info 
+         WHERE FIND_IN_SET(technology_group_info.id, technology_name_info.techGroupIds)) AS techGroupNames,
+        (SELECT GROUP_CONCAT(technology_subgroup_info.name) 
+         FROM technology_subgroup_info 
+         WHERE FIND_IN_SET(technology_subgroup_info.id, technology_name_info.techSubgroupIds)) AS techSubgroupNames
+      FROM 
+        technology_name_info
+    `;
+    const [names] = await db.execute(query);
+    return names;
+  } catch (err) {
+    console.error("Database Error:", err);
+    throw new Error("Error retrieving technology names");
+  }
+};
+
 module.exports = {
   createCountry,
   updateCountryDetails,
@@ -1843,4 +1951,9 @@ module.exports = {
   updateTechnologySubgroupDetails,
   activateDeactivateSubgroup,
   getAllTechnologySubgroups,
+
+  insertTechnologyName,
+  updateTechnologyNameDetails,
+  activateDeactivateTechnologyNameStatus,
+  getAllTechnologyNames,
 };
