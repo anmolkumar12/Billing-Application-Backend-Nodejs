@@ -1392,7 +1392,7 @@ const getIndustryHeadsList = async () => {
   }
 };
 
-// Database Queries
+// Sales Manager Master
 const insertSalesManager = async (
   name,
   code,
