@@ -1168,7 +1168,6 @@ const getIndustryMastersList = async () => {
   }
 };
 
-
 // Industries Group
 const insertGroupIndustry = async (
   groupIndustryName,
@@ -1494,6 +1493,92 @@ const getSalesManagersList = async () => {
   }
 };
 
+// Account Manager Master
+const insertAccountManager = async (
+  name,
+  code,
+  industryHeadIds,
+  fromDate,
+  description
+) => {
+  try {
+    const query = `
+            INSERT INTO account_manager_master 
+            (name, code, industryHeadIds, fromDate, description, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        `;
+    await db.execute(query, [
+      name,
+      code,
+      industryHeadIds,
+      fromDate,
+      description,
+    ]);
+  } catch (err) {
+    console.error("Error inserting Account Manager:", err);
+    throw new Error("Error inserting Account Manager");
+  }
+};
+
+const updateAccountManager = async (
+  id,
+  name,
+  code,
+  industryHeadIds,
+  fromDate,
+  description
+) => {
+  try {
+    const query = `
+            UPDATE account_manager_master
+            SET name = ?, code = ?, industryHeadIds = ?, fromDate = ?, description = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        `;
+    await db.execute(query, [
+      name,
+      code,
+      industryHeadIds,
+      fromDate,
+      description,
+      id,
+    ]);
+  } catch (err) {
+    console.error("Error updating Account Manager:", err);
+    throw new Error("Error updating Account Manager");
+  }
+};
+
+const activateOrDeactivateAccountManager = async (id, isActive, updatedBy) => {
+  try {
+    const query = `
+            UPDATE account_manager_master
+            SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        `;
+    await db.execute(query, [isActive, updatedBy, id]);
+  } catch (err) {
+    console.error("Error updating Account Manager status:", err);
+    throw new Error("Error updating Account Manager status");
+  }
+};
+
+const getAccountManagersList = async () => {
+  try {
+    const query = `
+            SELECT account_manager_master.*, 
+                   (SELECT GROUP_CONCAT(industry_head_master.industryHeadName) 
+                    FROM industry_head_master 
+                    WHERE FIND_IN_SET(industry_head_master.id, account_manager_master.industryHeadIds)) AS industryHeadNames
+            FROM account_manager_master
+        `;
+    const [accountManagers] = await db.execute(query);
+    return accountManagers;
+  } catch (err) {
+    console.error("Error retrieving Account Managers:", err);
+    throw new Error("Error retrieving Account Managers");
+  }
+};
+
 module.exports = {
   createCountry,
   updateCountryDetails,
@@ -1551,8 +1636,13 @@ module.exports = {
   updateIndustryHeadStatus,
   getIndustryHeadsList,
 
-insertSalesManager,
-updateSalesManagerDetails,
-updateSalesManagerStatus,
-getSalesManagersList
+  insertSalesManager,
+  updateSalesManagerDetails,
+  updateSalesManagerStatus,
+  getSalesManagersList,
+
+  insertAccountManager,
+  updateAccountManager,
+  activateOrDeactivateAccountManager,
+  getAccountManagersList,
 };
