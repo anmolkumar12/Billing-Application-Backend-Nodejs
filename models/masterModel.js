@@ -1287,7 +1287,7 @@ const insertIndustryHead = async (
       industryHeadName,
       industryIds,
       isRegionWise,
-      isRegionWise ? countryIds : null,
+      countryIds,
       isRegionWise ? regionIds : null,
       !isRegionWise ? stateIds : null,
       startDate,
