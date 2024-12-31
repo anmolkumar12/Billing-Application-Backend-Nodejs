@@ -1269,9 +1269,9 @@ const insertIndustryHead = async (
   industryHeadName,
   industryIds,
   isRegionWise,
-  countryId,
-  regionId,
-  stateId,
+  countryIds,
+  regionIds,
+  stateIds,
   startDate,
   endDate,
   updatedBy,
@@ -1280,7 +1280,7 @@ const insertIndustryHead = async (
   try {
     const query = `
       INSERT INTO industry_head_master 
-      (industryHeadName, industryIds, isRegionWise, countryId, regionId, stateId, startDate, endDate, updated_by, isActive, updated_at)
+      (industryHeadName, industryIds, isRegionWise, countryIds, regionIds, stateIds, startDate, endDate, updated_by, isActive, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
@@ -1288,9 +1288,9 @@ const insertIndustryHead = async (
       industryHeadName,
       industryIds,
       isRegionWise,
-      isRegionWise ? countryId : null,
-      isRegionWise ? regionId : null,
-      !isRegionWise ? stateId : null,
+      isRegionWise ? countryIds : null,
+      isRegionWise ? regionIds : null,
+      !isRegionWise ? stateIds : null,
       startDate,
       endDate,
       updatedBy,
@@ -1307,9 +1307,9 @@ const updateIndustryHeadDetails = async (
   industryHeadName,
   industryIds,
   isRegionWise,
-  countryId,
-  regionId,
-  stateId,
+  countryIds,
+  regionIds,
+  stateIds,
   startDate,
   endDate,
   updatedBy,
@@ -1318,7 +1318,7 @@ const updateIndustryHeadDetails = async (
   try {
     const query = `
       UPDATE industry_head_master
-      SET industryHeadName = ?, industryIds = ?, isRegionWise = ?, countryId = ?, regionId = ?, stateId = ?, startDate = ?, endDate = ?, updated_by = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
+      SET industryHeadName = ?, industryIds = ?, isRegionWise = ?, countryIds = ?, regionIds = ?, stateIds = ?, startDate = ?, endDate = ?, updated_by = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
 
@@ -1326,9 +1326,9 @@ const updateIndustryHeadDetails = async (
       industryHeadName,
       industryIds,
       isRegionWise,
-      isRegionWise ? countryId : null,
-      isRegionWise ? regionId : null,
-      !isRegionWise ? stateId : null,
+      isRegionWise ? countryIds : null,
+      isRegionWise ? regionIds : null,
+      !isRegionWise ? stateIds : null,
       startDate,
       endDate,
       updatedBy,

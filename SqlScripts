@@ -6,7 +6,6 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 CREATE TABLE country_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   code VARCHAR(10) NOT NULL,
@@ -18,9 +17,8 @@ CREATE TABLE country_info (
   companyAddtionalFields TEXT,
   isactive BOOLEAN DEFAULT 1,
   updated_by INT,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 CREATE TABLE state_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   countryId INT NOT NULL,
@@ -29,9 +27,8 @@ CREATE TABLE state_info (
   gstCode VARCHAR(20),
   isactive BOOLEAN DEFAULT 1,
   updated_by INT,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 CREATE TABLE region_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   countryId INT NOT NULL,
@@ -42,7 +39,6 @@ CREATE TABLE region_info (
   updated_by INT,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
 CREATE TABLE company_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   countryId INT NOT NULL,
@@ -59,7 +55,6 @@ CREATE TABLE company_info (
   updated_by INT NOT NULL,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
 CREATE TABLE company_location_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   companyId INT NOT NULL,
@@ -76,7 +71,6 @@ CREATE TABLE company_location_info (
   FOREIGN KEY (countryId) REFERENCES country_info(id) ON DELETE CASCADE,
   FOREIGN KEY (stateId) REFERENCES state_info(id) ON DELETE CASCADE
 );
-
 CREATE TABLE bank_account_type_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   countryId INT NOT NULL,
@@ -89,7 +83,6 @@ CREATE TABLE bank_account_type_info (
   FOREIGN KEY (updated_by) REFERENCES user_info(id) ON DELETE
   SET NULL
 );
-
 CREATE TABLE IF NOT EXISTS company_account_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   companyId INT NOT NULL,
@@ -107,16 +100,14 @@ CREATE TABLE IF NOT EXISTS company_account_info (
   FOREIGN KEY (countryId) REFERENCES country_info(id),
   FOREIGN KEY (bankAccountTypeId) REFERENCES bank_account_type_info(id)
 );
-
- CREATE TABLE production_type_info (
+CREATE TABLE production_type_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   productionTypeName VARCHAR(255) NOT NULL,
   updated_by INT NOT NULL,
   isActive TINYINT(1) DEFAULT 1,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (updated_by) REFERENCES users(id) 
+  FOREIGN KEY (updated_by) REFERENCES users(id)
 );
-
 CREATE TABLE industry_master_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   industryName VARCHAR(255) NOT NULL,
@@ -127,7 +118,6 @@ CREATE TABLE industry_master_info (
   FOREIGN KEY (productionTypeId) REFERENCES production_type_info(id),
   FOREIGN KEY (updated_by) REFERENCES users(id)
 );
-
 CREATE TABLE group_industry_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   groupIndustryName VARCHAR(255) NOT NULL,
@@ -135,20 +125,19 @@ CREATE TABLE group_industry_info (
   updated_by INT NOT NULL,
   isActive TINYINT(1) DEFAULT 1,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (updated_by) REFERENCES users(id) 
+  FOREIGN KEY (updated_by) REFERENCES users(id)
 );
-
 CREATE TABLE industry_head_master (
-    id INT AUTO_INCREMENT PRIMARY KEY,  
-    industryHeadName VARCHAR(255) NOT NULL,  
-    industryIds VARCHAR(255) NOT NULL, 
-    isRegionWise BOOLEAN NOT NULL, 
-    countryId INT DEFAULT NULL, 
-    regionId INT DEFAULT NULL,  
-    stateId INT DEFAULT NULL, 
-    startDate DATE NOT NULL,
-    endDate DATE NOT NULL,  
-    updated_by VARCHAR(255) NOT NULL, 
-    isActive BOOLEAN DEFAULT 1,  
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  industryHeadName VARCHAR(255) NOT NULL,
+  industryIds VARCHAR(255) NOT NULL,
+  isRegionWise BOOLEAN NOT NULL,
+  countryIds INT DEFAULT NULL,
+  regionIds INT DEFAULT NULL,
+  stateIds INT DEFAULT NULL,
+  startDate DATE NOT NULL,
+  endDate DATE NOT NULL,
+  updated_by VARCHAR(255) NOT NULL,
+  isActive BOOLEAN DEFAULT 1,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
