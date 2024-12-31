@@ -69,6 +69,11 @@ createTechnologyGroup,
 updateTechnologyGroup,
 activateDeactivateTechnologyGroup,
 getTechnologyGroups,
+
+createTechnologySubgroup,
+updateTechnologySubgroup,
+activateDeactivateTechnologySubgroup,
+getTechnologySubgroups,
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -153,11 +158,16 @@ router.post("/updateAccountsManager", authMiddleware, updateAccountsManager);
 router.post("/activateOrDeactivateAccountsManager", authMiddleware, activateOrDeactivateAccountsManager);
 router.post("/getAccountManagers", authMiddleware, getAccountManagers)
 
-// Accounts Manager Master
+// Technology Group Master
 router.post("/createTechnologyGroup", authMiddleware, createTechnologyGroup);
 router.post("/updateTechnologyGroup", authMiddleware, updateTechnologyGroup);
 router.post("/activateDeactivateTechnologyGroup", authMiddleware, activateDeactivateTechnologyGroup);
 router.post("/getTechnologyGroups", authMiddleware, getTechnologyGroups)
 
+// Technology Subgroup Master
+router.post("/createTechnologySubgroup", authMiddleware, createTechnologySubgroup);
+router.post("/updateTechnologySubgroup", authMiddleware, updateTechnologySubgroup);
+router.post("/activateDeactivateTechnologySubgroup", authMiddleware, activateDeactivateTechnologySubgroup);
+router.post("/getTechnologySubgroups", authMiddleware, getTechnologySubgroups)
 
 module.exports = router;

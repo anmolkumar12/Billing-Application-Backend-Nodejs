@@ -1670,6 +1670,103 @@ const getTechnologyGroupsList = async () => {
   }
 };
 
+// Technology Subgroup Master
+const insertTechnologySubgroup = async (
+  techGroupIds,
+  name,
+  description,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      INSERT INTO technology_subgroup_info (techGroupIds, name, description, isActive, updated_by, updated_at)
+      VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+    const [result] = await db.execute(query, [
+      techGroupIds,
+      name,
+      description,
+      isActive,
+      updatedBy,
+    ]);
+    return result;
+  } catch (err) {
+    console.error("Error inserting technology subgroup:", err);
+    throw new Error("Error inserting technology subgroup");
+  }
+};
+
+const updateTechnologySubgroupDetails = async (
+  subgroupId,
+  techGroupIds,
+  name,
+  description,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE technology_subgroup_info
+      SET 
+        techGroupIds = ?, 
+        name = ?, 
+        description = ?, 
+        isActive = ?, 
+        updated_by = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [
+      techGroupIds,
+      name,
+      description,
+      isActive,
+      updatedBy,
+      subgroupId,
+    ]);
+    return result;
+  } catch (err) {
+    console.error("Error updating technology subgroup:", err);
+    throw new Error("Error updating technology subgroup details");
+  }
+};
+
+const activateDeactivateSubgroup = async (subgroupId, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE technology_subgroup_info
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [isActive, updatedBy, subgroupId]);
+    return result;
+  } catch (err) {
+    console.error("Error activating or deactivating technology subgroup:", err);
+    throw new Error("Error activating/deactivating technology subgroup");
+  }
+};
+
+const getAllTechnologySubgroups = async () => {
+  try {
+    const query = `
+      SELECT 
+        technology_subgroup_info.*, 
+        (SELECT GROUP_CONCAT(technology_group_info.name) 
+         FROM technology_group_info 
+         WHERE technology_group_info.id = technology_subgroup_info.techGroupIds) AS techGroupNames
+      FROM 
+        technology_subgroup_info
+    `;
+
+    const [subgroups] = await db.execute(query);
+    return subgroups;
+  } catch (err) {
+    console.error("Error retrieving Technology Subgroups:", err);
+    throw new Error("Error retrieving Technology Subgroups");
+  }
+};
+
 module.exports = {
   createCountry,
   updateCountryDetails,
@@ -1741,4 +1838,9 @@ module.exports = {
   updateTechnologyGroupDetails,
   activateDeactivateGroup,
   getTechnologyGroupsList,
+
+  insertTechnologySubgroup,
+  updateTechnologySubgroupDetails,
+  activateDeactivateSubgroup,
+  getAllTechnologySubgroups,
 };
