@@ -1579,6 +1579,97 @@ const getAccountManagersList = async () => {
   }
 };
 
+// Technology Group Master
+const insertTechnologyGroup = async (
+  name,
+  description,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      INSERT INTO technology_group_info (name, description, isActive, updated_by, updated_at)
+      VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+
+    const [result] = await db.execute(query, [
+      name,
+      description,
+      isActive,
+      updatedBy,
+    ]);
+    return result;
+  } catch (err) {
+    console.log("Error inserting technology group:", err);
+    throw new Error("Error inserting technology group");
+  }
+};
+
+const updateTechnologyGroupDetails = async (
+  groupId,
+  name,
+  description,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE technology_group_info
+      SET 
+        name = ?, 
+        description = ?, 
+        isActive = ?, 
+        updated_by = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      name,
+      description,
+      isActive,
+      updatedBy,
+      groupId,
+    ]);
+    return result;
+  } catch (err) {
+    console.log("Error updating technology group:", err);
+    throw new Error("Error updating technology group details");
+  }
+};
+
+const activateDeactivateGroup = async (groupId, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE technology_group_info
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [isActive, updatedBy, groupId]);
+    return result;
+  } catch (err) {
+    console.error("Error activating or deactivating technology group:", err);
+    throw new Error("Error activating/deactivating technology group");
+  }
+};
+
+const getTechnologyGroupsList = async () => {
+  try {
+    const query = `
+      SELECT *
+      FROM 
+        technology_group_info
+    `;
+
+    const [groups] = await db.execute(query);
+    return groups;
+  } catch (err) {
+    console.log("Error retrieving technology groups:", err);
+    throw new Error("Error retrieving technology groups list");
+  }
+};
+
 module.exports = {
   createCountry,
   updateCountryDetails,
@@ -1645,4 +1736,9 @@ module.exports = {
   updateAccountManager,
   activateOrDeactivateAccountManager,
   getAccountManagersList,
+
+  insertTechnologyGroup,
+  updateTechnologyGroupDetails,
+  activateDeactivateGroup,
+  getTechnologyGroupsList,
 };

@@ -64,6 +64,11 @@ const {
   updateAccountManager,
   activateOrDeactivateAccountManager,
   getAccountManagersList,
+
+  insertTechnologyGroup,
+  updateTechnologyGroupDetails,
+  activateDeactivateGroup,
+  getTechnologyGroupsList,
 } = require("../models/masterModel");
 
 // Country
@@ -1665,6 +1670,100 @@ const getAccountManagers = async (req, res) => {
   }
 };
 
+// Technology Group Master
+const createTechnologyGroup = async (req, res) => {
+  const { name, description, isActive, updatedBy } = req.body;
+
+  try {
+    await insertTechnologyGroup(name, description, isActive, updatedBy);
+
+    res.status(201).json({
+      statusCode: 201,
+      message: "Technology Group created successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const updateTechnologyGroup = async (req, res) => {
+  const { groupId, name, description, isActive, updatedBy } = req.body;
+
+  if (!groupId) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Group ID is required",
+    });
+  }
+
+  try {
+    await updateTechnologyGroupDetails(
+      groupId,
+      name,
+      description,
+      isActive,
+      updatedBy
+    );
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Technology Group updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating technology group",
+    });
+  }
+};
+
+const activateDeactivateTechnologyGroup = async (req, res) => {
+  const { groupId, isActive, updatedBy } = req.body;
+
+  if (!groupId) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Group ID is required",
+    });
+  }
+
+  try {
+    await activateDeactivateGroup(groupId, isActive, updatedBy);
+
+    res.status(200).json({
+      statusCode: 200,
+      message: `Technology Group ${
+        isActive === 1 ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while activating/deactivating technology group",
+    });
+  }
+};
+
+const getTechnologyGroups = async (req, res) => {
+  try {
+    const groups = await getTechnologyGroupsList();
+
+    res.status(200).json({
+      statusCode: 200,
+      groups,
+    });
+  } catch (err) {
+    console.log("Error:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
 module.exports = {
   addCountry,
   updateCountry,
@@ -1730,4 +1829,9 @@ module.exports = {
   updateAccountsManager,
   activateOrDeactivateAccountsManager,
   getAccountManagers,
+
+  createTechnologyGroup,
+  updateTechnologyGroup,
+  activateDeactivateTechnologyGroup,
+  getTechnologyGroups,
 };
