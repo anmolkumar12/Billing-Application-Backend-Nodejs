@@ -1157,7 +1157,7 @@ const getIndustryMastersList = async () => {
              GROUP_CONCAT(production_type_info.productionTypeName) AS productionTypeNames
       FROM industry_master_info
       LEFT JOIN production_type_info 
-      ON FIND_IN_SET(production_type_info.id, industry_master_info.productionTypeId)
+      ON FIND_IN_SET(production_type_info.id, industry_master_info.productionTypeIds)
       GROUP BY industry_master_info.id;
     `;
     const [industryMasters] = await db.execute(query);
@@ -1371,7 +1371,16 @@ const getIndustryHeadsList = async () => {
       SELECT industry_head_master.*, 
              (SELECT GROUP_CONCAT(industry_master_info.industryName) 
               FROM industry_master_info 
-              WHERE FIND_IN_SET(industry_master_info.id, industry_head_master.industryIds)) AS industryNames
+              WHERE FIND_IN_SET(industry_master_info.id, industry_head_master.industryIds)) AS industryNames,
+             (SELECT GROUP_CONCAT(country_info.name) 
+              FROM country_info 
+              WHERE FIND_IN_SET(country_info.id, industry_head_master.countryIds)) AS countryNames,
+             (SELECT GROUP_CONCAT(region_info.regionName) 
+              FROM region_info 
+              WHERE FIND_IN_SET(region_info.id, industry_head_master.regionIds)) AS regionNames,
+             (SELECT GROUP_CONCAT(state_info.stateName) 
+              FROM state_info 
+              WHERE FIND_IN_SET(state_info.id, industry_head_master.stateIds)) AS stateNames
       FROM industry_head_master
     `;
 
@@ -1382,6 +1391,24 @@ const getIndustryHeadsList = async () => {
     throw new Error("Error retrieving Industry Heads");
   }
 };
+
+// const getIndustryHeadsList = async () => {
+//   try {
+//     const query = `
+//       SELECT industry_head_master.*, 
+//              (SELECT GROUP_CONCAT(industry_master_info.industryName) 
+//               FROM industry_master_info 
+//               WHERE FIND_IN_SET(industry_master_info.id, industry_head_master.industryIds)) AS industryNames
+//       FROM industry_head_master
+//     `;
+
+//     const [industryHeads] = await db.execute(query);
+//     return industryHeads;
+//   } catch (err) {
+//     console.error("Error retrieving Industry Heads:", err);
+//     throw new Error("Error retrieving Industry Heads");
+//   }
+// };
 
 module.exports = {
   createCountry,

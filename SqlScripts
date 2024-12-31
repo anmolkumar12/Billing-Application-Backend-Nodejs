@@ -114,9 +114,7 @@ CREATE TABLE industry_master_info (
   productionTypeIds VARCHAR(255) NOT NULL,
   updated_by INT NOT NULL,
   isActive TINYINT(1) DEFAULT 1,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (productionTypeId) REFERENCES production_type_info(id),
-  FOREIGN KEY (updated_by) REFERENCES users(id)
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 CREATE TABLE group_industry_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
