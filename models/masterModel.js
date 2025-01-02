@@ -2052,6 +2052,86 @@ const getAllPoleStarProducts = async () => {
   }
 };
 
+// Project/Service Master
+const insertProjectService = async (name, description, isActive, updatedBy) => {
+  try {
+    const query = `
+      INSERT INTO project_service_master (name, description, isActive, updatedBy, updated_at)
+      VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+    const [result] = await db.execute(query, [
+      name,
+      description,
+      isActive,
+      updatedBy,
+    ]);
+    return result;
+  } catch (err) {
+    console.log("Error inserting Project/Service:", err);
+    throw new Error("Error inserting Project/Service");
+  }
+};
+
+const updateProjectService = async (
+  id,
+  name,
+  description,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE project_service_master
+      SET 
+        name = ?, 
+        description = ?, 
+        isActive = ?, 
+        updatedBy = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [
+      name,
+      description,
+      isActive,
+      updatedBy,
+      id,
+    ]);
+    return result;
+  } catch (err) {
+    console.log("Error updating Project/Service:", err);
+    throw new Error("Error updating Project/Service details");
+  }
+};
+
+const activateDeactivateProjectService = async (id, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE project_service_master
+      SET isActive = ?, updatedBy = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [isActive, updatedBy, id]);
+    return result;
+  } catch (err) {
+    console.log("Error activating or deactivating Project/Service:", err);
+    throw new Error("Error activating/deactivating Project/Service");
+  }
+};
+
+const getAllProjectServices = async () => {
+  try {
+    const query = `
+      SELECT * FROM project_service_master
+    `;
+    const [records] = await db.execute(query);
+    return records;
+  } catch (err) {
+    console.error("Database Error:", err);
+    throw new Error("Error retrieving Project/Services");
+  }
+};
+
 module.exports = {
   createCountry,
   updateCountryDetails,
@@ -2143,4 +2223,9 @@ module.exports = {
   updatePoleStarProductDetails,
   activateDeactivatePoleStarProductStatus,
   getAllPoleStarProducts,
+
+  insertProjectService,
+  updateProjectService,
+  activateDeactivateProjectService,
+  getAllProjectServices,
 };

@@ -89,6 +89,11 @@ const {
   updatePoleStarProduct,
   activateDeactivatePoleStarProduct,
   getPoleStarProducts,
+
+  createProjectService,
+  updateProjectServiceHandler,
+  activateDeactivateProjectServiceHandler,
+  getProjectServices,
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -295,5 +300,18 @@ router.post(
 );
 router.post("/getPoleStarProducts", authMiddleware, getPoleStarProducts);
 
-// OEM Master
+// Project/Service Master
+router.post("/createProjectService", authMiddleware, createProjectService);
+router.post(
+  "/updateProjectService",
+  authMiddleware,
+  updateProjectServiceHandler
+);
+router.post(
+  "/activateDeactivateProjectService",
+  authMiddleware,
+  activateDeactivateProjectServiceHandler
+);
+router.post("/getProjectService", authMiddleware, getProjectServices);
+
 module.exports = router;

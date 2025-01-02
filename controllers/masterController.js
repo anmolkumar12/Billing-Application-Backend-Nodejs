@@ -89,6 +89,11 @@ const {
   updatePoleStarProductDetails,
   activateDeactivatePoleStarProductStatus,
   getAllPoleStarProducts,
+
+  insertProjectService,
+  updateProjectService,
+  activateDeactivateProjectService,
+  getAllProjectServices,
 } = require("../models/masterModel");
 
 // Country
@@ -2177,6 +2182,90 @@ const getPoleStarProducts = async (req, res) => {
   }
 };
 
+// Project/Service Master
+const createProjectService = async (req, res) => {
+  const { name, description, isActive, updatedBy } = req.body;
+
+  try {
+    await insertProjectService(name, description, isActive, updatedBy);
+    res.status(201).json({
+      statusCode: 201,
+      message: "Project/Service created successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const updateProjectServiceHandler = async (req, res) => {
+  const { id, name, description, isActive, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Project/Service ID is required",
+    });
+  }
+
+  try {
+    await updateProjectService(id, name, description, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: "Project/Service updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating Project/Service",
+    });
+  }
+};
+
+const activateDeactivateProjectServiceHandler = async (req, res) => {
+  const { id, isActive, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Project/Service ID is required",
+    });
+  }
+
+  try {
+    await activateDeactivateProjectService(id, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: `Project/Service ${
+        isActive === 1 ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while activating/deactivating Project/Service",
+    });
+  }
+};
+
+const getProjectServices = async (req, res) => {
+  try {
+    const records = await getAllProjectServices();
+    res.status(200).json({
+      statusCode: 200,
+      records,
+    });
+  } catch (err) {
+    console.error("Error fetching Project/Services:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Internal Server Error",
+    });
+  }
+};
+
 module.exports = {
   addCountry,
   updateCountry,
@@ -2267,4 +2356,9 @@ module.exports = {
   updatePoleStarProduct,
   activateDeactivatePoleStarProduct,
   getPoleStarProducts,
+
+  createProjectService,
+  updateProjectServiceHandler,
+  activateDeactivateProjectServiceHandler,
+  getProjectServices,
 };
