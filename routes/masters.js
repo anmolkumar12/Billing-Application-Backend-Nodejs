@@ -84,6 +84,11 @@ const {
   updateOEM,
   activateDeactivateOEM,
   getOEMs,
+
+  createPoleStarProduct,
+  updatePoleStarProduct,
+  activateDeactivatePoleStarProduct,
+  getPoleStarProducts,
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -280,4 +285,15 @@ router.post("/updateOEM", authMiddleware, updateOEM);
 router.post("/activateDeactivateOEM", authMiddleware, activateDeactivateOEM);
 router.post("/getOEMs", authMiddleware, getOEMs);
 
+// Product Sales Master
+router.post("/createPoleStarProduct", authMiddleware, createPoleStarProduct);
+router.post("/updatePoleStarProduct", authMiddleware, updatePoleStarProduct);
+router.post(
+  "/activateDeactivatePoleStarProduct",
+  authMiddleware,
+  activateDeactivatePoleStarProduct
+);
+router.post("/getPoleStarProducts", authMiddleware, getPoleStarProducts);
+
+// OEM Master
 module.exports = router;

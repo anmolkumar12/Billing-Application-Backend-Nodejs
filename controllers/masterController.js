@@ -84,6 +84,11 @@ const {
   updateOEMDetails,
   activateDeactivateOEMStatus,
   getAllOEMs,
+
+  insertPoleStarProduct,
+  updatePoleStarProductDetails,
+  activateDeactivatePoleStarProductStatus,
+  getAllPoleStarProducts,
 } = require("../models/masterModel");
 
 // Country
@@ -2081,7 +2086,96 @@ const getOEMs = async (req, res) => {
   }
 };
 
+// Product Sales Master
+const createPoleStarProduct = async (req, res) => {
+  const { productName, description, isActive, updatedBy } = req.body;
 
+  try {
+    await insertPoleStarProduct(productName, description, isActive, updatedBy);
+    res.status(201).json({
+      statusCode: 201,
+      message: "PoleStar Product created successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while creating PoleStar Product",
+    });
+  }
+};
+
+const updatePoleStarProduct = async (req, res) => {
+  const { id, productName, description, isActive, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Product ID is required",
+    });
+  }
+
+  try {
+    await updatePoleStarProductDetails(
+      id,
+      productName,
+      description,
+      isActive,
+      updatedBy
+    );
+    res.status(200).json({
+      statusCode: 200,
+      message: "PoleStar Product updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating PoleStar Product",
+    });
+  }
+};
+
+const activateDeactivatePoleStarProduct = async (req, res) => {
+  const { id, isActive, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Product ID is required",
+    });
+  }
+
+  try {
+    await activateDeactivatePoleStarProductStatus(id, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: `PoleStar Product ${
+        isActive === 1 ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while activating/deactivating PoleStar Product",
+    });
+  }
+};
+
+const getPoleStarProducts = async (req, res) => {
+  try {
+    const products = await getAllPoleStarProducts();
+
+    res.status(200).json({
+      statusCode: 200,
+      products,
+    });
+  } catch (err) {
+    console.error("Error fetching PoleStar Products:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Internal Server Error",
+    });
+  }
+};
 
 module.exports = {
   addCountry,
@@ -2168,4 +2262,9 @@ module.exports = {
   updateOEM,
   activateDeactivateOEM,
   getOEMs,
+
+  createPoleStarProduct,
+  updatePoleStarProduct,
+  activateDeactivatePoleStarProduct,
+  getPoleStarProducts,
 };

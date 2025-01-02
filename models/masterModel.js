@@ -1514,7 +1514,7 @@ const insertAccountManager = async (
       industryHeadIds,
       fromDate,
       description,
-      updatedBy
+      updatedBy,
     ]);
   } catch (err) {
     console.error("Error inserting Account Manager:", err);
@@ -1963,6 +1963,95 @@ const getAllOEMs = async () => {
   }
 };
 
+// Product Sales Master
+const insertPoleStarProduct = async (
+  productName,
+  description,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      INSERT INTO polestar_product_sales_master (productName, description, isActive, updatedBy, updated_at)
+      VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+    const [result] = await db.execute(query, [
+      productName,
+      description,
+      isActive,
+      updatedBy,
+    ]);
+    return result;
+  } catch (err) {
+    console.error("Error inserting PoleStar Product:", err);
+    throw new Error("Error inserting PoleStar Product");
+  }
+};
+
+const updatePoleStarProductDetails = async (
+  id,
+  productName,
+  description,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE polestar_product_sales_master
+      SET 
+        productName = ?, 
+        description = ?, 
+        isActive = ?, 
+        updatedBy = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [
+      productName,
+      description,
+      isActive,
+      updatedBy,
+      id,
+    ]);
+    return result;
+  } catch (err) {
+    console.error("Error updating PoleStar Product:", err);
+    throw new Error("Error updating PoleStar Product details");
+  }
+};
+
+const activateDeactivatePoleStarProductStatus = async (
+  id,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE polestar_product_sales_master
+      SET isActive = ?, updatedBy = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [isActive, updatedBy, id]);
+    return result;
+  } catch (err) {
+    console.error("Error activating or deactivating PoleStar Product:", err);
+    throw new Error("Error activating/deactivating PoleStar Product");
+  }
+};
+
+const getAllPoleStarProducts = async () => {
+  try {
+    const query = `
+      SELECT * FROM polestar_product_sales_master
+    `;
+    const [products] = await db.execute(query);
+    return products;
+  } catch (err) {
+    console.error("Database Error:", err);
+    throw new Error("Error retrieving PoleStar Products");
+  }
+};
+
 module.exports = {
   createCountry,
   updateCountryDetails,
@@ -2049,4 +2138,9 @@ module.exports = {
   updateOEMDetails,
   activateDeactivateOEMStatus,
   getAllOEMs,
+
+  insertPoleStarProduct,
+  updatePoleStarProductDetails,
+  activateDeactivatePoleStarProductStatus,
+  getAllPoleStarProducts,
 };
