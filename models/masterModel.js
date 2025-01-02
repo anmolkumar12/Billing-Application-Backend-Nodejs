@@ -1875,6 +1875,90 @@ const getAllTechnologyNames = async () => {
   }
 };
 
+// OEM Master
+const insertOEM = async (oemName, type, productName, isActive, updatedBy) => {
+  try {
+    const query = `
+      INSERT INTO oem_info (oemName, type, productName, isActive, updatedBy, updated_at)
+      VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+    const [result] = await db.execute(query, [
+      oemName,
+      type,
+      productName,
+      isActive,
+      updatedBy,
+    ]);
+    return result;
+  } catch (err) {
+    console.log("Error inserting OEM:", err);
+    throw new Error("Error inserting OEM");
+  }
+};
+
+const updateOEMDetails = async (
+  id,
+  oemName,
+  type,
+  productName,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE oem_info
+      SET 
+        oemName = ?, 
+        type = ?, 
+        productName = ?, 
+        isActive = ?, 
+        updatedBy = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [
+      oemName,
+      type,
+      productName,
+      isActive,
+      updatedBy,
+      id,
+    ]);
+    return result;
+  } catch (err) {
+    console.log("Error updating OEM:", err);
+    throw new Error("Error updating OEM details");
+  }
+};
+
+const activateDeactivateOEMStatus = async (id, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE oem_info
+      SET isActive = ?, updatedBy = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [isActive, updatedBy, id]);
+    return result;
+  } catch (err) {
+    console.log("Error activating or deactivating OEM:", err);
+    throw new Error("Error activating/deactivating OEM");
+  }
+};
+
+const getAllOEMs = async () => {
+  try {
+    const query = `
+      SELECT * FROM oem_info
+    `;
+    const [oems] = await db.execute(query);
+    return oems;
+  } catch (err) {
+    console.error("Database Error:", err);
+    throw new Error("Error retrieving OEMs");
+  }
+};
+
 module.exports = {
   createCountry,
   updateCountryDetails,
@@ -1956,4 +2040,9 @@ module.exports = {
   updateTechnologyNameDetails,
   activateDeactivateTechnologyNameStatus,
   getAllTechnologyNames,
+
+  insertOEM,
+  updateOEMDetails,
+  activateDeactivateOEMStatus,
+  getAllOEMs,
 };

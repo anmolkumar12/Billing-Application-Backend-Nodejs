@@ -79,6 +79,11 @@ const {
   updateTechnologyNameDetails,
   activateDeactivateTechnologyNameStatus,
   getAllTechnologyNames,
+
+  insertOEM,
+  updateOEMDetails,
+  activateDeactivateOEMStatus,
+  getAllOEMs,
 } = require("../models/masterModel");
 
 // Country
@@ -1991,6 +1996,91 @@ const getTechnologyNames = async (req, res) => {
   }
 };
 
+// OEM Master
+const createOEM = async (req, res) => {
+  const { oemName, type, productName, isActive, updatedBy } = req.body;
+
+  try {
+    await insertOEM(oemName, type, productName, isActive, updatedBy);
+    res.status(201).json({
+      statusCode: 201,
+      message: "OEM created successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const updateOEM = async (req, res) => {
+  const { id, oemName, type, productName, isActive, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "OEM ID is required",
+    });
+  }
+
+  try {
+    await updateOEMDetails(id, oemName, type, productName, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: "OEM updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating OEM",
+    });
+  }
+};
+
+const activateDeactivateOEM = async (req, res) => {
+  const { id, isActive, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "OEM ID is required",
+    });
+  }
+
+  try {
+    await activateDeactivateOEMStatus(id, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: `OEM ${
+        isActive === 1 ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while activating/deactivating OEM",
+    });
+  }
+};
+
+const getOEMs = async (req, res) => {
+  try {
+    const oems = await getAllOEMs();
+
+    res.status(200).json({
+      statusCode: 200,
+      oems,
+    });
+  } catch (err) {
+    console.error("Error fetching OEMs:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Internal Server Error",
+    });
+  }
+};
+
 module.exports = {
   addCountry,
   updateCountry,
@@ -2071,4 +2161,9 @@ module.exports = {
   updateTechnologyName,
   activateDeactivateTechnologyName,
   getTechnologyNames,
+
+  createOEM,
+  updateOEM,
+  activateDeactivateOEM,
+  getOEMs,
 };
