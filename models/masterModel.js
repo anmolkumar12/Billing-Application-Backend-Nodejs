@@ -1325,7 +1325,7 @@ const updateIndustryHeadDetails = async (
       industryHeadName,
       industryIds,
       isRegionWise,
-      isRegionWise ? countryIds : null,
+      countryIds,
       isRegionWise ? regionIds : null,
       !isRegionWise ? stateIds : null,
       startDate,
@@ -1504,8 +1504,8 @@ const insertAccountManager = async (
   try {
     const query = `
             INSERT INTO account_manager_master 
-            (name, code, industryHeadIds, fromDate, description, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            (name, code, industryHeadIds, fromDate, description, updated_at)
+            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
         `;
     await db.execute(query, [
       name,
