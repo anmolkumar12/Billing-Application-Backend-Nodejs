@@ -1536,14 +1536,16 @@ const insertAccountManager = async (
   industryHeadIds,
   fromDate,
   description,
-  updatedBy
+  updatedBy,
+  account_manager_email, // Add email here
+  isActive
 ) => {
   try {
     const query = `
-            INSERT INTO account_manager_master 
-            (name, code, industryHeadIds, fromDate, description, updated_at, updated_by)
-            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
-        `;
+      INSERT INTO account_manager_master 
+      (name, code, industryHeadIds, fromDate, description, updated_by, account_manager_email, isActive, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
     await db.execute(query, [
       name,
       code,
@@ -1551,6 +1553,8 @@ const insertAccountManager = async (
       fromDate,
       description,
       updatedBy,
+      account_manager_email, // Insert email here
+      isActive,
     ]);
   } catch (err) {
     console.error("Error inserting Account Manager:", err);
@@ -1565,14 +1569,16 @@ const updateAccountManager = async (
   industryHeadIds,
   fromDate,
   description,
-  updatedBy
+  updatedBy,
+  account_manager_email, // Add email here
+  isActive
 ) => {
   try {
     const query = `
-            UPDATE account_manager_master
-            SET name = ?, code = ?, industryHeadIds = ?, fromDate = ?, description = ?, updated_at = CURRENT_TIMESTAMP, updated_by = ?
-            WHERE id = ?
-        `;
+      UPDATE account_manager_master
+      SET name = ?, code = ?, industryHeadIds = ?, fromDate = ?, description = ?, updated_by = ?, account_manager_email = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
     await db.execute(query, [
       name,
       code,
@@ -1580,6 +1586,8 @@ const updateAccountManager = async (
       fromDate,
       description,
       updatedBy,
+      account_manager_email, // Update email here
+      isActive,
       id,
     ]);
   } catch (err) {

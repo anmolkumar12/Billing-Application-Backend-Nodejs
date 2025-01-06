@@ -1619,6 +1619,7 @@ const createAccountManager = async (req, res) => {
     fromDate,
     description,
     updatedBy,
+    account_manager_email, // Add email here
     isActive = 1,
   } = req.body;
 
@@ -1630,62 +1631,65 @@ const createAccountManager = async (req, res) => {
       fromDate,
       description,
       updatedBy,
+      account_manager_email, // Pass email here
       isActive
     );
 
     res.status(201).json({
       statusCode: 201,
-      message: "Sales Manager created successfully",
+      message: "Account Manager created successfully",
     });
   } catch (err) {
-    console.error("Error creating sales manager:", err);
+    console.error("Error creating Account Manager:", err);
     res.status(500).json({
       statusCode: 500,
-      message: "Server error while creating sales manager",
+      message: "Server error while creating Account Manager",
     });
   }
 };
 
 const updateAccountsManager = async (req, res) => {
   const {
-    salesManagerId,
+    accountManagerId,  // Rename variable to accountManagerId
     name,
     code,
     industryHeadIds,
     fromDate,
     description,
     updatedBy,
+    account_manager_email, // Add email here
     isActive,
   } = req.body;
 
-  if (!salesManagerId) {
+  if (!accountManagerId) {
     return res.status(400).json({
       statusCode: 400,
-      message: "Sales Manager ID is required",
+      message: "Account Manager ID is required",
     });
   }
 
   try {
     await updateAccountManager(
-      salesManagerId,
+      accountManagerId, // Pass the correct ID
       name,
       code,
       industryHeadIds,
       fromDate,
       description,
       updatedBy,
+      account_manager_email, // Pass email here
       isActive
     );
 
     res.status(200).json({
       statusCode: 200,
-      message: "Sales Manager updated successfully",
+      message: "Account Manager updated successfully",
     });
   } catch (err) {
-    console.error("Error updating sales manager:", err);
+    console.error("Error updating Account Manager:", err);
     res.status(500).json({
       statusCode: 500,
-      message: "Server error while updating sales manager",
+      message: "Server error while updating Account Manager",
     });
   }
 };

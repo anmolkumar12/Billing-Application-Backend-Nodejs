@@ -150,6 +150,7 @@ CREATE TABLE sales_manager_master (
   fromDate DATE NOT NULL,
   description TEXT,
   updated_by VARCHAR(255) NOT NULL,
+  sales_manager_email VARCHAR(255) UNIQUE, -- Add email column
   isActive BOOLEAN DEFAULT 1,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
