@@ -1930,7 +1930,7 @@ const insertOEM = async (oemName, type, productName, isActive, updatedBy) => {
       INSERT INTO oem_info (oemName, type, productName, isActive, updatedBy, updated_at)
       VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
-    const [result] = await dbm.execute(query, [
+    const [result] = await db.execute(query, [
       oemName,
       type,
       productName,

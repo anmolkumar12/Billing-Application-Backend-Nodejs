@@ -1728,11 +1728,11 @@ const activateOrDeactivateAccountsManager = async (req, res) => {
 
 const getAccountManagers = async (req, res) => {
   try {
-    const salesManagers = await getAccountManagersList();
+    const accountManagers = await getAccountManagersList();
 
     res.status(200).json({
       statusCode: 200,
-      salesManagers,
+      accountManagers,
     });
   } catch (err) {
     console.error("Error retrieving Sales Managers:", err);

@@ -242,7 +242,7 @@ router.post("/updateAccountsManager", authMiddleware, updateAccountsManager);
 router.post(
   "/activateOrDeactivateAccountsManager",
   authMiddleware,
-  activateOrDeactivateAccountsManager
+  activateOrDeactivateAccountsManager 
 );
 router.post("/getAccountManagers", authMiddleware, getAccountManagers);
 
