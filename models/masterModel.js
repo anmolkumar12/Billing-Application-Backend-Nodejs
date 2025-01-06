@@ -256,12 +256,15 @@ const createRegion = async (
   regionCode,
   stateIds,
   isActive,
-  updatedBy
+  updatedBy,
+  regionHeadName,
+  regionHeadEcode,
+  regionHeadEmail
 ) => {
   try {
     const query = `
-      INSERT INTO region_info (countryId, regionName, regionCode, stateIds, isactive, updated_by, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      INSERT INTO region_info (countryId, regionName, regionCode, stateIds, isActive, updated_by, updated_at, regionHeadName, regionHeadEcode, regionHeadEmail)
+      VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?)
     `;
 
     const [result] = await db.execute(query, [
@@ -271,6 +274,9 @@ const createRegion = async (
       stateIds,
       isActive,
       updatedBy,
+      regionHeadName,
+      regionHeadEcode,
+      regionHeadEmail,
     ]);
 
     return result;
@@ -287,7 +293,10 @@ const updateRegionDetails = async (
   regionCode,
   stateIds,
   isActive,
-  updatedBy
+  updatedBy,
+  regionHeadName,
+  regionHeadEcode,
+  regionHeadEmail
 ) => {
   try {
     const sanitizedValues = [
@@ -297,6 +306,9 @@ const updateRegionDetails = async (
       stateIds ?? null,
       isActive ?? null,
       updatedBy ?? null,
+      regionHeadName ?? null,
+      regionHeadEcode ?? null,
+      regionHeadEmail ?? null,
       regionId,
     ];
 
@@ -307,9 +319,12 @@ const updateRegionDetails = async (
         regionName = ?, 
         regionCode = ?, 
         stateIds = ?, 
-        isactive = ?, 
+        isActive = ?, 
         updated_by = ?, 
-        updated_at = CURRENT_TIMESTAMP
+        updated_at = CURRENT_TIMESTAMP,
+        regionHeadName = ?,
+        regionHeadEcode = ?,
+        regionHeadEmail = ?
       WHERE id = ?
     `;
 
@@ -1416,13 +1431,14 @@ const insertSalesManager = async (
   fromDate,
   description,
   updatedBy,
+  sales_manager_email, // Add email here
   isActive
 ) => {
   try {
     const query = `
       INSERT INTO sales_manager_master 
-      (name, code, industryHeadIds, fromDate, description, updated_by, isActive, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      (name, code, industryHeadIds, fromDate, description, updated_by, sales_manager_email, isActive, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     await db.execute(query, [
@@ -1432,6 +1448,7 @@ const insertSalesManager = async (
       fromDate,
       description,
       updatedBy,
+      sales_manager_email, // Insert email here
       isActive,
     ]);
   } catch (err) {
@@ -1448,12 +1465,13 @@ const updateSalesManagerDetails = async (
   fromDate,
   description,
   updatedBy,
+  sales_manager_email, // Add email here
   isActive
 ) => {
   try {
     const query = `
       UPDATE sales_manager_master
-      SET name = ?, code = ?, industryHeadIds = ?, fromDate = ?, description = ?, updated_by = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
+      SET name = ?, code = ?, industryHeadIds = ?, fromDate = ?, description = ?, updated_by = ?, sales_manager_email = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
 
@@ -1464,6 +1482,7 @@ const updateSalesManagerDetails = async (
       fromDate,
       description,
       updatedBy,
+      sales_manager_email, // Update email here
       isActive,
       salesManagerId,
     ]);
@@ -1903,7 +1922,7 @@ const insertOEM = async (oemName, type, productName, isActive, updatedBy) => {
       INSERT INTO oem_info (oemName, type, productName, isActive, updatedBy, updated_at)
       VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
-    const [result] = await db.execute(query, [
+    const [result] = await dbm.execute(query, [
       oemName,
       type,
       productName,

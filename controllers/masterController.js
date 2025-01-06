@@ -339,6 +339,9 @@ const addRegion = async (req, res) => {
     stateIds, // State ID (foreign key referencing state_info table)
     isActive, // Status: Active or Inactive
     updatedBy, // User who is updating this information
+    regionHeadName, // Name of the region head
+    regionHeadEcode, // Employee code of the region head
+    regionHeadEmail, // Email of the region head
   } = req.body;
 
   try {
@@ -348,7 +351,10 @@ const addRegion = async (req, res) => {
       regionCode,
       stateIds,
       isActive,
-      updatedBy
+      updatedBy,
+      regionHeadName,
+      regionHeadEcode,
+      regionHeadEmail
     );
 
     res.status(201).json({
@@ -372,6 +378,9 @@ const updateRegion = async (req, res) => {
     stateIds, // State ID (foreign key referencing state_info table)
     isActive, // Status: Active or Inactive
     updatedBy, // User who is updating this information
+    regionHeadName, // Name of the region head
+    regionHeadEcode, // Employee code of the region head
+    regionHeadEmail, // Email of the region head
   } = req.body;
 
   if (!regionId) {
@@ -389,7 +398,10 @@ const updateRegion = async (req, res) => {
       regionCode,
       stateIds,
       isActive,
-      updatedBy
+      updatedBy,
+      regionHeadName,
+      regionHeadEcode,
+      regionHeadEmail
     );
 
     res.status(200).json({
@@ -1478,6 +1490,7 @@ const createSalesManager = async (req, res) => {
     fromDate,
     description,
     updatedBy,
+    sales_manager_email, // Add email here
     isActive = 1,
   } = req.body;
 
@@ -1489,6 +1502,7 @@ const createSalesManager = async (req, res) => {
       fromDate,
       description,
       updatedBy,
+      sales_manager_email, // Pass email here
       isActive
     );
 
@@ -1514,6 +1528,7 @@ const updateSalesManager = async (req, res) => {
     fromDate,
     description,
     updatedBy,
+    sales_manager_email, // Add email here
     isActive,
   } = req.body;
 
@@ -1533,6 +1548,7 @@ const updateSalesManager = async (req, res) => {
       fromDate,
       description,
       updatedBy,
+      sales_manager_email, // Pass email here
       isActive
     );
 

@@ -37,7 +37,10 @@ CREATE TABLE region_info (
   stateIds VARCHAR(255),
   isactive BOOLEAN DEFAULT TRUE,
   updated_by INT,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  regionHeadName VARCHAR(255), -- Name of the region head
+  regionHeadEcode VARCHAR(50), -- Employee code of the region head
+  regionHeadEmail VARCHAR(255) -- Email of the region head
 );
 CREATE TABLE company_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -188,7 +191,7 @@ CREATE TABLE technology_name_info (
   updatedBy INT,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-CREATE TABLE oem_master (
+CREATE TABLE oem_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   oemName VARCHAR(255) NOT NULL,
   type ENUM('License', 'AMC') NOT NULL,
