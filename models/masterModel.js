@@ -821,6 +821,23 @@ const getBankAccountTypesList = async (countryId = null) => {
 };
 
 // Company Account Master
+const getDefaultAccount = async (companyId) => {
+  try {
+    const query = `
+      SELECT id 
+      FROM company_account_info
+      WHERE companyId = ? AND isDefaultAccount = 1
+      LIMIT 1
+    `;
+    const [rows] = await db.execute(query, [companyId]);
+    return rows.length > 0 ? rows[0] : null;
+  } catch (err) {
+    console.error("Error fetching default account:", err);
+    throw new Error("Error checking for existing default account");
+  }
+};
+
+
 const insertCompanyAccount = async (
   companyId,
   isDefaultAccount,
@@ -1506,7 +1523,7 @@ const insertAccountManager = async (
     const query = `
             INSERT INTO account_manager_master 
             (name, code, industryHeadIds, fromDate, description, updated_at, updated_by)
-            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
         `;
     await db.execute(query, [
       name,
@@ -2168,6 +2185,7 @@ module.exports = {
   updateCompanyAccountDetails,
   activateDeactivateCompanyAccountDetails,
   getCompanyAccountsList,
+  getDefaultAccount,
 
   insertProductionType,
   updateProductionTypeDetails,
@@ -2228,4 +2246,5 @@ module.exports = {
   updateProjectService,
   activateDeactivateProjectService,
   getAllProjectServices,
+  
 };

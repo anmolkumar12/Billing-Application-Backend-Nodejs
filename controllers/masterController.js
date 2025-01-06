@@ -34,6 +34,7 @@ const {
   updateCompanyAccountDetails,
   activateDeactivateCompanyAccountDetails,
   getCompanyAccountsList,
+  getDefaultAccount,
 
   insertProductionType,
   updateProductionTypeDetails,
@@ -840,19 +841,31 @@ const getBankAccountTypes = async (req, res) => {
 // Company Account Master
 const createCompanyAccount = async (req, res) => {
   const {
-    companyId, // Company Selection
-    isDefaultAccount, // Default Account or not
-    bankAccountTypeId, // Bank Account Type - Foreign key referencing the master table
-    bankName, // Bank Name
-    bankAddress, // Bank Address
-    accountNumber, // Account Number
-    countryId, // Country Selection
-    isActive, // Status: Active (1) or Inactive (0)
-    updatedBy, // User updating the information
-    additionalFieldDetails, // Additional fields as a JSON string or object
+    companyId,
+    isDefaultAccount,
+    bankAccountTypeId,
+    bankName,
+    bankAddress,
+    accountNumber,
+    countryId,
+    isActive,
+    updatedBy,
+    additionalFieldDetails,
   } = req.body;
 
   try {
+    if (isDefaultAccount) {
+      // Check if a default account already exists for the company
+      const existingDefaultAccount = await getDefaultAccount(companyId);
+      if (existingDefaultAccount) {
+        return res.status(400).json({
+          statusCode: 400,
+          message:
+            "A default account already exists. Please disable the current default account before making this one the default.",
+        });
+      }
+    }
+
     await insertCompanyAccount(
       companyId,
       isDefaultAccount,
@@ -871,6 +884,7 @@ const createCompanyAccount = async (req, res) => {
       message: "Company Account created successfully",
     });
   } catch (err) {
+    console.error("Error creating company account:", err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error while creating company account",
@@ -880,17 +894,17 @@ const createCompanyAccount = async (req, res) => {
 
 const updateCompanyAccount = async (req, res) => {
   const {
-    accountId, // ID of the company account to update
-    companyId, // Company Selection
-    isDefaultAccount, // Default Account or not
-    bankAccountTypeId, // Bank Account Type
-    bankName, // Bank Name
-    bankAddress, // Bank Address
-    accountNumber, // Account Number
-    countryId, // Country Selection
-    isActive, // Status: Active (1) or Inactive (0)
-    updatedBy, // User updating the information
-    additionalFieldDetails, // Additional fields as a JSON string or object
+    accountId,
+    companyId,
+    isDefaultAccount,
+    bankAccountTypeId,
+    bankName,
+    bankAddress,
+    accountNumber,
+    countryId,
+    isActive,
+    updatedBy,
+    additionalFieldDetails,
   } = req.body;
 
   if (!accountId) {
@@ -901,6 +915,19 @@ const updateCompanyAccount = async (req, res) => {
   }
 
   try {
+    if (isDefaultAccount) {
+      // Check if a default account already exists for the company
+      const existingDefaultAccount = await getDefaultAccount(companyId);
+
+      if (existingDefaultAccount && existingDefaultAccount.id !== accountId) {
+        return res.status(400).json({
+          statusCode: 400,
+          message:
+            "A default account already exists. Please disable the current default account before making this one the default.",
+        });
+      }
+    }
+
     await updateCompanyAccountDetails(
       accountId,
       companyId,
@@ -920,6 +947,7 @@ const updateCompanyAccount = async (req, res) => {
       message: "Company Account updated successfully",
     });
   } catch (err) {
+    console.error("Error updating company account:", err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error while updating company account",
