@@ -40,7 +40,8 @@ CREATE TABLE region_info (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   regionHeadName VARCHAR(255), -- Name of the region head
   regionHeadEcode VARCHAR(50), -- Employee code of the region head
-  regionHeadEmail VARCHAR(255) -- Email of the region head
+  regionHeadEmail VARCHAR(255), -- Email of the region head
+  fromDate DATE NULL -- Start date for the region's active status (optional)
 );
 CREATE TABLE company_info (
   id INT AUTO_INCREMENT PRIMARY KEY,

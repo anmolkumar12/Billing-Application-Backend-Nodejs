@@ -342,6 +342,7 @@ const addRegion = async (req, res) => {
     regionHeadName, // Name of the region head
     regionHeadEcode, // Employee code of the region head
     regionHeadEmail, // Email of the region head
+    fromDate, // Start date of the region's activity
   } = req.body;
 
   try {
@@ -354,7 +355,8 @@ const addRegion = async (req, res) => {
       updatedBy,
       regionHeadName,
       regionHeadEcode,
-      regionHeadEmail
+      regionHeadEmail,
+      fromDate
     );
 
     res.status(201).json({
@@ -381,6 +383,7 @@ const updateRegion = async (req, res) => {
     regionHeadName, // Name of the region head
     regionHeadEcode, // Employee code of the region head
     regionHeadEmail, // Email of the region head
+    fromDate, // Start date of the region's activity
   } = req.body;
 
   if (!regionId) {
@@ -401,7 +404,8 @@ const updateRegion = async (req, res) => {
       updatedBy,
       regionHeadName,
       regionHeadEcode,
-      regionHeadEmail
+      regionHeadEmail,
+      fromDate
     );
 
     res.status(200).json({
@@ -459,6 +463,7 @@ const addCompany = async (req, res) => {
   const {
     countryId,
     companyName,
+    companyCode, // Added companyCode
     Website,
     Email,
     description,
@@ -479,6 +484,7 @@ const addCompany = async (req, res) => {
     await createCompany(
       countryId,
       companyName,
+      companyCode, // Pass companyCode
       Website,
       Email,
       description,
@@ -508,6 +514,7 @@ const updateCompany = async (req, res) => {
     countryId,
     companyId,
     companyName,
+    companyCode, // Added companyCode
     Website,
     Email,
     description,
@@ -543,6 +550,7 @@ const updateCompany = async (req, res) => {
       countryId,
       companyId,
       companyName,
+      companyCode, // Pass companyCode
       Website,
       Email,
       description,

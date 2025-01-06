@@ -259,12 +259,25 @@ const createRegion = async (
   updatedBy,
   regionHeadName,
   regionHeadEcode,
-  regionHeadEmail
+  regionHeadEmail,
+  fromDate // Added fromDate
 ) => {
   try {
     const query = `
-      INSERT INTO region_info (countryId, regionName, regionCode, stateIds, isActive, updated_by, updated_at, regionHeadName, regionHeadEcode, regionHeadEmail)
-      VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?)
+      INSERT INTO region_info (
+        countryId, 
+        regionName, 
+        regionCode, 
+        stateIds, 
+        isActive, 
+        updated_by, 
+        updated_at, 
+        regionHeadName, 
+        regionHeadEcode, 
+        regionHeadEmail, 
+        fromDate
+      )
+      VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?)
     `;
 
     const [result] = await db.execute(query, [
@@ -277,6 +290,7 @@ const createRegion = async (
       regionHeadName,
       regionHeadEcode,
       regionHeadEmail,
+      fromDate, // Pass fromDate as a parameter
     ]);
 
     return result;
@@ -296,7 +310,8 @@ const updateRegionDetails = async (
   updatedBy,
   regionHeadName,
   regionHeadEcode,
-  regionHeadEmail
+  regionHeadEmail,
+  fromDate // Added fromDate
 ) => {
   try {
     const sanitizedValues = [
@@ -309,6 +324,7 @@ const updateRegionDetails = async (
       regionHeadName ?? null,
       regionHeadEcode ?? null,
       regionHeadEmail ?? null,
+      fromDate ?? null, // Include fromDate in the update
       regionId,
     ];
 
@@ -324,7 +340,8 @@ const updateRegionDetails = async (
         updated_at = CURRENT_TIMESTAMP,
         regionHeadName = ?,
         regionHeadEcode = ?,
-        regionHeadEmail = ?
+        regionHeadEmail = ?,
+        fromDate = ?
       WHERE id = ?
     `;
 
@@ -407,6 +424,7 @@ const getRegions = async (countryId = null) => {
 const createCompany = async (
   countryId,
   companyName,
+  companyCode, // Added companyCode
   Website,
   Email,
   description,
@@ -421,15 +439,16 @@ const createCompany = async (
   try {
     const query = `
       INSERT INTO company_info (
-       countryId, companyName, Website, Email, logopath, description, companyAddtionalFields, isactive, updated_by, 
-        independent, parentCompanyId, digitalSignPath, updated_at
+        countryId, companyName, companyCode, Website, Email, logopath, description, companyAddtionalFields, isactive, 
+        updated_by, independent, parentCompanyId, digitalSignPath, updated_at
       ) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     const [result] = await db.execute(query, [
       countryId,
       companyName,
+      companyCode, // Insert companyCode
       Website,
       Email,
       logopath,
@@ -449,27 +468,11 @@ const createCompany = async (
   }
 };
 
-const getCompanyById = async (companyId) => {
-  try {
-    const query =
-      "SELECT logoPath, digitalSignPath FROM company_info WHERE id = ?";
-    const [rows] = await db.execute(query, [companyId]);
-
-    if (rows.length > 0) {
-      return rows[0]; // Return the first matching row
-    }
-
-    throw new Error("Company not found");
-  } catch (err) {
-    console.error(err);
-    throw new Error("Error fetching company details");
-  }
-};
-
 const updateCompanyDetails = async (
   countryId,
   companyId,
   companyName,
+  companyCode, // Added companyCode
   Website,
   Email,
   description,
@@ -485,6 +488,7 @@ const updateCompanyDetails = async (
     const sanitizedValues = [
       countryId ?? null,
       companyName ?? null,
+      companyCode ?? null, // Pass companyCode
       Website ?? null,
       Email ?? null,
       logopath ?? null, // Updated logo path (if new)
@@ -501,8 +505,9 @@ const updateCompanyDetails = async (
     const query = `
       UPDATE company_info
       SET 
-      countryId = ?,
+        countryId = ?,
         companyName = ?, 
+        companyCode = ?, 
         Website = ?, 
         Email = ?, 
         logopath = ?, 
@@ -522,6 +527,23 @@ const updateCompanyDetails = async (
   } catch (err) {
     console.error(err);
     throw new Error("Error updating company details");
+  }
+};
+
+const getCompanyById = async (companyId) => {
+  try {
+    const query =
+      "SELECT logoPath, digitalSignPath FROM company_info WHERE id = ?";
+    const [rows] = await db.execute(query, [companyId]);
+
+    if (rows.length > 0) {
+      return rows[0]; // Return the first matching row
+    }
+
+    throw new Error("Company not found");
+  } catch (err) {
+    console.error(err);
+    throw new Error("Error fetching company details");
   }
 };
 
