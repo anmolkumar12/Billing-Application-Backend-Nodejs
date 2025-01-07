@@ -1121,20 +1121,20 @@ const getProductionTypesList = async () => {
 // Industry Master
 const insertIndustryMaster = async (
   industryName,
-  productionTypeIds,
+  subIndustryCategory,
   updatedBy,
   isActive
 ) => {
   try {
     const query = `
       INSERT INTO industry_master_info 
-      (industryName, productionTypeIds, updated_by, isActive, updated_at)
+      (industryName, subIndustryCategory, updated_by, isActive, updated_at)
       VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     const [result] = await db.execute(query, [
       industryName,
-      productionTypeIds,
+      subIndustryCategory,
       updatedBy,
       isActive,
     ]);
@@ -1149,7 +1149,7 @@ const insertIndustryMaster = async (
 const updateIndustryMasterDetails = async (
   industryMasterId,
   industryName,
-  productionTypeIds,
+  subIndustryCategory,
   updatedBy,
   isActive
 ) => {
@@ -1158,7 +1158,7 @@ const updateIndustryMasterDetails = async (
       UPDATE industry_master_info
       SET 
         industryName = ?, 
-        productionTypeIds = ?, 
+        subIndustryCategory = ?, 
         updated_by = ?, 
         isActive = ?, 
         updated_at = CURRENT_TIMESTAMP
@@ -1167,7 +1167,7 @@ const updateIndustryMasterDetails = async (
 
     const [result] = await db.execute(query, [
       industryName,
-      productionTypeIds,
+      subIndustryCategory,
       updatedBy,
       isActive,
       industryMasterId,
@@ -1207,15 +1207,12 @@ const updateIndustryMasterStatus = async (
 const getIndustryMastersList = async () => {
   try {
     const query = `
-      SELECT industry_master_info.*, 
-             GROUP_CONCAT(production_type_info.productionTypeName) AS productionTypeNames
-      FROM industry_master_info
-      LEFT JOIN production_type_info 
-      ON FIND_IN_SET(production_type_info.id, industry_master_info.productionTypeIds)
-      GROUP BY industry_master_info.id;
+      SELECT * 
+      FROM industry_master_info;
     `;
     const [industryMasters] = await db.execute(query);
-    return industryMasters;
+
+    return industryMasters; // Returning all columns as is
   } catch (err) {
     console.error("Error retrieving industry masters:", err);
     throw new Error("Error retrieving industry masters");

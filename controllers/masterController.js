@@ -1132,18 +1132,13 @@ const getProductionTypes = async (req, res) => {
 const createIndustryMaster = async (req, res) => {
   const {
     industryName, // Industry Name
-    productionTypeIds, // Tag/Select Production Type
+    subIndustryCategory, // Comma-separated string for Sub-Industry Category
     updatedBy, // User updating the record
     isActive = 1, // Default value is 1 (active)
   } = req.body;
 
   try {
-    await insertIndustryMaster(
-      industryName,
-      productionTypeIds,
-      updatedBy,
-      isActive
-    );
+    await insertIndustryMaster(industryName, subIndustryCategory, updatedBy, isActive);
 
     res.status(201).json({
       statusCode: 201,
@@ -1161,7 +1156,7 @@ const updateIndustryMaster = async (req, res) => {
   const {
     industryMasterId, // ID of the industry master record to update
     industryName, // Updated Industry Name
-    productionTypeIds, // Updated Production Type ID
+    subIndustryCategory, // Updated Sub-Industry Category
     updatedBy, // User who updated
     isActive, // Active status (1 or 0)
   } = req.body;
@@ -1177,7 +1172,7 @@ const updateIndustryMaster = async (req, res) => {
     await updateIndustryMasterDetails(
       industryMasterId,
       industryName,
-      productionTypeIds,
+      subIndustryCategory,
       updatedBy,
       isActive
     );
@@ -1193,6 +1188,7 @@ const updateIndustryMaster = async (req, res) => {
     });
   }
 };
+
 
 const activateOrDeactivateIndustryMaster = async (req, res) => {
   const { industryMasterId, isActive, updatedBy } = req.body;
