@@ -332,5 +332,5 @@ router.post(
   activateDeactivateFinancialYearHandler
 );
 router.post("/getAllFinancialYearsHandler", authMiddleware, getAllFinancialYearsHandler);
-,
+
 module.exports = router;

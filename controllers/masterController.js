@@ -2524,5 +2524,5 @@ module.exports = {
   createFinancialYear,
   updateFinancialYearHandler,
   activateDeactivateFinancialYearHandler,
-  getAllFinancialYearsHandler,
+  getAllFinancialYearsHandler
 };
