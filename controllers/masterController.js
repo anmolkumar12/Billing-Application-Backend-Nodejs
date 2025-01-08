@@ -95,6 +95,11 @@ const {
   updateProjectService,
   activateDeactivateProjectService,
   getAllProjectServices,
+
+  insertFinancialYear,
+  updateFinancialYear,
+  activateDeactivateFinancialYear,
+  getAllFinancialYears,
 } = require("../models/masterModel");
 
 // Country
@@ -1138,7 +1143,12 @@ const createIndustryMaster = async (req, res) => {
   } = req.body;
 
   try {
-    await insertIndustryMaster(industryName, subIndustryCategory, updatedBy, isActive);
+    await insertIndustryMaster(
+      industryName,
+      subIndustryCategory,
+      updatedBy,
+      isActive
+    );
 
     res.status(201).json({
       statusCode: 201,
@@ -1188,7 +1198,6 @@ const updateIndustryMaster = async (req, res) => {
     });
   }
 };
-
 
 const activateOrDeactivateIndustryMaster = async (req, res) => {
   const { industryMasterId, isActive, updatedBy } = req.body;
@@ -1654,7 +1663,7 @@ const createAccountManager = async (req, res) => {
 
 const updateAccountsManager = async (req, res) => {
   const {
-    accountManagerId,  // Rename variable to accountManagerId
+    accountManagerId, // Rename variable to accountManagerId
     name,
     code,
     industryHeadIds,
@@ -2318,6 +2327,104 @@ const getProjectServices = async (req, res) => {
   }
 };
 
+// Financial Year Master
+const createFinancialYear = async (req, res) => {
+  const { startYear, endYear, financialYearName, isActive, updatedBy } =
+    req.body;
+
+  try {
+    await insertFinancialYear(
+      startYear,
+      endYear,
+      financialYearName,
+      isActive,
+      updatedBy
+    );
+    res.status(201).json({
+      statusCode: 201,
+      message: "Financial Year created successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const updateFinancialYearHandler = async (req, res) => {
+  const { id, startYear, endYear, financialYearName, isActive, updatedBy } =
+    req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Financial Year ID is required",
+    });
+  }
+
+  try {
+    await updateFinancialYear(
+      id,
+      startYear,
+      endYear,
+      financialYearName,
+      isActive,
+      updatedBy
+    );
+    res.status(200).json({
+      statusCode: 200,
+      message: "Financial Year updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating Financial Year",
+    });
+  }
+};
+
+const activateDeactivateFinancialYearHandler = async (req, res) => {
+  const { id, isActive, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Financial Year ID is required",
+    });
+  }
+
+  try {
+    await activateDeactivateFinancialYear(id, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: `Financial Year ${
+        isActive === 1 ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while activating/deactivating Financial Year",
+    });
+  }
+};
+
+const getAllFinancialYearsHandler = async (req, res) => {
+  try {
+    const records = await getAllFinancialYears();
+    res.status(200).json({
+      statusCode: 200,
+      records, // Returning the entire list of financial years
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while retrieving Financial Years",
+    });
+  }
+};
+
 module.exports = {
   addCountry,
   updateCountry,
@@ -2413,4 +2520,9 @@ module.exports = {
   updateProjectServiceHandler,
   activateDeactivateProjectServiceHandler,
   getProjectServices,
+
+  createFinancialYear,
+  updateFinancialYearHandler,
+  activateDeactivateFinancialYearHandler,
+  getAllFinancialYearsHandler,
 };

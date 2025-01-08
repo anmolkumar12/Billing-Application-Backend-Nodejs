@@ -220,3 +220,13 @@ REATE TABLE project_service_master (
   updatedBy VARCHAR(255) NOT NULL,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+CREATE TABLE financial_year_master (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  startYear INT NOT NULL,
+  endYear INT NOT NULL,
+  financialYearName VARCHAR(255) NOT NULL, -- The name of the financial year (e.g., "2024-2025")
+  isActive TINYINT(1) DEFAULT 1,  -- Indicates whether the financial year is active
+  updatedBy INT NOT NULL,         -- ID of the user who last updated the record
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

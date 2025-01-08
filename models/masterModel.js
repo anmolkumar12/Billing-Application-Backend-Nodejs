@@ -874,7 +874,6 @@ const getDefaultAccount = async (companyId) => {
   }
 };
 
-
 const insertCompanyAccount = async (
   companyId,
   isDefaultAccount,
@@ -2195,6 +2194,96 @@ const getAllProjectServices = async () => {
   }
 };
 
+// Financial Year Master
+const insertFinancialYear = async (
+  startYear,
+  endYear,
+  financialYearName,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      INSERT INTO financial_year_master (startYear, endYear, financialYearName, isActive, updatedBy, updated_at)
+      VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+    const [result] = await db.execute(query, [
+      startYear,
+      endYear,
+      financialYearName,
+      isActive,
+      updatedBy,
+    ]);
+    return result;
+  } catch (err) {
+    console.log("Error inserting Financial Year:", err);
+    throw new Error("Error inserting Financial Year");
+  }
+};
+
+const updateFinancialYear = async (
+  id,
+  startYear,
+  endYear,
+  financialYearName,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE financial_year_master
+      SET 
+        startYear = ?, 
+        endYear = ?, 
+        financialYearName = ?, 
+        isActive = ?, 
+        updatedBy = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [
+      startYear,
+      endYear,
+      financialYearName,
+      isActive,
+      updatedBy,
+      id,
+    ]);
+    return result;
+  } catch (err) {
+    console.log("Error updating Financial Year:", err);
+    throw new Error("Error updating Financial Year details");
+  }
+};
+
+const activateDeactivateFinancialYear = async (id, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE financial_year_master
+      SET isActive = ?, updatedBy = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [isActive, updatedBy, id]);
+    return result;
+  } catch (err) {
+    console.log("Error activating or deactivating Financial Year:", err);
+    throw new Error("Error activating/deactivating Financial Year");
+  }
+};
+
+const getAllFinancialYears = async () => {
+  try {
+    const query = `
+      SELECT * FROM financial_year_master
+    `;
+    const [records] = await db.execute(query);
+    return records;
+  } catch (err) {
+    console.error("Database Error:", err);
+    throw new Error("Error retrieving Financial Years");
+  }
+};
+
 module.exports = {
   createCountry,
   updateCountryDetails,
@@ -2292,5 +2381,9 @@ module.exports = {
   updateProjectService,
   activateDeactivateProjectService,
   getAllProjectServices,
-  
+
+  insertFinancialYear,
+  updateFinancialYear,
+  activateDeactivateFinancialYear,
+  getAllFinancialYears,
 };

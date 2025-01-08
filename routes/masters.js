@@ -94,6 +94,11 @@ const {
   updateProjectServiceHandler,
   activateDeactivateProjectServiceHandler,
   getProjectServices,
+
+  createFinancialYear,
+updateFinancialYearHandler,
+activateDeactivateFinancialYearHandler,
+getAllFinancialYearsHandler
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -314,4 +319,18 @@ router.post(
 );
 router.post("/getProjectService", authMiddleware, getProjectServices);
 
+// Project/Service Master
+router.post("/createFinancialYear", authMiddleware, createFinancialYear);
+router.post(
+  "/updateFinancialYearHandler",
+  authMiddleware,
+  updateFinancialYearHandler
+);
+router.post(
+  "/activateDeactivateProjectService",
+  authMiddleware,
+  activateDeactivateFinancialYearHandler
+);
+router.post("/getAllFinancialYearsHandler", authMiddleware, getAllFinancialYearsHandler);
+,
 module.exports = router;
