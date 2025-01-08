@@ -38,9 +38,12 @@ CREATE TABLE region_info (
   isactive BOOLEAN DEFAULT TRUE,
   updated_by INT,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  regionHeadName VARCHAR(255), -- Name of the region head
-  regionHeadEcode VARCHAR(50), -- Employee code of the region head
-  regionHeadEmail VARCHAR(255), -- Email of the region head
+  regionHeadName VARCHAR(255),
+  -- Name of the region head
+  regionHeadEcode VARCHAR(50),
+  -- Employee code of the region head
+  regionHeadEmail VARCHAR(255),
+  -- Email of the region head
   fromDate DATE NULL -- Start date for the region's active status (optional)
 );
 CREATE TABLE company_info (
@@ -151,7 +154,8 @@ CREATE TABLE sales_manager_master (
   fromDate DATE NOT NULL,
   description TEXT,
   updated_by VARCHAR(255) NOT NULL,
-  sales_manager_email VARCHAR(255) UNIQUE, -- Add email column
+  sales_manager_email VARCHAR(255) UNIQUE,
+  -- Add email column
   isActive BOOLEAN DEFAULT 1,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -160,14 +164,15 @@ CREATE TABLE account_manager_master (
   name VARCHAR(255) NOT NULL,
   code VARCHAR(100) NOT NULL UNIQUE,
   industryHeadIds VARCHAR(255),
-  fromDate DATE NOT NULL, -- Add DATE for fromDate
+  fromDate DATE NOT NULL,
+  -- Add DATE for fromDate
   description TEXT,
   updated_by VARCHAR(255) NOT NULL,
-  account_manager_email VARCHAR(255) UNIQUE, -- Add email column
+  account_manager_email VARCHAR(255) UNIQUE,
+  -- Add email column
   isActive BOOLEAN DEFAULT 1,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
 CREATE TABLE technology_group_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
@@ -220,13 +225,25 @@ REATE TABLE project_service_master (
   updatedBy VARCHAR(255) NOT NULL,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
 CREATE TABLE financial_year_master (
   id INT AUTO_INCREMENT PRIMARY KEY,
   startYear INT NOT NULL,
   endYear INT NOT NULL,
-  financialYearName VARCHAR(255) NOT NULL, -- The name of the financial year (e.g., "2024-2025")
-  isActive TINYINT(1) DEFAULT 1,  -- Indicates whether the financial year is active
-  updatedBy INT NOT NULL,         -- ID of the user who last updated the record
+  financialYearName VARCHAR(255) NOT NULL,
+  isActive TINYINT(1) DEFAULT 1,
+  updatedBy INT NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+CREATE TABLE region_head_info (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  regionId INT NOT NULL,
+  countryId INT NOT NULL,
+  companyId INT NOT NULL,
+  regionHeadName VARCHAR(255) NOT NULL,
+  regionHeadEcode VARCHAR(255) NOT NULL,
+  regionHeadEmail VARCHAR(255) NOT NULL,
+  fromDate DATE,
+  isActive TINYINT(1) DEFAULT 1,
+  updated_by INT,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

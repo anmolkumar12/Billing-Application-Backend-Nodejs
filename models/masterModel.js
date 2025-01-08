@@ -2284,6 +2284,156 @@ const getAllFinancialYears = async () => {
   }
 };
 
+// Region Head Master
+const createRegionHead = async (
+  regionId,
+  countryId,
+  companyId,
+  regionHeadName,
+  regionHeadEcode,
+  regionHeadEmail,
+  fromDate,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      INSERT INTO region_head_info (
+        regionId,
+        countryId,
+        companyId,
+        regionHeadName,
+        regionHeadEcode,
+        regionHeadEmail,
+        fromDate,
+        isActive,
+        updated_by,
+        updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+
+    const [result] = await db.execute(query, [
+      regionId,
+      countryId,
+      companyId,
+      regionHeadName,
+      regionHeadEcode,
+      regionHeadEmail,
+      fromDate,
+      isActive,
+      updatedBy,
+    ]);
+
+    return result;
+  } catch (err) {
+    console.log("Error creating region head:", err);
+    throw new Error("Error creating region head");
+  }
+};
+
+const updateRegionHeadDetails = async (
+  regionHeadId,
+  regionId,
+  countryId,
+  companyId,
+  regionHeadName,
+  regionHeadEcode,
+  regionHeadEmail,
+  fromDate,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const sanitizedValues = [
+      regionId ?? null,
+      countryId ?? null,
+      companyId ?? null,
+      regionHeadName ?? null,
+      regionHeadEcode ?? null,
+      regionHeadEmail ?? null,
+      fromDate ?? null,
+      isActive ?? null,
+      updatedBy ?? null,
+      regionHeadId,
+    ];
+
+    const query = `
+      UPDATE region_head_info
+      SET 
+        regionId = ?, 
+        countryId = ?, 
+        companyId = ?, 
+        regionHeadName = ?, 
+        regionHeadEcode = ?, 
+        regionHeadEmail = ?, 
+        fromDate = ?, 
+        isActive = ?, 
+        updated_by = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, sanitizedValues);
+    return result;
+  } catch (err) {
+    console.log("Error updating region head:", err);
+    throw new Error("Error updating region head details");
+  }
+};
+
+const activateDeactivateRegionHeadDetails = async (
+  regionHeadId,
+  isActive,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE region_head_info
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      isActive, // 1 for active, 0 for inactive
+      updatedBy ?? null,
+      regionHeadId,
+    ]);
+
+    return result;
+  } catch (err) {
+    console.error("Error activating or deactivating region head:", err);
+    throw new Error("Error activating/deactivating region head");
+  }
+};
+
+const getRegionHeads = async () => {
+  try {
+    const query = `
+      SELECT 
+        region_head_info.*, 
+        country_info.name AS countryName,
+        company_info.companyName
+      FROM 
+        region_head_info
+      LEFT JOIN 
+        country_info 
+      ON 
+        region_head_info.countryId = country_info.id
+      LEFT JOIN 
+        company_info 
+      ON 
+        region_head_info.companyId = company_info.id
+    `;
+
+    const [regionHeads] = await db.execute(query);
+    return regionHeads;
+  } catch (err) {
+    console.log("Error retrieving region heads list:", err);
+    throw new Error("Error retrieving region heads list");
+  }
+};
+
 module.exports = {
   createCountry,
   updateCountryDetails,
@@ -2386,4 +2536,9 @@ module.exports = {
   updateFinancialYear,
   activateDeactivateFinancialYear,
   getAllFinancialYears,
+
+  createRegionHead,
+  updateRegionHeadDetails,
+  activateDeactivateRegionHeadDetails,
+  getRegionHeads,
 };

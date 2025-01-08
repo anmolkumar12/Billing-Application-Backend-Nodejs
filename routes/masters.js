@@ -96,9 +96,14 @@ const {
   getProjectServices,
 
   createFinancialYear,
-updateFinancialYearHandler,
-activateDeactivateFinancialYearHandler,
-getAllFinancialYearsHandler
+  updateFinancialYearHandler,
+  activateDeactivateFinancialYearHandler,
+  getAllFinancialYearsHandler,
+
+  addRegionHead,
+  updateRegionHead,
+  activateDeactivateRegionHead,
+  getRegionHeadsList,
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -247,7 +252,7 @@ router.post("/updateAccountsManager", authMiddleware, updateAccountsManager);
 router.post(
   "/activateOrDeactivateAccountsManager",
   authMiddleware,
-  activateOrDeactivateAccountsManager 
+  activateOrDeactivateAccountsManager
 );
 router.post("/getAccountManagers", authMiddleware, getAccountManagers);
 
@@ -331,6 +336,20 @@ router.post(
   authMiddleware,
   activateDeactivateFinancialYearHandler
 );
-router.post("/getAllFinancialYearsHandler", authMiddleware, getAllFinancialYearsHandler);
+router.post(
+  "/getAllFinancialYearsHandler",
+  authMiddleware,
+  getAllFinancialYearsHandler
+);
+
+// Region Head Master
+router.post("/addRegionHead", authMiddleware, addRegionHead);
+router.post("/updateRegionHead", authMiddleware, updateRegionHead);
+router.post(
+  "/activateDeactivateRegionHead",
+  authMiddleware,
+  activateDeactivateRegionHead
+);
+router.post("/getRegionHeadsList", authMiddleware, getRegionHeadsList);
 
 module.exports = router;

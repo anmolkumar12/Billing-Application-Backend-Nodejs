@@ -100,6 +100,11 @@ const {
   updateFinancialYear,
   activateDeactivateFinancialYear,
   getAllFinancialYears,
+
+  createRegionHead,
+  updateRegionHeadDetails,
+  activateDeactivateRegionHeadDetails,
+  getRegionHeads,
 } = require("../models/masterModel");
 
 // Country
@@ -2425,6 +2430,132 @@ const getAllFinancialYearsHandler = async (req, res) => {
   }
 };
 
+// Region Head Master
+const addRegionHead = async (req, res) => {
+  const {
+    regionId, // Region ID
+    countryId, // Country ID
+    companyId, // Company ID
+    regionHeadName, // Name of the region head
+    regionHeadEcode, // Ecode of the region head
+    regionHeadEmail, // Email of the region head
+    fromDate, // From date of the region's activity
+    isActive, // Active status
+    updatedBy, // User who is updating
+  } = req.body;
+
+  try {
+    await createRegionHead(
+      regionId,
+      countryId,
+      companyId,
+      regionHeadName,
+      regionHeadEcode,
+      regionHeadEmail,
+      fromDate,
+      isActive,
+      updatedBy
+    );
+
+    res.status(201).json({
+      statusCode: 201,
+      message: "Region Head created successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const updateRegionHead = async (req, res) => {
+  const {
+    regionHeadId, // Region Head ID to update
+    regionId, // Region ID
+    countryId, // Country ID
+    companyId, // Company ID
+    regionHeadName, // Region head name
+    regionHeadEcode, // Region head ecode
+    regionHeadEmail, // Region head email
+    fromDate, // From date
+    isActive, // Active status
+    updatedBy, // User who is updating
+  } = req.body;
+
+  if (!regionHeadId) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Region Head ID is required",
+    });
+  }
+
+  try {
+    await updateRegionHeadDetails(
+      regionHeadId,
+      regionId,
+      countryId,
+      companyId,
+      regionHeadName,
+      regionHeadEcode,
+      regionHeadEmail,
+      fromDate,
+      isActive,
+      updatedBy
+    );
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Region Head updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating region head details",
+    });
+  }
+};
+
+const activateDeactivateRegionHead = async (req, res) => {
+  const { regionHeadId, isActive, updatedBy } = req.body;
+
+  try {
+    await activateDeactivateRegionHeadDetails(
+      regionHeadId,
+      isActive,
+      updatedBy
+    );
+    res.status(200).json({
+      statusCode: 200,
+      message: `Region Head ${
+        isActive == 1 ? "activated" : "deactivated"
+      } successfully`,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
+const getRegionHeadsList = async (req, res) => {
+  try {
+    const regionHeads = await getRegionHeads();
+
+    res.status(200).json({
+      statusCode: 200,
+      regionHeads,
+    });
+  } catch (err) {
+    console.log("Error:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error",
+    });
+  }
+};
+
 module.exports = {
   addCountry,
   updateCountry,
@@ -2524,5 +2655,10 @@ module.exports = {
   createFinancialYear,
   updateFinancialYearHandler,
   activateDeactivateFinancialYearHandler,
-  getAllFinancialYearsHandler
+  getAllFinancialYearsHandler,
+
+  addRegionHead,
+  updateRegionHead,
+  activateDeactivateRegionHead,
+  getRegionHeadsList,
 };
