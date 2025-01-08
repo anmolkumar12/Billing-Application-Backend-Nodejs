@@ -485,10 +485,8 @@ const addCompany = async (req, res) => {
   } = req.body;
 
   // Access the files from req.files
-  const logoPath = req.files.logo ? req.files.logo[0].path : null; // Handle logo
-  const digitalSignPath = req.files.digitalSign
-    ? req.files.digitalSign[0].path
-    : null; // Handle digital signature
+  const logoPath = req.files.logo ? req.files.logo[0].path.replace("\\", "/"):null;
+  const digitalSignPath = req.files.digitalSign ? req.files.digitalSign[0].path.replace("\\", "/"):null;
 
   try {
     await createCompany(
@@ -536,10 +534,8 @@ const updateCompany = async (req, res) => {
   } = req.body;
 
   // Access the files from req.files
-  const logoPath = req.files.logo ? req.files.logo[0].path : null; // Handle logo
-  const digitalSignPath = req.files.digitalSign
-    ? req.files.digitalSign[0].path
-    : null; // Handle digital signature
+  const logoPath = req.files.logo ? req.files.logo[0].path.replace("\\", "/"): null;
+  const digitalSignPath = req.files.digitalSign ? req.files.digitalSign[0].path.replace("\\", "/"): null;
 
   if (!companyId) {
     return res.status(400).json({
