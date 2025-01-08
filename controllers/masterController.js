@@ -1361,6 +1361,7 @@ const getGroupIndustries = async (req, res) => {
 // Industryhead Master
 const createIndustryHead = async (req, res) => {
   const {
+    companyId,
     industryHeadName,
     industryIds,
     isRegionWise,
@@ -1375,6 +1376,7 @@ const createIndustryHead = async (req, res) => {
 
   try {
     await insertIndustryHead(
+      companyId,
       industryHeadName,
       industryIds,
       isRegionWise,
@@ -1402,6 +1404,7 @@ const createIndustryHead = async (req, res) => {
 
 const updateIndustryHead = async (req, res) => {
   const {
+    companyId,
     industryHeadId,
     industryHeadName,
     industryIds,
@@ -1424,6 +1427,7 @@ const updateIndustryHead = async (req, res) => {
 
   try {
     await updateIndustryHeadDetails(
+      companyId,
       industryHeadId,
       industryHeadName,
       industryIds,
@@ -1506,6 +1510,7 @@ const createSalesManager = async (req, res) => {
     updatedBy,
     sales_manager_email, // Add email here
     isActive = 1,
+    companyId
   } = req.body;
 
   try {
@@ -1517,7 +1522,8 @@ const createSalesManager = async (req, res) => {
       description,
       updatedBy,
       sales_manager_email, // Pass email here
-      isActive
+      isActive,
+      companyId
     );
 
     res.status(201).json({
@@ -1535,6 +1541,7 @@ const createSalesManager = async (req, res) => {
 
 const updateSalesManager = async (req, res) => {
   const {
+    companyId,
     salesManagerId,
     name,
     code,
@@ -1555,6 +1562,7 @@ const updateSalesManager = async (req, res) => {
 
   try {
     await updateSalesManagerDetails(
+      companyId,
       salesManagerId,
       name,
       code,
@@ -1563,7 +1571,7 @@ const updateSalesManager = async (req, res) => {
       description,
       updatedBy,
       sales_manager_email, // Pass email here
-      isActive
+      isActive,
     );
 
     res.status(200).json({
@@ -1627,6 +1635,7 @@ const getSalesManagers = async (req, res) => {
 // Account Manager Master
 const createAccountManager = async (req, res) => {
   const {
+    companyId,
     name,
     code,
     industryHeadIds,
@@ -1639,6 +1648,7 @@ const createAccountManager = async (req, res) => {
 
   try {
     await insertAccountManager(
+      companyId,
       name,
       code,
       industryHeadIds,
@@ -1664,6 +1674,7 @@ const createAccountManager = async (req, res) => {
 
 const updateAccountsManager = async (req, res) => {
   const {
+    companyId,
     accountManagerId, // Rename variable to accountManagerId
     name,
     code,
@@ -1684,6 +1695,7 @@ const updateAccountsManager = async (req, res) => {
 
   try {
     await updateAccountManager(
+      companyId,
       accountManagerId, // Pass the correct ID
       name,
       code,

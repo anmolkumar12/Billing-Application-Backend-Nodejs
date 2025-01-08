@@ -15,7 +15,7 @@ const createCountry = async (
   try {
     const query = `
       INSERT INTO country_info (code, name, language, phoneCode, addressAdditionalFields, bankAccAdditionalFields, companyAddtionalFields, isactive, updated_by, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     const [result] = await db.execute(query, [
@@ -287,9 +287,9 @@ const createRegion = async (
       stateIds,
       isActive,
       updatedBy,
-      regionHeadName,
-      regionHeadEcode,
-      regionHeadEmail,
+      regionHeadName ?? null,
+      regionHeadEcode ?? null,
+      regionHeadEmail ?? null,
       fromDate, // Pass fromDate as a parameter
     ]);
 
@@ -1315,6 +1315,7 @@ const getGroupIndustriesList = async () => {
 
 // Industry Head Master
 const insertIndustryHead = async (
+  companyId,
   industryHeadName,
   industryIds,
   isRegionWise,
@@ -1329,11 +1330,12 @@ const insertIndustryHead = async (
   try {
     const query = `
       INSERT INTO industry_head_master 
-      (industryHeadName, industryIds, isRegionWise, countryIds, regionIds, stateIds, startDate, endDate, updated_by, isActive, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      (companyId, industryHeadName, industryIds, isRegionWise, countryIds, regionIds, stateIds, startDate, endDate, updated_by, isActive, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     await db.execute(query, [
+      companyId,
       industryHeadName,
       industryIds,
       isRegionWise,
@@ -1352,6 +1354,7 @@ const insertIndustryHead = async (
 };
 
 const updateIndustryHeadDetails = async (
+  companyId,
   industryHeadId,
   industryHeadName,
   industryIds,
@@ -1367,7 +1370,7 @@ const updateIndustryHeadDetails = async (
   try {
     const query = `
       UPDATE industry_head_master
-      SET industryHeadName = ?, industryIds = ?, isRegionWise = ?, countryIds = ?, regionIds = ?, stateIds = ?, startDate = ?, endDate = ?, updated_by = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
+      SET companyId = ?, industryHeadName = ?, industryIds = ?, isRegionWise = ?, countryIds = ?, regionIds = ?, stateIds = ?, startDate = ?, endDate = ?, updated_by = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
 
@@ -1450,13 +1453,14 @@ const insertSalesManager = async (
   description,
   updatedBy,
   sales_manager_email, // Add email here
-  isActive
+  isActive,
+  companyId
 ) => {
   try {
     const query = `
       INSERT INTO sales_manager_master 
-      (name, code, industryHeadIds, fromDate, description, updated_by, sales_manager_email, isActive, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      (name, code, industryHeadIds, fromDate, description, updated_by, sales_manager_email, isActive, updated_at, companyId)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
     `;
 
     await db.execute(query, [
@@ -1468,6 +1472,7 @@ const insertSalesManager = async (
       updatedBy,
       sales_manager_email, // Insert email here
       isActive,
+      companyId
     ]);
   } catch (err) {
     console.error("Error inserting sales manager:", err);
@@ -1476,6 +1481,7 @@ const insertSalesManager = async (
 };
 
 const updateSalesManagerDetails = async (
+  companyId,
   salesManagerId,
   name,
   code,
@@ -1484,16 +1490,17 @@ const updateSalesManagerDetails = async (
   description,
   updatedBy,
   sales_manager_email, // Add email here
-  isActive
+  isActive,
 ) => {
   try {
     const query = `
       UPDATE sales_manager_master
-      SET name = ?, code = ?, industryHeadIds = ?, fromDate = ?, description = ?, updated_by = ?, sales_manager_email = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
+      SET companyId = ?, name = ?, code = ?, industryHeadIds = ?, fromDate = ?, description = ?, updated_by = ?, sales_manager_email = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
 
     await db.execute(query, [
+      companyId,
       name,
       code,
       industryHeadIds,
@@ -1533,10 +1540,12 @@ const getSalesManagersList = async () => {
   try {
     const query = `
       SELECT sales_manager_master.*, 
-             (SELECT GROUP_CONCAT(industry_head_master.industryHeadName) 
+             (SELECT GROUP_CONCAT(industry_head_master.industryHeadName)
               FROM industry_head_master 
-              WHERE FIND_IN_SET(industry_head_master.id, sales_manager_master.industryHeadIds)) AS industryHeadNames
+              WHERE FIND_IN_SET(industry_head_master.id, sales_manager_master.industryHeadIds)) AS industryHeadNames, company_info.companyName
       FROM sales_manager_master
+      LEFT JOIN 
+        company_info ON sales_manager_master.companyId = company_info.id
     `;
 
     const [salesManagers] = await db.execute(query);
@@ -1549,6 +1558,7 @@ const getSalesManagersList = async () => {
 
 // Account Manager Master
 const insertAccountManager = async (
+  companyId,
   name,
   code,
   industryHeadIds,
@@ -1561,10 +1571,11 @@ const insertAccountManager = async (
   try {
     const query = `
       INSERT INTO account_manager_master 
-      (name, code, industryHeadIds, fromDate, description, updated_by, account_manager_email, isActive, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      (companyId, name, code, industryHeadIds, fromDate, description, updated_by, account_manager_email, isActive, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
     await db.execute(query, [
+      companyId,
       name,
       code,
       industryHeadIds,
@@ -1581,6 +1592,7 @@ const insertAccountManager = async (
 };
 
 const updateAccountManager = async (
+  companyId,
   id,
   name,
   code,
@@ -1594,10 +1606,11 @@ const updateAccountManager = async (
   try {
     const query = `
       UPDATE account_manager_master
-      SET name = ?, code = ?, industryHeadIds = ?, fromDate = ?, description = ?, updated_by = ?, account_manager_email = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
+      SET companyId = ?, name = ?, code = ?, industryHeadIds = ?, fromDate = ?, description = ?, updated_by = ?, account_manager_email = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
     await db.execute(query, [
+      companyId,
       name,
       code,
       industryHeadIds,
@@ -1634,8 +1647,10 @@ const getAccountManagersList = async () => {
             SELECT account_manager_master.*, 
                    (SELECT GROUP_CONCAT(industry_head_master.industryHeadName) 
                     FROM industry_head_master 
-                    WHERE FIND_IN_SET(industry_head_master.id, account_manager_master.industryHeadIds)) AS industryHeadNames
+                    WHERE FIND_IN_SET(industry_head_master.id, account_manager_master.industryHeadIds)) AS industryHeadNames, company_info.companyName
             FROM account_manager_master
+            LEFT JOIN 
+            company_info ON account_manager_master.companyId = company_info.id
         `;
     const [accountManagers] = await db.execute(query);
     return accountManagers;
