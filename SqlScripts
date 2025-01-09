@@ -155,6 +155,7 @@ CREATE TABLE sales_manager_master (
   description TEXT,
   updated_by VARCHAR(255) NOT NULL,
   sales_manager_email VARCHAR(255) UNIQUE,
+  companyId INT NOT NULL,
   -- Add email column
   isActive BOOLEAN DEFAULT 1,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -164,6 +165,7 @@ CREATE TABLE account_manager_master (
   name VARCHAR(255) NOT NULL,
   code VARCHAR(100) NOT NULL UNIQUE,
   industryHeadIds VARCHAR(255),
+  companyId INT NOT NULL,
   fromDate DATE NOT NULL,
   -- Add DATE for fromDate
   description TEXT,
@@ -236,7 +238,7 @@ CREATE TABLE financial_year_master (
 );
 CREATE TABLE region_head_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  regionId INT NOT NULL,
+  regionId VARCHAR(255) NOT NULL,
   countryId INT NOT NULL,
   companyId INT NOT NULL,
   regionHeadName VARCHAR(255) NOT NULL,

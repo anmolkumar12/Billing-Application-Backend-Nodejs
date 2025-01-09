@@ -2428,7 +2428,13 @@ const getRegionHeads = async () => {
       SELECT 
         region_head_info.*, 
         country_info.name AS countryName,
-        company_info.companyName
+        company_info.companyName,
+        (SELECT GROUP_CONCAT(region_info.regionName) 
+              FROM region_info 
+              WHERE FIND_IN_SET(region_info.id, region_head_info.regionId)) AS regionNames,
+        (SELECT GROUP_CONCAT(region_info.regionCode) 
+              FROM region_info 
+              WHERE FIND_IN_SET(region_info.id, region_head_info.regionId)) AS regionCodes
       FROM 
         region_head_info
       LEFT JOIN 
