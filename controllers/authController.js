@@ -65,6 +65,12 @@ const login = async (req, res) => {
   }
 };
 
+const validateToken = async (req,res) => {
+      res.status(200).json({
+        tokenIsValid:true
+      })
+}
+
 
 
 const changePassword = async (req, res) => {
@@ -144,4 +150,5 @@ module.exports = {
   login,
   changePassword,
   forgetPassword,
+  validateToken
 };
