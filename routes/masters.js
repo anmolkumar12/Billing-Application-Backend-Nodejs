@@ -332,7 +332,7 @@ router.post(
   updateFinancialYearHandler
 );
 router.post(
-  "/activateDeactivateProjectService",
+  "/activateDeactivateFinancialYear",
   authMiddleware,
   activateDeactivateFinancialYearHandler
 );
