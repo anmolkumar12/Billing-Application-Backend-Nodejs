@@ -2507,7 +2507,7 @@ const updateRegionHead = async (req, res) => {
   }
 
   try {
-    await updateRegionHeadDetails(
+    const finalRes = await updateRegionHeadDetails(
       regionHeadId,
       regionId,
       countryId,
@@ -2519,11 +2519,18 @@ const updateRegionHead = async (req, res) => {
       isActive,
       updatedBy
     );
-
-    res.status(200).json({
-      statusCode: 200,
-      message: "Region Head updated successfully",
-    });
+    if(finalRes.status == 'existing'){
+      res.status(400).json({
+        statusCode: 400,
+        // message: `This region already has a region head: ${finalRes.existingRegionHead}`,
+        message: finalRes.conflictMessage
+      });
+    } else {
+      res.status(200).json({
+        statusCode: 200,
+        message: "Region Head updated successfully",
+      });
+    }
   } catch (err) {
     res.status(500).json({
       statusCode: 500,

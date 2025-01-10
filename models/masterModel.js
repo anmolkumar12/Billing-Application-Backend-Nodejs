@@ -2420,6 +2420,34 @@ const updateRegionHeadDetails = async (
   updatedBy
 ) => {
   try {
+
+        // Check for region ID conflict
+        const conflictQuery = `
+        SELECT rhi.regionHeadName, r.regionName
+        FROM region_head_info rhi
+        JOIN region_info r ON FIND_IN_SET(r.id, rhi.regionId)
+        WHERE rhi.companyId = ? 
+          AND rhi.id != ? 
+          AND (
+            ${regionId.split(',').map(() => "FIND_IN_SET(?, rhi.regionId)").join(" OR ")}
+          )
+      `;
+  
+      const regionIdArray = regionId.split(',').map(id => id.trim());
+      const conflictValues = [companyId, regionHeadId, ...regionIdArray];
+  
+      const [conflictRows] = await db.execute(conflictQuery, conflictValues);
+      const conflictingRegions = conflictRows
+      .map(row => `Region ${row.regionName} is already assigned to ${row.regionHeadName}`)
+      .join(", ");
+      console.log('conflictRows', conflictingRegions);
+      if (conflictRows.length > 0) {
+        return {status: 'existing', conflictMessage: conflictingRegions}
+        // res.status(400).json({
+        //   statusCode: 400,
+        //   message: `Region already assigned to ${conflictRows[0].regionHeadName}`,
+        // });
+      }
     const sanitizedValues = [
       regionId ?? null,
       countryId ?? null,
