@@ -2468,7 +2468,7 @@ const addRegionHead = async (req, res) => {
     if(finalResult.status == 'existing'){
       res.status(400).json({
         statusCode: 400,
-        message: `Region already has a region head: ${finalResult.existingRegionHead}`,
+        message: `This region already has a region head: ${finalResult.existingRegionHead}`,
       });
     } else {
       res.status(201).json({
