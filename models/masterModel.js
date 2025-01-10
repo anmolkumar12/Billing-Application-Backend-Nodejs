@@ -2367,7 +2367,6 @@ const createRegionHead = async (
   try {
 
     const existingRegionHead = await checkRegionHeadOverlap(regionId, companyId);
-    console.log('llllllllllllllll', existingRegionHead);
     
     if (existingRegionHead?.regionHeadName) {
       return {'status': 'existing', 'existingRegionHead': existingRegionHead?.regionHeadName};

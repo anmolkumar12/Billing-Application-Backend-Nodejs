@@ -2464,7 +2464,6 @@ const addRegionHead = async (req, res) => {
       isActive,
       updatedBy
     );
-    console.log('finalResulto', finalResult);
 
     if(finalResult.status == 'existing'){
       res.status(400).json({
@@ -2479,7 +2478,6 @@ const addRegionHead = async (req, res) => {
     }
     
   } catch (err) {
-    console.log('helloooo', err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
