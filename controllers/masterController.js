@@ -2464,11 +2464,13 @@ const addRegionHead = async (req, res) => {
       isActive,
       updatedBy
     );
-
+    console.log('rrrrrrrrrrrr', finalResult);
+    
     if(finalResult.status == 'existing'){
       res.status(400).json({
         statusCode: 400,
-        message: `This region already has a region head: ${finalResult.existingRegionHead}`,
+        // message: `This region already has a region head ${finalResult.existingRegionHead}`,
+        message: finalResult.conflictMessage
       });
     } else {
       res.status(201).json({

@@ -2317,34 +2317,36 @@ const checkExistingRegionHead = async (regionId) => {
   }
 };
 
-// Function to check if there is an overlap of regions for the same company
 const checkRegionHeadOverlap = async (newRegionIds, companyId) => {
-  console.log("newRegionIds (input):", newRegionIds);
+  console.log("newRegionIds:", newRegionIds);
 
-  // Ensure newRegionIds is an array
   if (!Array.isArray(newRegionIds)) {
-    newRegionIds = newRegionIds.split(",").map((id) => id.trim()); // Convert comma-separated string to array
+    newRegionIds = newRegionIds.split(",").map((id) => id.trim());
   }
 
   try {
     const query = `
-      SELECT regionHeadName, regionId
-      FROM region_head_info
-      WHERE companyId = ?
-      AND isActive = 1
+      SELECT rhi.regionHeadName, rhi.regionId, r.id AS regionId, r.regionName
+      FROM region_head_info rhi
+      JOIN region_info r ON FIND_IN_SET(r.id, rhi.regionId)
+      WHERE rhi.companyId = ?
+      AND rhi.isActive = 1
     `;
 
     const [rows] = await db.execute(query, [companyId]);
 
+    const overlappingRegions = [];
+
     for (const row of rows) {
-      const existingRegionIds = row.regionId.split(",").map((id) => id.trim()); // Parse existing region IDs
-      const overlap = newRegionIds.some((id) => existingRegionIds.includes(id));
-      if (overlap) {
-        return row; // Return the overlapping region head details
+      if (newRegionIds.includes(row.regionId.toString())) {
+        overlappingRegions.push({
+          regionName: row.regionName,
+          regionHeadName: row.regionHeadName,
+        });
       }
     }
 
-    return null; // No overlap found
+    return overlappingRegions.length > 0 ? overlappingRegions : null;
   } catch (err) {
     console.error("Error checking region head overlap:", err);
     throw new Error("Error checking region head overlap");
@@ -2366,12 +2368,17 @@ const createRegionHead = async (
 ) => {
   try {
 
-    const existingRegionHead = await checkRegionHeadOverlap(regionId, companyId);
-    
-    if (existingRegionHead?.regionHeadName) {
-      return {'status': 'existing', 'existingRegionHead': existingRegionHead?.regionHeadName};
+    const existingOverlaps = await checkRegionHeadOverlap(regionId, companyId);
+    console.log('ooooooooo', existingOverlaps);
+
+    if (existingOverlaps) {
+      const conflictMessage = existingOverlaps.map((conflict) => `Region ${conflict.regionName} is already assigned to ${conflict.regionHeadName}`).join(", ");
+      return {
+        status: "existing",
+        conflictMessage: conflictMessage,
+      };
     }
-    
+
     const query = `
       INSERT INTO region_head_info (
         regionId,
@@ -2421,8 +2428,8 @@ const updateRegionHeadDetails = async (
 ) => {
   try {
 
-        // Check for region ID conflict
-        const conflictQuery = `
+    // Check for region ID conflict
+    const conflictQuery = `
         SELECT rhi.regionHeadName, r.regionName
         FROM region_head_info rhi
         JOIN region_info r ON FIND_IN_SET(r.id, rhi.regionId)
@@ -2432,22 +2439,22 @@ const updateRegionHeadDetails = async (
             ${regionId.split(',').map(() => "FIND_IN_SET(?, rhi.regionId)").join(" OR ")}
           )
       `;
-  
-      const regionIdArray = regionId.split(',').map(id => id.trim());
-      const conflictValues = [companyId, regionHeadId, ...regionIdArray];
-  
-      const [conflictRows] = await db.execute(conflictQuery, conflictValues);
-      const conflictingRegions = conflictRows
+
+    const regionIdArray = regionId.split(',').map(id => id.trim());
+    const conflictValues = [companyId, regionHeadId, ...regionIdArray];
+
+    const [conflictRows] = await db.execute(conflictQuery, conflictValues);
+    const conflictingRegions = conflictRows
       .map(row => `Region ${row.regionName} is already assigned to ${row.regionHeadName}`)
       .join(", ");
-      console.log('conflictRows', conflictingRegions);
-      if (conflictRows.length > 0) {
-        return {status: 'existing', conflictMessage: conflictingRegions}
-        // res.status(400).json({
-        //   statusCode: 400,
-        //   message: `Region already assigned to ${conflictRows[0].regionHeadName}`,
-        // });
-      }
+    console.log('conflictRows', conflictingRegions);
+    if (conflictRows.length > 0) {
+      return { status: 'existing', conflictMessage: conflictingRegions }
+      // res.status(400).json({
+      //   statusCode: 400,
+      //   message: `Region already assigned to ${conflictRows[0].regionHeadName}`,
+      // });
+    }
     const sanitizedValues = [
       regionId ?? null,
       countryId ?? null,
