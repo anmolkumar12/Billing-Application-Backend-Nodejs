@@ -2453,7 +2453,7 @@ const addRegionHead = async (req, res) => {
   } = req.body;
 
   try {
-    await createRegionHead(
+    const finalResult = await createRegionHead(
       regionId,
       countryId,
       companyId,
@@ -2464,12 +2464,22 @@ const addRegionHead = async (req, res) => {
       isActive,
       updatedBy
     );
+    console.log('finalResulto', finalResult);
 
-    res.status(201).json({
-      statusCode: 201,
-      message: "Region Head created successfully",
-    });
+    if(finalResult.status == 'existing'){
+      res.status(400).json({
+        statusCode: 400,
+        message: `Region already has a region head: ${finalResult.existingRegionHead}`,
+      });
+    } else {
+      res.status(201).json({
+        statusCode: 201,
+        message: "Region Head created successfully",
+      });
+    }
+    
   } catch (err) {
+    console.log('helloooo', err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",

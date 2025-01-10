@@ -2299,6 +2299,59 @@ const getAllFinancialYears = async () => {
   }
 };
 
+// Function to check if a region head already exists for the given regionId
+const checkExistingRegionHead = async (regionId) => {
+  try {
+    const query = `
+      SELECT regionHeadName
+      FROM region_head_info
+      WHERE regionId = ?
+      AND isActive = 1
+    `;
+
+    const [rows] = await db.execute(query, [regionId]);
+    return rows.length > 0 ? rows[0] : null;
+  } catch (err) {
+    console.error("Error checking existing region head:", err);
+    throw new Error("Error checking existing region head");
+  }
+};
+
+// Function to check if there is an overlap of regions for the same company
+const checkRegionHeadOverlap = async (newRegionIds, companyId) => {
+  console.log("newRegionIds (input):", newRegionIds);
+
+  // Ensure newRegionIds is an array
+  if (!Array.isArray(newRegionIds)) {
+    newRegionIds = newRegionIds.split(",").map((id) => id.trim()); // Convert comma-separated string to array
+  }
+
+  try {
+    const query = `
+      SELECT regionHeadName, regionId
+      FROM region_head_info
+      WHERE companyId = ?
+      AND isActive = 1
+    `;
+
+    const [rows] = await db.execute(query, [companyId]);
+
+    for (const row of rows) {
+      const existingRegionIds = row.regionId.split(",").map((id) => id.trim()); // Parse existing region IDs
+      const overlap = newRegionIds.some((id) => existingRegionIds.includes(id));
+      if (overlap) {
+        return row; // Return the overlapping region head details
+      }
+    }
+
+    return null; // No overlap found
+  } catch (err) {
+    console.error("Error checking region head overlap:", err);
+    throw new Error("Error checking region head overlap");
+  }
+};
+
+
 // Region Head Master
 const createRegionHead = async (
   regionId,
@@ -2312,6 +2365,14 @@ const createRegionHead = async (
   updatedBy
 ) => {
   try {
+
+    const existingRegionHead = await checkRegionHeadOverlap(regionId, companyId);
+    console.log('llllllllllllllll', existingRegionHead);
+    
+    if (existingRegionHead?.regionHeadName) {
+      return {'status': 'existing', 'existingRegionHead': existingRegionHead?.regionHeadName};
+    }
+    
     const query = `
       INSERT INTO region_head_info (
         regionId,
