@@ -2300,6 +2300,61 @@ const getAllFinancialYears = async () => {
   }
 };
 
+// Function to check if a region head already exists for the given regionId
+const checkExistingRegionHead = async (regionId) => {
+  try {
+    const query = `
+      SELECT regionHeadName
+      FROM region_head_info
+      WHERE regionId = ?
+      AND isActive = 1
+    `;
+
+    const [rows] = await db.execute(query, [regionId]);
+    return rows.length > 0 ? rows[0] : null;
+  } catch (err) {
+    console.error("Error checking existing region head:", err);
+    throw new Error("Error checking existing region head");
+  }
+};
+
+const checkRegionHeadOverlap = async (newRegionIds, companyId) => {
+  console.log("newRegionIds:", newRegionIds);
+
+  if (!Array.isArray(newRegionIds)) {
+    newRegionIds = newRegionIds.split(",").map((id) => id.trim());
+  }
+
+  try {
+    const query = `
+      SELECT rhi.regionHeadName, rhi.regionId, r.id AS regionId, r.regionName
+      FROM region_head_info rhi
+      JOIN region_info r ON FIND_IN_SET(r.id, rhi.regionId)
+      WHERE rhi.companyId = ?
+      AND rhi.isActive = 1
+    `;
+
+    const [rows] = await db.execute(query, [companyId]);
+
+    const overlappingRegions = [];
+
+    for (const row of rows) {
+      if (newRegionIds.includes(row.regionId.toString())) {
+        overlappingRegions.push({
+          regionName: row.regionName,
+          regionHeadName: row.regionHeadName,
+        });
+      }
+    }
+
+    return overlappingRegions.length > 0 ? overlappingRegions : null;
+  } catch (err) {
+    console.error("Error checking region head overlap:", err);
+    throw new Error("Error checking region head overlap");
+  }
+};
+
+
 // Region Head Master
 const createRegionHead = async (
   regionId,
@@ -2313,6 +2368,18 @@ const createRegionHead = async (
   updatedBy
 ) => {
   try {
+
+    const existingOverlaps = await checkRegionHeadOverlap(regionId, companyId);
+    console.log('ooooooooo', existingOverlaps);
+
+    if (existingOverlaps) {
+      const conflictMessage = existingOverlaps.map((conflict) => `Region ${conflict.regionName} is already assigned to ${conflict.regionHeadName}`).join(", ");
+      return {
+        status: "existing",
+        conflictMessage: conflictMessage,
+      };
+    }
+
     const query = `
       INSERT INTO region_head_info (
         regionId,
@@ -2361,6 +2428,34 @@ const updateRegionHeadDetails = async (
   updatedBy
 ) => {
   try {
+
+    // Check for region ID conflict
+    const conflictQuery = `
+        SELECT rhi.regionHeadName, r.regionName
+        FROM region_head_info rhi
+        JOIN region_info r ON FIND_IN_SET(r.id, rhi.regionId)
+        WHERE rhi.companyId = ? 
+          AND rhi.id != ? 
+          AND (
+            ${regionId.split(',').map(() => "FIND_IN_SET(?, rhi.regionId)").join(" OR ")}
+          )
+      `;
+
+    const regionIdArray = regionId.split(',').map(id => id.trim());
+    const conflictValues = [companyId, regionHeadId, ...regionIdArray];
+
+    const [conflictRows] = await db.execute(conflictQuery, conflictValues);
+    const conflictingRegions = conflictRows
+      .map(row => `Region ${row.regionName} is already assigned to ${row.regionHeadName}`)
+      .join(", ");
+    console.log('conflictRows', conflictingRegions);
+    if (conflictRows.length > 0) {
+      return { status: 'existing', conflictMessage: conflictingRegions }
+      // res.status(400).json({
+      //   statusCode: 400,
+      //   message: `Region already assigned to ${conflictRows[0].regionHeadName}`,
+      // });
+    }
     const sanitizedValues = [
       regionId ?? null,
       countryId ?? null,
@@ -2429,7 +2524,13 @@ const getRegionHeads = async () => {
       SELECT 
         region_head_info.*, 
         country_info.name AS countryName,
-        company_info.companyName
+        company_info.companyName,
+        (SELECT GROUP_CONCAT(region_info.regionName) 
+              FROM region_info 
+              WHERE FIND_IN_SET(region_info.id, region_head_info.regionId)) AS regionNames,
+        (SELECT GROUP_CONCAT(region_info.regionCode) 
+              FROM region_info 
+              WHERE FIND_IN_SET(region_info.id, region_head_info.regionId)) AS regionCodes
       FROM 
         region_head_info
       LEFT JOIN 
@@ -2519,9 +2620,22 @@ const activateOrDeactivateCurrency = async (id, isActive, updatedBy) => {
 const getAllCurrencies = async () => {
   try {
     const query = `
-      SELECT * FROM currency_master
+      SELECT * FROM currency_exchange_table
     `;
     const [records] = await db.execute(query);
+    return records;
+  } catch (err) {
+    console.error("Database Error:", err);
+    throw new Error("Error retrieving Currencies");
+  }
+};
+const getCurrencyHistory = async (data) => {
+  const {currencyCode ='USD'} = data;   
+  try {
+    const query = `
+      SELECT * FROM currency_exchange_table where currencyCode = ? order by -id;
+    `;
+    const [records] = await db.execute(query,[currencyCode]);
     return records;
   } catch (err) {
     console.error("Database Error:", err);
@@ -2642,5 +2756,6 @@ module.exports = {
   createCurrency,
   updateCurrency,
   activateOrDeactivateCurrency,
-  getAllCurrencies 
+  getAllCurrencies,
+  getCurrencyHistory
 };

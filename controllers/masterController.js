@@ -1,3 +1,4 @@
+
 const { updateExchangeRates } = require("../cron/currencyCron");
 const {
   createCountry,
@@ -110,7 +111,8 @@ const {
   createCurrency,
   updateCurrency,
   activateOrDeactivateCurrency,
-  getAllCurrencies
+  getAllCurrencies,
+  getCurrencyHistory
 
 } = require("../models/masterModel");
 
@@ -2460,7 +2462,7 @@ const addRegionHead = async (req, res) => {
   } = req.body;
 
   try {
-    await createRegionHead(
+    const finalResult = await createRegionHead(
       regionId,
       countryId,
       companyId,
@@ -2471,11 +2473,21 @@ const addRegionHead = async (req, res) => {
       isActive,
       updatedBy
     );
-
-    res.status(201).json({
-      statusCode: 201,
-      message: "Region Head created successfully",
-    });
+    console.log('rrrrrrrrrrrr', finalResult);
+    
+    if(finalResult.status == 'existing'){
+      res.status(400).json({
+        statusCode: 400,
+        // message: `This region already has a region head ${finalResult.existingRegionHead}`,
+        message: finalResult.conflictMessage
+      });
+    } else {
+      res.status(201).json({
+        statusCode: 201,
+        message: "Region Head created successfully",
+      });
+    }
+    
   } catch (err) {
     res.status(500).json({
       statusCode: 500,
@@ -2506,7 +2518,7 @@ const updateRegionHead = async (req, res) => {
   }
 
   try {
-    await updateRegionHeadDetails(
+    const finalRes = await updateRegionHeadDetails(
       regionHeadId,
       regionId,
       countryId,
@@ -2518,11 +2530,18 @@ const updateRegionHead = async (req, res) => {
       isActive,
       updatedBy
     );
-
-    res.status(200).json({
-      statusCode: 200,
-      message: "Region Head updated successfully",
-    });
+    if(finalRes.status == 'existing'){
+      res.status(400).json({
+        statusCode: 400,
+        // message: `This region already has a region head: ${finalRes.existingRegionHead}`,
+        message: finalRes.conflictMessage
+      });
+    } else {
+      res.status(200).json({
+        statusCode: 200,
+        message: "Region Head updated successfully",
+      });
+    }
   } catch (err) {
     res.status(500).json({
       statusCode: 500,
@@ -2686,6 +2705,23 @@ const getAllCurrenciesHandler = async (req, res) => {
   }
 };
 
+const getCurrencyHistoryHandler =  async (req, res) => {
+  try { 
+    const currencies = await getCurrencyHistory(req.body);
+    res.status(200).json({
+      statusCode: 200,
+      message: "Currencies history retrieved successfully",
+      data: currencies,
+    });
+  } catch (err) {
+    console.log("Error retrieving currencies history:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while retrieving currencies history",
+    });
+  }
+};
+
 
 
 
@@ -2801,5 +2837,6 @@ module.exports = {
   createCurrencyHandler,
   updateCurrencyHandler,
   activateOrDeactivateCurrencyHandler,
-  getAllCurrenciesHandler
+  getAllCurrenciesHandler,
+  getCurrencyHistoryHandler
 };
