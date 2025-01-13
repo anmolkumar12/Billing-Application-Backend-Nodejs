@@ -10,7 +10,7 @@ const API_URL = "https://v6.exchangerate-api.com/v6/1778dd608f3d037212203d50/lat
 const updateExchangeRates = async () => {
     try {
       const response = await axios.get(API_URL);
-      const currencies = await getAllCurrencies(); 
+    //   const currencies = await getAllCurrencies(); 
  
       const { result, conversion_rates } = response.data;
       if (result !== "success") {
@@ -19,23 +19,23 @@ const updateExchangeRates = async () => {
       }
   
       
-      const existingCurrencyCodes = new Set(currencies.map((currency) => currency.currencyCode));
+    //   const existingCurrencyCodes = new Set(currencies.map((currency) => currency.currencyCode));
   
       for (const [currencyCode, exchangeRate] of Object.entries(conversion_rates)) {
-        // Check if the currencyCode exists in the currency_master
-        if (existingCurrencyCodes.has(currencyCode)) {
-          // Update only existing records in currency_master
-          const updateCurrencyMasterQuery = `
-            UPDATE currency_master
-            SET 
-              exchangeRate = ?, 
-              updated_at = CURRENT_TIMESTAMP
-            WHERE currencyCode = ?
-          `;
+        // // Check if the currencyCode exists in the currency_master
+        // if (existingCurrencyCodes.has(currencyCode)) {
+        //   // Update only existing records in currency_master
+        //   const updateCurrencyMasterQuery = `
+        //     UPDATE currency_master
+        //     SET 
+        //       exchangeRate = ?, 
+        //       updated_at = CURRENT_TIMESTAMP
+        //     WHERE currencyCode = ?
+        //   `;
   
-          await db.execute(updateCurrencyMasterQuery, [exchangeRate, currencyCode]);
+        //   await db.execute(updateCurrencyMasterQuery, [exchangeRate, currencyCode]);
 
-        }
+        // }
   
         // Insert all records into currency_exchange_table
         const insertCurrencyExchangeQuery = `

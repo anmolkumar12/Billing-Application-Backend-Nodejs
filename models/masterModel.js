@@ -2620,9 +2620,22 @@ const activateOrDeactivateCurrency = async (id, isActive, updatedBy) => {
 const getAllCurrencies = async () => {
   try {
     const query = `
-      SELECT * FROM currency_master
+      SELECT * FROM currency_exchange_table
     `;
     const [records] = await db.execute(query);
+    return records;
+  } catch (err) {
+    console.error("Database Error:", err);
+    throw new Error("Error retrieving Currencies");
+  }
+};
+const getCurrencyHistory = async (data) => {
+  const {currencyCode ='USD'} = data;   
+  try {
+    const query = `
+      SELECT * FROM currency_exchange_table where currencyCode = ? order by -id;
+    `;
+    const [records] = await db.execute(query,[currencyCode]);
     return records;
   } catch (err) {
     console.error("Database Error:", err);
@@ -2743,5 +2756,6 @@ module.exports = {
   createCurrency,
   updateCurrency,
   activateOrDeactivateCurrency,
-  getAllCurrencies 
+  getAllCurrencies,
+  getCurrencyHistory
 };

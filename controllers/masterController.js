@@ -1,3 +1,4 @@
+
 const { updateExchangeRates } = require("../cron/currencyCron");
 const {
   createCountry,
@@ -110,7 +111,8 @@ const {
   createCurrency,
   updateCurrency,
   activateOrDeactivateCurrency,
-  getAllCurrencies
+  getAllCurrencies,
+  getCurrencyHistory
 
 } = require("../models/masterModel");
 
@@ -2703,6 +2705,23 @@ const getAllCurrenciesHandler = async (req, res) => {
   }
 };
 
+const getCurrencyHistoryHandler =  async (req, res) => {
+  try { 
+    const currencies = await getCurrencyHistory(req.body);
+    res.status(200).json({
+      statusCode: 200,
+      message: "Currencies history retrieved successfully",
+      data: currencies,
+    });
+  } catch (err) {
+    console.log("Error retrieving currencies history:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while retrieving currencies history",
+    });
+  }
+};
+
 
 
 
@@ -2818,5 +2837,6 @@ module.exports = {
   createCurrencyHandler,
   updateCurrencyHandler,
   activateOrDeactivateCurrencyHandler,
-  getAllCurrenciesHandler
+  getAllCurrenciesHandler,
+  getCurrencyHistoryHandler
 };
