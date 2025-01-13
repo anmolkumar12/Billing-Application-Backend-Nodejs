@@ -112,7 +112,13 @@ const {
   updateCurrency,
   activateOrDeactivateCurrency,
   getAllCurrencies,
-  getCurrencyHistory
+  getCurrencyHistory,
+
+  createTax,
+  updateTax,
+  activateOrDeactivateTax,
+  getAllTaxes,
+
 
 } = require("../models/masterModel");
 
@@ -2594,7 +2600,7 @@ const getRegionHeadsList = async (req, res) => {
 // Currency
 
 
-// Project/Service Master
+// currency Master
 const createCurrencyHandler = async (req, res) => {
   const { currencyCode, description, isActive, updatedBy } = req.body;
 
@@ -2722,6 +2728,116 @@ const getCurrencyHistoryHandler =  async (req, res) => {
   }
 };
 
+//  Tax Master
+
+const createTaxHandler = async (req, res) => {
+  const { countryCode, taxType, taxFieldName, taxPercentage, isActive, updatedBy } = req.body;
+
+  if (!countryCode || !taxType || !taxFieldName || taxPercentage === undefined || isActive === undefined || !updatedBy) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "countryCode, taxType, taxFieldName, taxPercentage, isActive, and updatedBy are required",
+    });
+  }
+
+  try {
+    await createTax(countryCode, taxType, taxFieldName, taxPercentage, isActive, updatedBy);
+    res.status(201).json({
+      statusCode: 201,
+      message: "Tax created successfully",
+    });
+  } catch (err) {
+    console.log("Error creating tax:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while creating tax",
+    });
+  }
+};
+
+const updateTaxHandler = async (req, res) => {
+  const { id, countryCode, taxType, taxFieldName, taxPercentage, isActive, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Tax ID is required",
+    });
+  }
+
+  if (!countryCode || !taxType || !taxFieldName || taxPercentage === undefined || isActive === undefined || !updatedBy) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "countryCode, taxType, taxFieldName, taxPercentage, isActive, and updatedBy are required",
+    });
+  }
+
+  try {
+    await updateTax(id, countryCode, taxType, taxFieldName, taxPercentage, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: "Tax updated successfully",
+    });
+  } catch (err) {
+    console.log("Error updating tax:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating tax",
+    });
+  }
+};
+
+const activateOrDeactivateTaxHandler = async (req, res) => {
+  const { id, isActive, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Tax ID is required",
+    });
+  }
+
+  if (isActive === undefined || !updatedBy) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "isActive and updatedBy are required",
+    });
+  }
+
+  try {
+    await activateOrDeactivateTax(id, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: `Tax ${isActive === 1 ? "activated" : "deactivated"} successfully`,
+    });
+  } catch (err) {
+    console.log("Error activating/deactivating tax:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while activating/deactivating tax",
+    });
+  }
+};
+
+const getAllTaxesHandler = async (req, res) => {
+  try {
+    const taxes = await getAllTaxes();
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Taxes retrieved successfully",
+      data: taxes,
+    });
+  } catch (err) {
+    console.log("Error retrieving taxes:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while retrieving taxes",
+    });
+  }
+};
+
+
 
 
 
@@ -2834,9 +2950,16 @@ module.exports = {
   getRegionHeadsList,
 
   // currency
-  createCurrencyHandler,
+    createCurrencyHandler,
   updateCurrencyHandler,
   activateOrDeactivateCurrencyHandler,
   getAllCurrenciesHandler,
-  getCurrencyHistoryHandler
+  getCurrencyHistoryHandler,
+
+  //  tax master
+
+  createTaxHandler,
+  updateTaxHandler,
+  activateOrDeactivateTaxHandler,
+  getAllTaxesHandler
 };

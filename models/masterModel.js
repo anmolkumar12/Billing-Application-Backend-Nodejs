@@ -2643,6 +2643,85 @@ const getCurrencyHistory = async (data) => {
   }
 };
 
+//  tax services
+
+const createTax = async (countryCode, taxType, taxFieldName, taxPercentage, updatedBy) => {
+  try {
+    const query = `
+      INSERT INTO tax_master (countryCode, taxType, taxFieldName, taxPercentage, updatedBy, created_at)
+      VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+    const [result] = await db.execute(query, [
+      countryCode,
+      taxType,
+      taxFieldName,
+      taxPercentage,
+      updatedBy,
+    ]);
+    return result;
+  } catch (err) {
+    console.log("Error inserting Tax:", err);
+    throw new Error("Error inserting Tax");
+  }
+};
+
+const updateTax = async (id, countryCode, taxType, taxFieldName, taxPercentage, updatedBy) => {
+  try {
+    const query = `
+      UPDATE tax_master
+      SET 
+        countryCode = ?, 
+        taxType = ?, 
+        taxFieldName = ?, 
+        taxPercentage = ?, 
+        updatedBy = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [
+      countryCode,
+      taxType,
+      taxFieldName,
+      taxPercentage,
+      updatedBy,
+      id,
+    ]);
+    return result;
+  } catch (err) {
+    console.log("Error updating Tax:", err);
+    throw new Error("Error updating Tax details");
+  }
+};
+
+const activateOrDeactivateTax = async (id, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE tax_master
+      SET isActive = ?, updatedBy = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [isActive, updatedBy, id]);
+    return result;
+  } catch (err) {
+    console.log("Error activating or deactivating Tax:", err);
+    throw new Error("Error activating/deactivating Tax");
+  }
+};
+
+const getAllTaxes = async () => {
+  try {
+    const query = `
+      SELECT tm.*,cf.name as countryName FROM tax_master tm inner join country_info cf on tm.countryCode = cf.id;
+    `;
+    const [records] = await db.execute(query);
+    return records;
+  } catch (err) {
+    console.error("Database Error:", err);
+    throw new Error("Error retrieving Taxes");
+  }
+};
+
+
 
 module.exports = {
   createCountry,
@@ -2757,5 +2836,11 @@ module.exports = {
   updateCurrency,
   activateOrDeactivateCurrency,
   getAllCurrencies,
-  getCurrencyHistory
+  getCurrencyHistory,
+
+  //  Tax services
+  createTax,
+  updateTax,
+  activateOrDeactivateTax,
+  getAllTaxes,
 };

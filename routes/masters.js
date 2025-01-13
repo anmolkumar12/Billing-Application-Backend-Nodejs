@@ -108,7 +108,13 @@ const {
   createCurrencyHandler,
   updateCurrencyHandler,
   activateOrDeactivateCurrencyHandler,
-  getAllCurrenciesHandler
+  getAllCurrenciesHandler,
+
+  createTaxHandler,
+  updateTaxHandler,
+  activateOrDeactivateTaxHandler,
+  getAllTaxesHandler
+
 
 } = require("../controllers/masterController");
 const multer = require("multer");
@@ -223,6 +229,19 @@ router.post(
   activateOrDeactivateCurrencyHandler
 );
 router.post("/getCurrency", authMiddleware, getAllCurrenciesHandler);
+
+
+//  Tax Master
+
+router.post("/createTax", authMiddleware, createTaxHandler);
+router.post("/updateTax", authMiddleware, updateTaxHandler);
+router.post(
+  "/activateOrDeactivateTax",
+  authMiddleware,
+  activateOrDeactivateTaxHandler
+);
+router.get("/getTax", authMiddleware, getAllTaxesHandler);
+
 
 
 // Industry Type Master
