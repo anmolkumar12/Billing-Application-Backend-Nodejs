@@ -2181,6 +2181,7 @@ const updateProjectService = async (
   }
 };
 
+
 const activateDeactivateProjectService = async (id, isActive, updatedBy) => {
   try {
     const query = `
@@ -2550,6 +2551,86 @@ const getRegionHeads = async () => {
   }
 };
 
+
+
+// Currency Master
+const createCurrency = async (currencyCode, description, isActive, updatedBy) => {
+  try {
+    const query = `
+      INSERT INTO currency_master (currencyCode, description, isActive, updatedBy, updated_at)
+      VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+    const [result] = await db.execute(query, [
+      currencyCode,
+      description,
+      isActive,
+      updatedBy,
+    ]);
+    return result;
+  } catch (err) {
+    console.log("Error inserting Currency:", err);
+    throw new Error("Error inserting Currency");
+  }
+};
+
+const updateCurrency = async (id, currencyCode, description, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE currency_master
+      SET 
+        currencyCode = ?, 
+        description = ?, 
+        isActive = ?, 
+        updatedBy = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [
+      currencyCode,
+      description,
+      isActive,
+      updatedBy,
+      id,
+    ]);
+    return result;
+  } catch (err) {
+    console.log("Error updating Currency:", err);
+    throw new Error("Error updating Currency details");
+  }
+};
+
+
+
+const activateOrDeactivateCurrency = async (id, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE currency_master
+      SET isActive = ?, updatedBy = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [isActive, updatedBy, id]);
+    return result;
+  } catch (err) {
+    console.log("Error activating or deactivating Currency:", err);
+    throw new Error("Error activating/deactivating Currency");
+  }
+};
+
+
+const getAllCurrencies = async () => {
+  try {
+    const query = `
+      SELECT * FROM currency_master
+    `;
+    const [records] = await db.execute(query);
+    return records;
+  } catch (err) {
+    console.error("Database Error:", err);
+    throw new Error("Error retrieving Currencies");
+  }
+};
+
+
 module.exports = {
   createCountry,
   updateCountryDetails,
@@ -2657,4 +2738,10 @@ module.exports = {
   updateRegionHeadDetails,
   activateDeactivateRegionHeadDetails,
   getRegionHeads,
+
+  // currency services
+  createCurrency,
+  updateCurrency,
+  activateOrDeactivateCurrency,
+  getAllCurrencies 
 };
