@@ -1,3 +1,4 @@
+const { updateExchangeRates } = require("../cron/currencyCron");
 const {
   createCountry,
   updateCountryDetails,
@@ -105,6 +106,12 @@ const {
   updateRegionHeadDetails,
   activateDeactivateRegionHeadDetails,
   getRegionHeads,
+
+  createCurrency,
+  updateCurrency,
+  activateOrDeactivateCurrency,
+  getAllCurrencies
+
 } = require("../models/masterModel");
 
 // Country
@@ -2564,6 +2571,126 @@ const getRegionHeadsList = async (req, res) => {
   }
 };
 
+
+// Currency
+
+
+// Project/Service Master
+const createCurrencyHandler = async (req, res) => {
+  const { currencyCode, description, isActive, updatedBy } = req.body;
+
+  if (!currencyCode || !description || isActive === undefined || !updatedBy) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "currencyCode, description, isActive, and updatedBy are required",
+    });
+  }
+
+  try {
+    await createCurrency(currencyCode, description, isActive, updatedBy);
+    res.status(201).json({
+      statusCode: 201,
+      message: "Currency created successfully",
+    });
+  } catch (err) {
+    console.log("Error creating currency:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while creating currency",
+    });
+  }
+};
+
+
+const updateCurrencyHandler = async (req, res) => {
+  const { id, currencyCode, description, isActive, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Currency ID is required",
+    });
+  }
+
+  if (!currencyCode || !description || isActive === undefined || !updatedBy) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "currencyCode, description, isActive, and updatedBy are required",
+    });
+  }
+
+  try {
+    await updateCurrency(id, currencyCode, description, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: "Currency updated successfully",
+    });
+  } catch (err) {
+    console.log("Error updating currency:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating currency",
+    });
+  }
+};
+
+
+const activateOrDeactivateCurrencyHandler = async (req, res) => {
+  const { id, isActive, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Currency ID is required",
+    });
+  }
+
+  if (isActive === undefined || !updatedBy) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "isActive and updatedBy are required",
+    });
+  }
+
+  try {
+    await activateOrDeactivateCurrency(id, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: `Currency ${isActive === 1 ? "activated" : "deactivated"} successfully`,
+    });
+  } catch (err) {
+    console.log("Error activating/deactivating currency:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while activating/deactivating currency",
+    });
+  }
+};
+
+const getAllCurrenciesHandler = async (req, res) => {
+  try {
+   
+    const currencies = await getAllCurrencies();
+    
+    res.status(200).json({
+      statusCode: 200,
+      message: "Currencies retrieved successfully",
+      data: currencies,
+    });
+  } catch (err) {
+    console.log("Error retrieving currencies:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while retrieving currencies",
+    });
+  }
+};
+
+
+
+
+
+
 module.exports = {
   addCountry,
   updateCountry,
@@ -2669,4 +2796,10 @@ module.exports = {
   updateRegionHead,
   activateDeactivateRegionHead,
   getRegionHeadsList,
+
+  // currency
+  createCurrencyHandler,
+  updateCurrencyHandler,
+  activateOrDeactivateCurrencyHandler,
+  getAllCurrenciesHandler
 };

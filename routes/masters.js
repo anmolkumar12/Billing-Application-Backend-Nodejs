@@ -104,6 +104,12 @@ const {
   updateRegionHead,
   activateDeactivateRegionHead,
   getRegionHeadsList,
+
+  createCurrencyHandler,
+  updateCurrencyHandler,
+  activateOrDeactivateCurrencyHandler,
+  getAllCurrenciesHandler
+
 } = require("../controllers/masterController");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
@@ -205,6 +211,19 @@ router.post(
   activateOrDeactivateProductionType
 );
 router.post("/getProductionTypes", authMiddleware, getProductionTypes);
+
+
+// Currency Master
+
+router.post("/createCurrency", authMiddleware, createCurrencyHandler);
+router.post("/updateCurrency", authMiddleware, updateCurrencyHandler);
+router.post(
+  "/activateOrDeactivateCurrency",
+  authMiddleware,
+  activateOrDeactivateCurrencyHandler
+);
+router.post("/getCurrency", authMiddleware, getAllCurrenciesHandler);
+
 
 // Industry Type Master
 router.post("/createIndustryMaster", authMiddleware, createIndustryMaster);
