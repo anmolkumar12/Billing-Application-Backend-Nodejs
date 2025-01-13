@@ -55,7 +55,7 @@ const updateExchangeRates = async () => {
   
 
 function runAllCronJobs(){
-    cron.schedule("0 0 * * *", async () => {
+    cron.schedule("00 16 * * *", async () => {
         console.log("Running currency exchange rate update cron job...");
         await updateExchangeRates();
       });
