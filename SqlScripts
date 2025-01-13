@@ -249,3 +249,11 @@ CREATE TABLE region_head_info (
   updated_by INT,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+create table currency_exchange_table (
+id int primary key auto_increment not null,
+currencyCode varchar(10) not null,
+exchangeRate DECIMAL(10,4) default null,
+baseCurrency varchar(10) default 'INR',
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
