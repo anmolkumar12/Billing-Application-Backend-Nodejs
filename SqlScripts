@@ -257,3 +257,15 @@ exchangeRate DECIMAL(10,4) default null,
 baseCurrency varchar(10) default 'INR',
 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+CREATE TABLE tax_master (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    countryCode VARCHAR(10) NOT NULL,
+    taxType VARCHAR(50) NOT NULL,
+    taxFieldName VARCHAR(100) NOT NULL,
+    isActive TINYINT(1) DEFAULT 1,
+    taxPercentage DECIMAL(5, 2) NOT NULL,
+    updatedBy INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
