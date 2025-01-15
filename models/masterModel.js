@@ -1328,6 +1328,53 @@ const insertIndustryHead = async (
   isActive
 ) => {
   try {
+
+    // Convert regionIds and stateIds to arrays for comparison
+    const regionIdArray = regionIds ? String(regionIds).split(",").map(id => id.trim()) : [];
+    const stateIdArray = stateIds ? String(stateIds).split(",").map(id => id.trim()) : [];
+    console.log('regionIdArray', regionIdArray, stateIdArray);
+
+    // Check for existing regionIds
+    if (isRegionWise && regionIdArray.length > 0) {
+      const [existingRegions] = await db.execute(
+        `SELECT regionIds, industryHeadName, r.id AS regionId, r.regionName
+        FROM industry_head_master 
+        JOIN region_info r ON FIND_IN_SET(r.id, industry_head_master.regionIds)
+        WHERE isRegionWise = 1 
+        AND companyId = ?`,
+        [companyId]
+      );
+
+      console.log('overlapRegions111---->>>>>', [existingRegions]);
+      for (const record of existingRegions) {
+        const existingRegionIds = record.regionIds ? record.regionIds.split(",").map(id => id.trim()) : [];
+        const overlapRegions = regionIdArray.filter(id => existingRegionIds.includes(id));
+
+
+        if (overlapRegions.length > 0) {
+          return { status: 'existing', conflictMessage: `Region ${record.regionName} already allocated to ${record.industryHeadName}` }
+        }
+      }
+    }
+
+    // Check for existing stateIds
+    if (!isRegionWise && stateIdArray.length > 0) {
+      const [existingStates] = await db.execute(
+        `SELECT stateIds, industryHeadName FROM industry_head_master WHERE isRegionWise = 0 AND companyId = ?`,
+        [companyId]
+      );
+
+      for (const record of existingStates) {
+        const existingStateIds = record.stateIds ? record.stateIds.split(",").map(id => id.trim()) : [];
+        const overlapStates = stateIdArray.filter(id => existingStateIds.includes(id));
+        console.log('overlapStates', overlapStates);
+
+        if (overlapStates.length > 0) {
+          return { status: 'existing states', conflictMessage: `State ID(s) ${overlapStates.join(", ")} already allocated to ${record.industryHeadName}` }
+        }
+      }
+    }
+
     const query = `
       INSERT INTO industry_head_master 
       (companyId, industryHeadName, industryIds, isRegionWise, countryIds, regionIds, stateIds, startDate, endDate, updated_by, isActive, updated_at)
@@ -1432,8 +1479,10 @@ const getIndustryHeadsList = async () => {
               WHERE FIND_IN_SET(region_info.id, industry_head_master.regionIds)) AS regionNames,
              (SELECT GROUP_CONCAT(state_info.stateName) 
               FROM state_info 
-              WHERE FIND_IN_SET(state_info.id, industry_head_master.stateIds)) AS stateNames
+              WHERE FIND_IN_SET(state_info.id, industry_head_master.stateIds)) AS stateNames, company_info.companyName
       FROM industry_head_master
+      LEFT JOIN 
+        company_info ON industry_head_master.companyId = company_info.id
     `;
 
     const [industryHeads] = await db.execute(query);
@@ -2630,12 +2679,12 @@ const getAllCurrencies = async () => {
   }
 };
 const getCurrencyHistory = async (data) => {
-  const {currencyCode ='USD'} = data;   
+  const { currencyCode = 'USD' } = data;
   try {
     const query = `
       SELECT * FROM currency_exchange_table where currencyCode = ? order by -id;
     `;
-    const [records] = await db.execute(query,[currencyCode]);
+    const [records] = await db.execute(query, [currencyCode]);
     return records;
   } catch (err) {
     console.error("Database Error:", err);

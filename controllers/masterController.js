@@ -1375,6 +1375,7 @@ const getGroupIndustries = async (req, res) => {
 
 // Industryhead Master
 const createIndustryHead = async (req, res) => {
+
   const {
     companyId,
     industryHeadName,
@@ -1390,7 +1391,7 @@ const createIndustryHead = async (req, res) => {
   } = req.body;
 
   try {
-    await insertIndustryHead(
+    const finalResult = await insertIndustryHead(
       companyId,
       industryHeadName,
       industryIds,
@@ -1404,10 +1405,20 @@ const createIndustryHead = async (req, res) => {
       isActive
     );
 
-    res.status(201).json({
-      statusCode: 201,
-      message: "Industry Head created successfully",
-    });
+    console.log('finalRes--->>>>', finalResult);
+
+    if(finalResult && finalResult.status == 'existing'){
+      res.status(400).json({
+        statusCode: 400,
+        // message: `This region already has a region head ${finalResult.existingRegionHead}`,
+        message: finalResult.conflictMessage
+      });
+    } else{
+      res.status(201).json({
+        statusCode: 201,
+        message: "Industry Head created successfully",
+      });
+    }
   } catch (err) {
     console.error("Error creating industry head:", err);
     res.status(500).json({
