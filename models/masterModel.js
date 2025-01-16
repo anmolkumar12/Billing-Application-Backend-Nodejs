@@ -114,7 +114,22 @@ const activateDeactivateCountryDetails = async (
 
 const getCountries = async () => {
   try {
-    const query = `SELECT * FROM country_info`;
+    const query = `
+      SELECT 
+        ci.id,
+        ci.code,
+        ci.name,
+        ci.language,
+        ci.phoneCode,
+        ci.addressAdditionalFields,
+        ci.bankAccAdditionalFields,
+        ci.companyAddtionalFields,
+        ci.isactive,
+        u.username AS updated_by,
+        ci.updated_at
+      FROM country_info ci
+      LEFT JOIN users u ON ci.updated_by = u.id
+    `;
 
     const [countries] = await db.execute(query);
     return countries;
@@ -123,6 +138,7 @@ const getCountries = async () => {
     throw err;
   }
 };
+
 
 // State
 const createState = async (
@@ -222,15 +238,22 @@ const getStates = async (countryId = null) => {
   try {
     // Define the base query with an INNER JOIN to include countryName
     let query = `
-      SELECT 
-        s.*, 
-        c.name 
-      FROM 
-        state_info s
-      INNER JOIN 
-        country_info c 
-      ON 
-        s.countryId = c.id
+SELECT 
+    s.*, 
+    c.name,
+    u.username AS updated_by
+FROM 
+    state_info s
+INNER JOIN 
+    country_info c 
+ON 
+    s.countryId = c.id
+LEFT JOIN 
+    users u
+ON 
+    s.updated_by = u.id;
+
+        
     `;
     const queryParams = [];
 
@@ -380,39 +403,44 @@ const activateDeactivateRegionDetails = async (
 
 const getRegions = async (countryId = null) => {
   try {
-    // Define the base query with joins to fetch country name and state names
-    let query = `
-      SELECT 
-        region_info.*, 
-        country_info.name AS countryName,
-        IFNULL(GROUP_CONCAT(state_info.stateName), 'No States') AS stateNames
-      FROM 
-        region_info
-      LEFT JOIN 
-        country_info 
-      ON 
-        region_info.countryId = country_info.id
-      LEFT JOIN 
-        state_info 
-      ON 
-        region_info.stateIds IS NOT NULL AND FIND_IN_SET(state_info.id, region_info.stateIds) > 0`;
+        // Define the base query with joins to fetch country name and state names
+        let query = `
+        SELECT 
+          region_info.*, 
+          country_info.name AS countryName,
+          IFNULL(GROUP_CONCAT(state_info.stateName), 'No States') AS stateNames,
+          u.username AS updated_by
+        FROM 
+          region_info
+        LEFT JOIN 
+          country_info 
+        ON 
+          region_info.countryId = country_info.id
+        LEFT JOIN 
+          state_info 
+        ON 
+          region_info.stateIds IS NOT NULL AND FIND_IN_SET(state_info.id, region_info.stateIds) > 0
+        LEFT JOIN 
+          users u
+        ON 
+          region_info.updated_by = u.id`;
 
+    // Add condition for filtering by `countryId`, if provided
     const queryParams = [];
-
-    // If countryId is provided, filter by it
     if (countryId) {
-      query += " WHERE region_info.countryId = ?";
-      queryParams.push(countryId);
+    query += " WHERE region_info.countryId = ?";
+    queryParams.push(countryId);
     }
 
-    // Group by region to aggregate state names
-    query += " GROUP BY region_info.id";
+    // Add GROUP BY clause
+    query += " GROUP BY region_info.id, country_info.name, u.username";
 
     // Debugging query output for validation
     console.log("Executing query:", query, "with params:", queryParams);
 
     // Execute the query with the appropriate parameters
     const [regions] = await db.execute(query, queryParams);
+
     return regions;
   } catch (err) {
     console.log("Error retrieving regions list:", err);
@@ -1443,18 +1471,20 @@ const updateIndustryHeadDetails = async (
 const updateIndustryHeadStatus = async (
   industryHeadId,
   isActive,
-  updatedBy
+  updatedBy,
+  deactivationDate
 ) => {
   try {
     const query = `
       UPDATE industry_head_master
-      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP,deactivationDate = ?
       WHERE id = ?
     `;
 
     const [result] = await db.execute(query, [
       isActive,
       updatedBy,
+      deactivationDate,
       industryHeadId,
     ]);
     return result;
@@ -1482,7 +1512,7 @@ const getIndustryHeadsList = async () => {
               WHERE FIND_IN_SET(state_info.id, industry_head_master.stateIds)) AS stateNames, company_info.companyName
       FROM industry_head_master
       LEFT JOIN 
-        company_info ON industry_head_master.companyId = company_info.id
+        company_info ON industry_head_master.  = company_info.id
     `;
 
     const [industryHeads] = await db.execute(query);
@@ -1569,16 +1599,17 @@ const updateSalesManagerDetails = async (
 const updateSalesManagerStatus = async (
   salesManagerId,
   isActive,
-  updatedBy
+  updatedBy,
+  deactivationDate
 ) => {
   try {
     const query = `
       UPDATE sales_manager_master
-      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP,deactivationDate = ?
       WHERE id = ?
     `;
 
-    await db.execute(query, [isActive, updatedBy, salesManagerId]);
+    await db.execute(query, [isActive, updatedBy,deactivationDate, salesManagerId]);
   } catch (err) {
     console.error("Error updating Sales Manager status:", err);
     throw err;
@@ -1676,14 +1707,14 @@ const updateAccountManager = async (
   }
 };
 
-const activateOrDeactivateAccountManager = async (id, isActive, updatedBy) => {
+const activateOrDeactivateAccountManager = async (id, isActive, updatedBy,deactivationDate) => {
   try {
     const query = `
             UPDATE account_manager_master
-            SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+            SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP,deactivationDate = ?
             WHERE id = ?
         `;
-    await db.execute(query, [isActive, updatedBy, id]);
+    await db.execute(query, [isActive, updatedBy,deactivationDate, id]);
   } catch (err) {
     console.error("Error updating Account Manager status:", err);
     throw err;

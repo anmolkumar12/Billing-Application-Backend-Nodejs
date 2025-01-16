@@ -1507,17 +1507,17 @@ const updateIndustryHead = async (req, res) => {
 };
 
 const activateOrDeactivateIndustryHead = async (req, res) => {
-  const { industryHeadId, isActive, updatedBy } = req.body;
+  const { industryHeadId, isActive, updatedBy,deactivationDate } = req.body;
 
   if (!industryHeadId || isActive === undefined) {
     return res.status(400).json({
       statusCode: 400,
-      message: "Industry Head ID and isActive are required",
+      message: "Industry Head ID and deactivation date are required",
     });
   }
 
   try {
-    await updateIndustryHeadStatus(industryHeadId, isActive, updatedBy);
+    await updateIndustryHeadStatus(industryHeadId, isActive, updatedBy,deactivationDate);
 
     res.status(200).json({
       statusCode: 200,
@@ -1640,17 +1640,17 @@ const updateSalesManager = async (req, res) => {
 };
 
 const activateOrDeactivateSalesManager = async (req, res) => {
-  const { salesManagerId, isActive, updatedBy } = req.body;
+  const { salesManagerId, isActive, updatedBy,deactivationDate } = req.body;
 
   if (!salesManagerId || isActive === undefined) {
     return res.status(400).json({
       statusCode: 400,
-      message: "Sales Manager ID and isActive are required",
+      message: "Deactivation date is required",
     });
   }
 
   try {
-    await updateSalesManagerStatus(salesManagerId, isActive, updatedBy);
+    await updateSalesManagerStatus(salesManagerId, isActive, updatedBy,deactivationDate);
 
     res.status(200).json({
       statusCode: 200,
@@ -1773,12 +1773,12 @@ const updateAccountsManager = async (req, res) => {
 };
 
 const activateOrDeactivateAccountsManager = async (req, res) => {
-  const { salesManagerId, isActive, updatedBy } = req.body;
+  const { salesManagerId, isActive, updatedBy,deactivationDate } = req.body;
 
   if (!salesManagerId || isActive === undefined) {
     return res.status(400).json({
       statusCode: 400,
-      message: "Sales Manager ID and isActive are required",
+      message: "Deactivation date is required",
     });
   }
 
@@ -1786,12 +1786,13 @@ const activateOrDeactivateAccountsManager = async (req, res) => {
     await activateOrDeactivateAccountManager(
       salesManagerId,
       isActive,
-      updatedBy
+      updatedBy,
+      deactivationDate
     );
 
     res.status(200).json({
       statusCode: 200,
-      message: `Sales Manager ${
+      message: `Account Manager ${
         isActive ? "activated" : "deactivated"
       } successfully`,
     });
