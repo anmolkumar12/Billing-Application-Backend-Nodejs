@@ -229,8 +229,8 @@ REATE TABLE project_service_master (
 );
 CREATE TABLE financial_year_master (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  startYear INT NOT NULL,
-  endYear INT NOT NULL,
+  startYear VARCHAR(255) NOT NULL,
+  endYear VARCHAR(255) NOT NULL,
   financialYearName VARCHAR(255) NOT NULL,
   isActive TINYINT(1) DEFAULT 1,
   updatedBy INT NOT NULL,
