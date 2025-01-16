@@ -1873,7 +1873,8 @@ const insertTechnologyName = async (
     return result;
   } catch (err) {
     console.log("Error inserting technology name:", err);
-    throw new Error("Error inserting technology name");
+    throw err;
+
   }
 };
 
@@ -1911,7 +1912,7 @@ const updateTechnologyNameDetails = async (
     return result;
   } catch (err) {
     console.log("Error updating technology name:", err);
-    throw new Error("Error updating technology name details");
+    throw err;
   }
 };
 
@@ -1973,7 +1974,7 @@ const insertOEM = async (oemName, type, productName, isActive, updatedBy) => {
     return result;
   } catch (err) {
     console.log("Error inserting OEM:", err);
-    throw new Error("Error inserting OEM");
+    throw err;
   }
 };
 
@@ -2008,7 +2009,7 @@ const updateOEMDetails = async (
     return result;
   } catch (err) {
     console.log("Error updating OEM:", err);
-    throw new Error("Error updating OEM details");
+    throw err;
   }
 };
 
@@ -2061,7 +2062,7 @@ const insertPoleStarProduct = async (
     return result;
   } catch (err) {
     console.error("Error inserting PoleStar Product:", err);
-    throw new Error("Error inserting PoleStar Product");
+    throw err;
   }
 };
 
@@ -2093,7 +2094,7 @@ const updatePoleStarProductDetails = async (
     return result;
   } catch (err) {
     console.error("Error updating PoleStar Product:", err);
-    throw new Error("Error updating PoleStar Product details");
+    throw err;
   }
 };
 
@@ -2145,7 +2146,7 @@ const insertProjectService = async (name, description, isActive, updatedBy) => {
     return result;
   } catch (err) {
     console.log("Error inserting Project/Service:", err);
-    throw new Error("Error inserting Project/Service");
+    throw err;
   }
 };
 
@@ -2177,7 +2178,7 @@ const updateProjectService = async (
     return result;
   } catch (err) {
     console.log("Error updating Project/Service:", err);
-    throw new Error("Error updating Project/Service details");
+    throw err;
   }
 };
 
