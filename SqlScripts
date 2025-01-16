@@ -269,3 +269,52 @@ CREATE TABLE tax_master (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+--  UNIQUE CONSTRAINT CHNAGES
+
+ALTER TABLE country_info 
+ADD UNIQUE INDEX `code_UNIQUE` (`code` ASC) VISIBLE,
+ADD UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE;  
+
+ALTER TABLE `ims_backend`.`state_info` 
+ADD UNIQUE INDEX `stateName_UNIQUE` (`stateName` ASC) VISIBLE,
+ADD UNIQUE INDEX `stateCode_UNIQUE` (`stateCode` ASC) VISIBLE;
+;
+ALTER TABLE `ims_backend`.`region_info` 
+ADD UNIQUE INDEX `regionCode_UNIQUE` (`regionCode` ASC) VISIBLE;
+
+-- ALTER TABLE `ims_backend`.`company_info` 
+-- ADD UNIQUE INDEX `companyName_UNIQUE` (`companyName` ASC) VISIBLE,
+-- ADD UNIQUE INDEX `countryId_UNIQUE` (`countryId` ASC) VISIBLE;
+-- ;
+
+ALTER TABLE `bank_account_type_info`
+ADD CONSTRAINT `unique_account_type_country` UNIQUE (`accountTypeName`, `countryId`);
+
+ALTER TABLE `ims_backend`.`group_industry_info` 
+ADD UNIQUE INDEX `groupIndustryName_UNIQUE` (`groupIndustryName` ASC) VISIBLE;
+
+
+ALTER TABLE `ims_backend`.`technology_group_info` 
+ADD UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE;
+
+ALTER TABLE `technology_subgroup_info`
+ADD CONSTRAINT `unique_tech_group_name` UNIQUE (`techGroupIds`, `name`);
+
+
+ALTER TABLE `technology_name_info`
+ADD CONSTRAINT `unique_tech_group_subgroup_name` UNIQUE (`techGroupIds`, `techSubgroupIds`, `techName`);
+
+ALTER TABLE `oem_info`
+ADD CONSTRAINT `unique_oem_product` UNIQUE (`oemName`, `productName`);
+
+ALTER TABLE `ims_backend`.`polestar_product_sales_master` 
+ADD UNIQUE INDEX `productName_UNIQUE` (`productName` ASC) VISIBLE;
+
+ALTER TABLE `ims_backend`.`project_service_master` 
+ADD UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE;
+
+
+
+
+
+-- REMAINING Sub Industry

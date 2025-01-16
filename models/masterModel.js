@@ -32,8 +32,8 @@ const createCountry = async (
 
     return result;
   } catch (err) {
-    console.log("Error creating country:", err);
-    throw new Error("Error creating country");
+    console.error("Error creating country:", err); // Log the full error
+    throw err; // Re-throw the original error for handling in the controller
   }
 };
 
@@ -83,7 +83,7 @@ const updateCountryDetails = async (
     return result;
   } catch (err) {
     console.log("Error updating country:", err);
-    throw new Error("Error updating country details");
+    throw err;
   }
 };
 
@@ -108,7 +108,7 @@ const activateDeactivateCountryDetails = async (
     return result;
   } catch (err) {
     console.log("Error activating or deactivating country:", err);
-    throw new Error("Error activating/deactivating country");
+    throw err;
   }
 };
 
@@ -120,7 +120,7 @@ const getCountries = async () => {
     return countries;
   } catch (err) {
     console.log("Error retrieving countries list:", err);
-    throw new Error("Error retrieving countries list");
+    throw err;
   }
 };
 
@@ -151,7 +151,7 @@ const createState = async (
     return result;
   } catch (err) {
     console.log("Error creating state:", err);
-    throw new Error("Error creating state");
+    throw err;
   }
 };
 
@@ -192,7 +192,7 @@ const updateStateDetails = async (
     return result;
   } catch (err) {
     console.log("Error updating state:", err);
-    throw new Error("Error updating state details");
+    throw err;
   }
 };
 
@@ -214,7 +214,7 @@ const activateDeactivateStateDetails = async (stateId, isActive, updatedBy) => {
     return result;
   } catch (err) {
     console.error("Error activating or deactivating state:", err);
-    throw new Error("Error activating/deactivating state");
+    throw err;
   }
 };
 
@@ -245,7 +245,7 @@ const getStates = async (countryId = null) => {
     return states;
   } catch (err) {
     console.log("Error retrieving states list:", err);
-    throw new Error("Error retrieving states list");
+    throw err;
   }
 };
 
@@ -296,7 +296,7 @@ const createRegion = async (
     return result;
   } catch (err) {
     console.log("Error creating region:", err);
-    throw new Error("Error creating region");
+    throw err;
   }
 };
 
@@ -349,7 +349,7 @@ const updateRegionDetails = async (
     return result;
   } catch (err) {
     console.log("Error updating region:", err);
-    throw new Error("Error updating region details");
+    throw err;
   }
 };
 
@@ -374,7 +374,7 @@ const activateDeactivateRegionDetails = async (
     return result;
   } catch (err) {
     console.error("Error activating or deactivating region:", err);
-    throw new Error("Error activating/deactivating region");
+    throw err;
   }
 };
 
@@ -416,7 +416,7 @@ const getRegions = async (countryId = null) => {
     return regions;
   } catch (err) {
     console.log("Error retrieving regions list:", err);
-    throw new Error("Error retrieving regions list");
+    throw err;
   }
 };
 
@@ -464,7 +464,7 @@ const createCompany = async (
     return result;
   } catch (err) {
     console.error(err);
-    throw new Error("Error creating company");
+    throw err;
   }
 };
 
@@ -526,7 +526,7 @@ const updateCompanyDetails = async (
     return result;
   } catch (err) {
     console.error(err);
-    throw new Error("Error updating company details");
+    throw err;
   }
 };
 
@@ -540,10 +540,10 @@ const getCompanyById = async (companyId) => {
       return rows[0]; // Return the first matching row
     }
 
-    throw new Error("Company not found");
+    throw err;
   } catch (err) {
     console.error(err);
-    throw new Error("Error fetching company details");
+    throw err;
   }
 };
 
@@ -568,7 +568,7 @@ const activateDeactivateCompanyDetails = async (
     return result;
   } catch (err) {
     console.error("Error activating or deactivating company:", err);
-    throw new Error("Error activating/deactivating company");
+    throw err;
   }
 };
 
@@ -596,7 +596,7 @@ const getCompanies = async () => {
     return companies;
   } catch (err) {
     console.error("Error retrieving companies list:", err);
-    throw new Error("Error retrieving companies list");
+    throw err;
   }
 };
 
@@ -631,7 +631,7 @@ const insertCompanyLocation = async (
     return result;
   } catch (err) {
     console.log("Error inserting company location:", err);
-    throw new Error("Error inserting company location");
+    throw err;
   }
 };
 
@@ -678,7 +678,7 @@ const updateLocationDetails = async (
     return result;
   } catch (err) {
     console.log("Error updating company location:", err);
-    throw new Error("Error updating company location details");
+    throw err;
   }
 };
 
@@ -712,7 +712,7 @@ const getLocations = async (companyId = null) => {
     return locations;
   } catch (err) {
     console.log("Error retrieving company locations:", err);
-    throw new Error("Error retrieving company locations list");
+    throw err;
   }
 };
 
@@ -733,7 +733,7 @@ const activateDeactivateLocation = async (locationId, isActive, updatedBy) => {
     return result;
   } catch (err) {
     console.error("Error activating or deactivating company location:", err);
-    throw new Error("Error activating/deactivating company location");
+    throw err;
   }
 };
 
@@ -762,7 +762,7 @@ const insertBankAccountType = async (
     return result;
   } catch (err) {
     console.log("Error inserting bank account type:", err);
-    throw new Error("Error inserting bank account type");
+    throw err;
   }
 };
 
@@ -800,7 +800,7 @@ const updateBankAccountTypeDetails = async (
     return result;
   } catch (err) {
     console.log("Error updating bank account type:", err);
-    throw new Error("Error updating bank account type details");
+    throw err;
   }
 };
 
@@ -825,7 +825,7 @@ const activateDeactivateAccountType = async (
     return result;
   } catch (err) {
     console.error("Error activating or deactivating bank account type:", err);
-    throw new Error("Error activating/deactivating bank account type");
+    throw err;
   }
 };
 
@@ -853,7 +853,7 @@ const getBankAccountTypesList = async (countryId = null) => {
     return accountTypes;
   } catch (err) {
     console.log("Error retrieving bank account types:", err);
-    throw new Error("Error retrieving bank account types list");
+    throw err;
   }
 };
 
@@ -870,7 +870,7 @@ const getDefaultAccount = async (companyId) => {
     return rows.length > 0 ? rows[0] : null;
   } catch (err) {
     console.error("Error fetching default account:", err);
-    throw new Error("Error checking for existing default account");
+    throw err;
   }
 };
 
@@ -909,7 +909,7 @@ const insertCompanyAccount = async (
     return result;
   } catch (err) {
     console.error("Error inserting company account:", err);
-    throw new Error("Error inserting company account");
+    throw err;
   }
 };
 
@@ -962,7 +962,7 @@ const updateCompanyAccountDetails = async (
     return result;
   } catch (err) {
     console.error("Error updating company account:", err);
-    throw new Error("Error updating company account details");
+    throw err;
   }
 };
 
@@ -987,7 +987,7 @@ const activateDeactivateCompanyAccountDetails = async (
     return result;
   } catch (err) {
     console.error("Error activating/deactivating company account:", err);
-    throw new Error("Error activating/deactivating company account");
+    throw err;
   }
 };
 
@@ -1020,7 +1020,7 @@ const getCompanyAccountsList = async (companyId = null) => {
     return companyAccounts;
   } catch (err) {
     console.error("Error retrieving company accounts:", err);
-    throw new Error("Error retrieving company accounts list");
+    throw err;
   }
 };
 
@@ -1046,7 +1046,7 @@ const insertProductionType = async (
     return result;
   } catch (err) {
     console.error("Error inserting production type:", err);
-    throw new Error("Error inserting production type");
+    throw err;
   }
 };
 
@@ -1078,7 +1078,7 @@ const updateProductionTypeDetails = async (
     return result;
   } catch (err) {
     console.error("Error updating production type:", err);
-    throw new Error("Error updating production type details");
+    throw err;
   }
 };
 
@@ -1102,7 +1102,7 @@ const updateProductionTypeStatus = async (
     return result;
   } catch (err) {
     console.error("Error updating production type status:", err);
-    throw new Error("Error updating production type status");
+    throw err;
   }
 };
 
@@ -1113,7 +1113,7 @@ const getProductionTypesList = async () => {
     return productionTypes;
   } catch (err) {
     console.error("Error retrieving production types:", err);
-    throw new Error("Error retrieving production types list");
+    throw err;
   }
 };
 
@@ -1141,7 +1141,7 @@ const insertIndustryMaster = async (
     return result;
   } catch (err) {
     console.error("Error inserting industry master:", err);
-    throw new Error("Error inserting industry master");
+    throw err;
   }
 };
 
@@ -1175,7 +1175,7 @@ const updateIndustryMasterDetails = async (
     return result;
   } catch (err) {
     console.error("Error updating industry master:", err);
-    throw new Error("Error updating industry master details");
+    throw err;
   }
 };
 
@@ -1199,7 +1199,7 @@ const updateIndustryMasterStatus = async (
     return result;
   } catch (err) {
     console.error("Error updating industry master status:", err);
-    throw new Error("Error updating industry master status");
+    throw err;
   }
 };
 
@@ -1214,7 +1214,7 @@ const getIndustryMastersList = async () => {
     return industryMasters; // Returning all columns as is
   } catch (err) {
     console.error("Error retrieving industry masters:", err);
-    throw new Error("Error retrieving industry masters");
+    throw err;
   }
 };
 
@@ -1240,7 +1240,7 @@ const insertGroupIndustry = async (
     ]);
   } catch (err) {
     console.error("Error inserting group industry:", err);
-    throw new Error("Error inserting group industry");
+    throw err;
   }
 };
 
@@ -1267,7 +1267,7 @@ const updateGroupIndustryDetails = async (
     ]);
   } catch (err) {
     console.error("Error updating group industry:", err);
-    throw new Error("Error updating group industry");
+    throw err;
   }
 };
 
@@ -1291,7 +1291,7 @@ const updateGroupIndustryStatus = async (
     return result;
   } catch (err) {
     console.error("Error updating Group Industry status:", err);
-    throw new Error("Error updating Group Industry status");
+    throw err;
   }
 };
 
@@ -1309,7 +1309,7 @@ const getGroupIndustriesList = async () => {
     return groupIndustries;
   } catch (err) {
     console.error("Error retrieving Group Industries:", err);
-    throw new Error("Error retrieving Group Industries");
+    throw err;
   }
 };
 
@@ -1396,7 +1396,7 @@ const insertIndustryHead = async (
     ]);
   } catch (err) {
     console.error("Error inserting industry head:", err);
-    throw new Error("Error inserting industry head");
+    throw err;
   }
 };
 
@@ -1436,7 +1436,7 @@ const updateIndustryHeadDetails = async (
     ]);
   } catch (err) {
     console.error("Error updating industry head:", err);
-    throw new Error("Error updating industry head");
+    throw err;
   }
 };
 
@@ -1460,7 +1460,7 @@ const updateIndustryHeadStatus = async (
     return result;
   } catch (err) {
     console.error("Error updating Industry Head status:", err);
-    throw new Error("Error updating Industry Head status");
+    throw err;
   }
 };
 
@@ -1489,7 +1489,7 @@ const getIndustryHeadsList = async () => {
     return industryHeads;
   } catch (err) {
     console.error("Error retrieving Industry Heads:", err);
-    throw new Error("Error retrieving Industry Heads");
+    throw err;
   }
 };
 
@@ -1525,7 +1525,7 @@ const insertSalesManager = async (
     ]);
   } catch (err) {
     console.error("Error inserting sales manager:", err);
-    throw new Error("Error inserting sales manager");
+    throw err;
   }
 };
 
@@ -1562,7 +1562,7 @@ const updateSalesManagerDetails = async (
     ]);
   } catch (err) {
     console.error("Error updating sales manager:", err);
-    throw new Error("Error updating sales manager");
+    throw err;
   }
 };
 
@@ -1581,7 +1581,7 @@ const updateSalesManagerStatus = async (
     await db.execute(query, [isActive, updatedBy, salesManagerId]);
   } catch (err) {
     console.error("Error updating Sales Manager status:", err);
-    throw new Error("Error updating Sales Manager status");
+    throw err;
   }
 };
 
@@ -1601,7 +1601,7 @@ const getSalesManagersList = async () => {
     return salesManagers;
   } catch (err) {
     console.error("Error retrieving Sales Managers:", err);
-    throw new Error("Error retrieving Sales Managers");
+    throw err;
   }
 };
 
@@ -1636,7 +1636,7 @@ const insertAccountManager = async (
     ]);
   } catch (err) {
     console.error("Error inserting Account Manager:", err);
-    throw new Error("Error inserting Account Manager");
+    throw err;
   }
 };
 
@@ -1672,7 +1672,7 @@ const updateAccountManager = async (
     ]);
   } catch (err) {
     console.error("Error updating Account Manager:", err);
-    throw new Error("Error updating Account Manager");
+    throw err;
   }
 };
 
@@ -1686,7 +1686,7 @@ const activateOrDeactivateAccountManager = async (id, isActive, updatedBy) => {
     await db.execute(query, [isActive, updatedBy, id]);
   } catch (err) {
     console.error("Error updating Account Manager status:", err);
-    throw new Error("Error updating Account Manager status");
+    throw err;
   }
 };
 
@@ -1705,7 +1705,7 @@ const getAccountManagersList = async () => {
     return accountManagers;
   } catch (err) {
     console.error("Error retrieving Account Managers:", err);
-    throw new Error("Error retrieving Account Managers");
+    throw err;
   }
 };
 
@@ -1731,7 +1731,7 @@ const insertTechnologyGroup = async (
     return result;
   } catch (err) {
     console.log("Error inserting technology group:", err);
-    throw new Error("Error inserting technology group");
+    throw err;
   }
 };
 
@@ -1764,7 +1764,7 @@ const updateTechnologyGroupDetails = async (
     return result;
   } catch (err) {
     console.log("Error updating technology group:", err);
-    throw new Error("Error updating technology group details");
+    throw err;
   }
 };
 
@@ -1780,7 +1780,7 @@ const activateDeactivateGroup = async (groupId, isActive, updatedBy) => {
     return result;
   } catch (err) {
     console.error("Error activating or deactivating technology group:", err);
-    throw new Error("Error activating/deactivating technology group");
+    throw err;
   }
 };
 
@@ -1796,7 +1796,7 @@ const getTechnologyGroupsList = async () => {
     return groups;
   } catch (err) {
     console.log("Error retrieving technology groups:", err);
-    throw new Error("Error retrieving technology groups list");
+    throw err;
   }
 };
 
@@ -1823,7 +1823,7 @@ const insertTechnologySubgroup = async (
     return result;
   } catch (err) {
     console.error("Error inserting technology subgroup:", err);
-    throw new Error("Error inserting technology subgroup");
+    throw err;
   }
 };
 
@@ -1858,7 +1858,7 @@ const updateTechnologySubgroupDetails = async (
     return result;
   } catch (err) {
     console.error("Error updating technology subgroup:", err);
-    throw new Error("Error updating technology subgroup details");
+    throw err;
   }
 };
 
@@ -1873,7 +1873,7 @@ const activateDeactivateSubgroup = async (subgroupId, isActive, updatedBy) => {
     return result;
   } catch (err) {
     console.error("Error activating or deactivating technology subgroup:", err);
-    throw new Error("Error activating/deactivating technology subgroup");
+    throw err;
   }
 };
 
@@ -1893,7 +1893,7 @@ const getAllTechnologySubgroups = async () => {
     return subgroups;
   } catch (err) {
     console.error("Error retrieving Technology Subgroups:", err);
-    throw new Error("Error retrieving Technology Subgroups");
+    throw err;
   }
 };
 
