@@ -1,5 +1,7 @@
 
-const { updateExchangeRates } = require("../cron/currencyCron");
+
+
+const {errorHandler} = require("../utils/errorHandler.js");
 const {
   createCountry,
   updateCountryDetails,
@@ -155,12 +157,14 @@ const addCountry = async (req, res) => {
     });
   } catch (err) {
     console.log("Error", err);
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error",
-    });
+    const { statusCode, message } = errorHandler("country", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });   
   }
 };
+
 
 const updateCountry = async (req, res) => {
   const {
@@ -202,10 +206,11 @@ const updateCountry = async (req, res) => {
       message: "Country updated successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error while updating country details",
-    });
+    const { statusCode, message } = errorHandler("country", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });   
   }
 };
 
@@ -269,10 +274,12 @@ const addState = async (req, res) => {
       message: "State created successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error",
-    });
+    console.log("Error", err);
+    const { statusCode, message } = errorHandler("state", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });   
   }
 };
 
@@ -310,10 +317,12 @@ const updateState = async (req, res) => {
       message: "State updated successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error while updating state details",
-    });
+    console.log("Error", err);
+    const { statusCode, message } = errorHandler("state", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });   
   }
 };
 
@@ -389,10 +398,12 @@ const addRegion = async (req, res) => {
       message: "Region created successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error",
-    });
+    console.log("Error", err);
+    const { statusCode, message } = errorHandler("region", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });   
   }
 };
 
@@ -438,10 +449,12 @@ const updateRegion = async (req, res) => {
       message: "Region updated successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error while updating region details",
-    });
+    console.log("Error", err);
+    const { statusCode, message } = errorHandler("region", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });   
   }
 };
 
@@ -524,11 +537,12 @@ const addCompany = async (req, res) => {
       message: "Company created successfully",
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error",
-    });
+    console.log("Error", err);
+    const { statusCode, message } = errorHandler("company", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });   
   }
 };
 
@@ -589,11 +603,12 @@ const updateCompany = async (req, res) => {
       message: "Company updated successfully",
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error while updating company details",
-    });
+    console.log("Error", err);
+    const { statusCode, message } = errorHandler("company", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });   
   }
 };
 
@@ -787,10 +802,12 @@ const createBankAccountType = async (req, res) => {
       message: "Bank Account Type created successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error",
-    });
+    console.log("Error", err);
+    const { statusCode, message } = errorHandler("bankAccountType", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });   
   }
 };
 
@@ -826,10 +843,12 @@ const updateBankAccountType = async (req, res) => {
       message: "Bank Account Type updated successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error while updating bank account type",
-    });
+    console.log("Error", err);
+    const { statusCode, message } = errorHandler("bankAccountType", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });   
   }
 };
 
@@ -1171,10 +1190,12 @@ const createIndustryMaster = async (req, res) => {
       message: "Industry Master created successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error while creating industry master",
-    });
+    console.log("Error", err);
+    const { statusCode, message } = errorHandler("subindustry", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });   
   }
 };
 
@@ -1208,10 +1229,12 @@ const updateIndustryMaster = async (req, res) => {
       message: "Industry Master updated successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error while updating industry master",
-    });
+    console.log("Error", err);
+    const { statusCode, message } = errorHandler("subindustry", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });   
   }
 };
 
@@ -1282,11 +1305,12 @@ const createGroupIndustry = async (req, res) => {
       message: "Group Industry created successfully",
     });
   } catch (err) {
-    console.error("Error creating group industry:", err);
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error while creating group industry",
-    });
+    console.log("Error", err);
+    const { statusCode, message } = errorHandler("groupIndustry", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });   
   }
 };
 
@@ -1321,10 +1345,12 @@ const updateGroupIndustry = async (req, res) => {
       message: "Group Industry updated successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error while updating group industry",
-    });
+    console.log("Error", err);
+    const { statusCode, message } = errorHandler("groupIndustry", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });   
   }
 };
 
@@ -1375,6 +1401,7 @@ const getGroupIndustries = async (req, res) => {
 
 // Industryhead Master
 const createIndustryHead = async (req, res) => {
+
   const {
     companyId,
     industryHeadName,
@@ -1390,7 +1417,7 @@ const createIndustryHead = async (req, res) => {
   } = req.body;
 
   try {
-    await insertIndustryHead(
+    const finalResult = await insertIndustryHead(
       companyId,
       industryHeadName,
       industryIds,
@@ -1404,10 +1431,20 @@ const createIndustryHead = async (req, res) => {
       isActive
     );
 
-    res.status(201).json({
-      statusCode: 201,
-      message: "Industry Head created successfully",
-    });
+    console.log('finalRes--->>>>', finalResult);
+
+    if(finalResult && finalResult.status == 'existing'){
+      res.status(400).json({
+        statusCode: 400,
+        // message: `This region already has a region head ${finalResult.existingRegionHead}`,
+        message: finalResult.conflictMessage
+      });
+    } else{
+      res.status(201).json({
+        statusCode: 201,
+        message: "Industry Head created successfully",
+      });
+    }
   } catch (err) {
     console.error("Error creating industry head:", err);
     res.status(500).json({
@@ -1796,10 +1833,12 @@ const createTechnologyGroup = async (req, res) => {
       message: "Technology Group created successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error",
-    });
+    console.log("Error", err);
+    const { statusCode, message } = errorHandler("technologyGroup", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });   
   }
 };
 
@@ -1827,10 +1866,12 @@ const updateTechnologyGroup = async (req, res) => {
       message: "Technology Group updated successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error while updating technology group",
-    });
+    console.log("Error", err);
+    const { statusCode, message } = errorHandler("technologyGroup", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });   
   }
 };
 
@@ -1896,10 +1937,12 @@ const createTechnologySubgroup = async (req, res) => {
       message: "Technology Subgroup created successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error",
-    });
+    console.log("Error", err);
+    const { statusCode, message } = errorHandler("technologySubgroup", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });   
   }
 };
 
@@ -1929,10 +1972,12 @@ const updateTechnologySubgroup = async (req, res) => {
       message: "Technology Subgroup updated successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error while updating technology subgroup",
-    });
+    console.log("Error", err);
+    const { statusCode, message } = errorHandler("technologySubgroup", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });   
   }
 };
 
@@ -2005,10 +2050,12 @@ const createTechnologyName = async (req, res) => {
       message: "Technology Name created successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error",
-    });
+    console.log("Error", err);
+    const { statusCode, message } = errorHandler("technologyName", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });   
   }
 };
 
@@ -2045,9 +2092,10 @@ const updateTechnologyName = async (req, res) => {
       message: "Technology Name updated successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error while updating technology name",
+    const { statusCode, message } = errorHandler("technologyName", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
     });
   }
 };
@@ -2106,9 +2154,11 @@ const createOEM = async (req, res) => {
       message: "OEM created successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error",
+    console.log('error--',err);
+    const { statusCode, message } = errorHandler("oem", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
     });
   }
 };
@@ -2130,9 +2180,11 @@ const updateOEM = async (req, res) => {
       message: "OEM updated successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error while updating OEM",
+    console.log('error--',err);
+    const { statusCode, message } = errorHandler("oem", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
     });
   }
 };
@@ -2191,9 +2243,11 @@ const createPoleStarProduct = async (req, res) => {
       message: "PoleStar Product created successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error while creating PoleStar Product",
+    console.log('error--',err);
+    const { statusCode, message } = errorHandler("polestarProduct", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
     });
   }
 };
@@ -2221,9 +2275,11 @@ const updatePoleStarProduct = async (req, res) => {
       message: "PoleStar Product updated successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error while updating PoleStar Product",
+    console.log('error--',err);
+    const { statusCode, message } = errorHandler("polestarProduct", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
     });
   }
 };
@@ -2282,9 +2338,11 @@ const createProjectService = async (req, res) => {
       message: "Project/Service created successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error",
+    console.log('error--',err);
+    const { statusCode, message } = errorHandler("projectService", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
     });
   }
 };
@@ -2306,9 +2364,11 @@ const updateProjectServiceHandler = async (req, res) => {
       message: "Project/Service updated successfully",
     });
   } catch (err) {
-    res.status(500).json({
-      statusCode: 500,
-      message: "Server error while updating Project/Service",
+    console.log('error--',err);
+    const { statusCode, message } = errorHandler("projectService", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
     });
   }
 };
