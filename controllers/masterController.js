@@ -3376,31 +3376,7 @@ const getClientGroups = async (req, res) => {
 };
 
 
-const updateMSAFile = async (req, res) => {
-  const { clientId, start_date, end_date, updated_by } = req.body;
-  const msaFile = req.file ? req.file.path.replace(/\\/g, "/") : null;
 
-  if (!clientId || !start_date || !end_date || !msaFile) {
-    return res.status(400).json({
-      statusCode: 400,
-      message: "Missing required fields: clientId, start_date, end_date, msaFile",
-    });
-  }
-
-  try {
-    const result = await updateClientMSA(clientId, start_date, end_date, msaFile, updated_by);
-    res.status(200).json({
-      statusCode: 200,
-      message: "MSA file updated successfully",
-    });
-  } catch (err) {
-    console.error("Error updating MSA file:", err);
-    res.status(500).json({
-      statusCode: 500,
-      message: "Failed to update MSA file",
-    });
-  }
-};
 
 
 
@@ -3554,5 +3530,5 @@ module.exports = {
   activateDeactivateClientGroup,
   getClientGroups,
 
-  updateMSAFile
+  // updateMSAFile
 };
