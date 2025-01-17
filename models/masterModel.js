@@ -1512,7 +1512,7 @@ const getIndustryHeadsList = async () => {
               WHERE FIND_IN_SET(state_info.id, industry_head_master.stateIds)) AS stateNames, company_info.companyName
       FROM industry_head_master
       LEFT JOIN 
-        company_info ON industry_head_master.  = company_info.id
+        company_info ON industry_head_master.companyId  = company_info.id
     `;
 
     const [industryHeads] = await db.execute(query);
