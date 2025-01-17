@@ -1,7 +1,7 @@
 
 
 
-const {errorHandler} = require("../utils/errorHandler.js");
+const { errorHandler } = require("../utils/errorHandler.js");
 const {
   createCountry,
   updateCountryDetails,
@@ -121,6 +121,35 @@ const {
   activateOrDeactivateTax,
   getAllTaxes,
 
+  createClient,
+  updateClientDetails,
+  activateDeactivateClientDetails,
+  getClientById,
+  getClients,
+
+  createClientContact,
+  updateClientContactDetails,
+  activateDeactivateClientContactDetails,
+  getClientContacts,
+
+  // Functions for client_bill_to_info
+  insertClientBillTo,
+  updateClientBillToDetails,
+  activateDeactivateClientBillToDetails,
+  getClientBillToDetails,
+
+  // Functions for client_ship_to_info
+  insertClientShipTo,
+  updateClientShipToDetails,
+  activateDeactivateClientShipToDetails,
+  getClientShipToDetails,
+  // Functions for client_group_info
+  insertClientGroup,
+  updateClientGroupDetails,
+  activateDeactivateClientGroupDetails,
+  getClientGroupsDetails,
+
+  updateClientMSA
 
 } = require("../models/masterModel");
 
@@ -161,7 +190,7 @@ const addCountry = async (req, res) => {
     res.status(statusCode).json({
       statusCode,
       message,
-    });   
+    });
   }
 };
 
@@ -210,7 +239,7 @@ const updateCountry = async (req, res) => {
     res.status(statusCode).json({
       statusCode,
       message,
-    });   
+    });
   }
 };
 
@@ -221,9 +250,8 @@ const activateDeactivateCountry = async (req, res) => {
     await activateDeactivateCountryDetails(countryId, isActive, updatedBy);
     res.status(200).json({
       statusCode: 200,
-      message: `Country ${
-        isActive == 1 ? "activated" : "deactivated"
-      } successfully`,
+      message: `Country ${isActive == 1 ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     res.status(500).json({
@@ -279,7 +307,7 @@ const addState = async (req, res) => {
     res.status(statusCode).json({
       statusCode,
       message,
-    });   
+    });
   }
 };
 
@@ -322,7 +350,7 @@ const updateState = async (req, res) => {
     res.status(statusCode).json({
       statusCode,
       message,
-    });   
+    });
   }
 };
 
@@ -333,9 +361,8 @@ const activateDeactivateState = async (req, res) => {
     await activateDeactivateStateDetails(stateId, isActive, updatedBy);
     res.status(200).json({
       statusCode: 200,
-      message: `State ${
-        isActive == 1 ? "activated" : "deactivated"
-      } successfully`,
+      message: `State ${isActive == 1 ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     res.status(500).json({
@@ -403,7 +430,7 @@ const addRegion = async (req, res) => {
     res.status(statusCode).json({
       statusCode,
       message,
-    });   
+    });
   }
 };
 
@@ -454,7 +481,7 @@ const updateRegion = async (req, res) => {
     res.status(statusCode).json({
       statusCode,
       message,
-    });   
+    });
   }
 };
 
@@ -465,9 +492,8 @@ const activateDeactivateRegion = async (req, res) => {
     await activateDeactivateRegionDetails(regionId, isActive, updatedBy);
     res.status(200).json({
       statusCode: 200,
-      message: `Region ${
-        isActive == 1 ? "activated" : "deactivated"
-      } successfully`,
+      message: `Region ${isActive == 1 ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     res.status(500).json({
@@ -513,8 +539,8 @@ const addCompany = async (req, res) => {
   } = req.body;
 
   // Access the files from req.files
-  const logoPath = req.files.logo ? req.files.logo[0].path.replace("\\", "/"):null;
-  const digitalSignPath = req.files.digitalSign ? req.files.digitalSign[0].path.replace("\\", "/"):null;
+  const logoPath = req.files.logo ? req.files.logo[0].path.replace("\\", "/") : null;
+  const digitalSignPath = req.files.digitalSign ? req.files.digitalSign[0].path.replace("\\", "/") : null;
 
   try {
     await createCompany(
@@ -542,7 +568,7 @@ const addCompany = async (req, res) => {
     res.status(statusCode).json({
       statusCode,
       message,
-    });   
+    });
   }
 };
 
@@ -563,8 +589,8 @@ const updateCompany = async (req, res) => {
   } = req.body;
 
   // Access the files from req.files
-  const logoPath = req.files.logo ? req.files.logo[0].path.replace("\\", "/"): null;
-  const digitalSignPath = req.files.digitalSign ? req.files.digitalSign[0].path.replace("\\", "/"): null;
+  const logoPath = req.files.logo ? req.files.logo[0].path.replace("\\", "/") : null;
+  const digitalSignPath = req.files.digitalSign ? req.files.digitalSign[0].path.replace("\\", "/") : null;
 
   if (!companyId) {
     return res.status(400).json({
@@ -608,7 +634,7 @@ const updateCompany = async (req, res) => {
     res.status(statusCode).json({
       statusCode,
       message,
-    });   
+    });
   }
 };
 
@@ -619,9 +645,8 @@ const activateDeactivateCompany = async (req, res) => {
     await activateDeactivateCompanyDetails(companyId, isActive, updatedBy);
     res.status(200).json({
       statusCode: 200,
-      message: `Company ${
-        isActive == 1 ? "activated" : "deactivated"
-      } successfully`,
+      message: `Company ${isActive == 1 ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     console.error("Error:", err);
@@ -766,9 +791,8 @@ const activateDeactivateCompanyLocation = async (req, res) => {
 
     res.status(200).json({
       statusCode: 200,
-      message: `Company location ${
-        isActive === 1 ? "activated" : "deactivated"
-      } successfully`,
+      message: `Company location ${isActive === 1 ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     res.status(500).json({
@@ -807,7 +831,7 @@ const createBankAccountType = async (req, res) => {
     res.status(statusCode).json({
       statusCode,
       message,
-    });   
+    });
   }
 };
 
@@ -848,7 +872,7 @@ const updateBankAccountType = async (req, res) => {
     res.status(statusCode).json({
       statusCode,
       message,
-    });   
+    });
   }
 };
 
@@ -867,9 +891,8 @@ const activateDeactivateBankAccountType = async (req, res) => {
 
     res.status(200).json({
       statusCode: 200,
-      message: `Bank Account Type ${
-        isActive === 1 ? "activated" : "deactivated"
-      } successfully`,
+      message: `Bank Account Type ${isActive === 1 ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     res.status(500).json({
@@ -1034,9 +1057,8 @@ const activateDeactivateCompanyAccount = async (req, res) => {
 
     res.status(200).json({
       statusCode: 200,
-      message: `Company Account ${
-        isActive === 1 ? "activated" : "deactivated"
-      } successfully`,
+      message: `Company Account ${isActive === 1 ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     res.status(500).json({
@@ -1139,9 +1161,8 @@ const activateOrDeactivateProductionType = async (req, res) => {
 
     res.status(200).json({
       statusCode: 200,
-      message: `Production Type ${
-        isActive ? "activated" : "deactivated"
-      } successfully`,
+      message: `Production Type ${isActive ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     res.status(500).json({
@@ -1195,7 +1216,7 @@ const createIndustryMaster = async (req, res) => {
     res.status(statusCode).json({
       statusCode,
       message,
-    });   
+    });
   }
 };
 
@@ -1234,7 +1255,7 @@ const updateIndustryMaster = async (req, res) => {
     res.status(statusCode).json({
       statusCode,
       message,
-    });   
+    });
   }
 };
 
@@ -1253,9 +1274,8 @@ const activateOrDeactivateIndustryMaster = async (req, res) => {
 
     res.status(200).json({
       statusCode: 200,
-      message: `Industry Master ${
-        isActive ? "activated" : "deactivated"
-      } successfully`,
+      message: `Industry Master ${isActive ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     res.status(500).json({
@@ -1310,7 +1330,7 @@ const createGroupIndustry = async (req, res) => {
     res.status(statusCode).json({
       statusCode,
       message,
-    });   
+    });
   }
 };
 
@@ -1350,7 +1370,7 @@ const updateGroupIndustry = async (req, res) => {
     res.status(statusCode).json({
       statusCode,
       message,
-    });   
+    });
   }
 };
 
@@ -1369,9 +1389,8 @@ const activateOrDeactivateGroupIndustry = async (req, res) => {
 
     res.status(200).json({
       statusCode: 200,
-      message: `Group Industry ${
-        isActive ? "activated" : "deactivated"
-      } successfully`,
+      message: `Group Industry ${isActive ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     console.error("Error updating Group Industry status:", err);
@@ -1433,13 +1452,13 @@ const createIndustryHead = async (req, res) => {
 
     console.log('finalRes--->>>>', finalResult);
 
-    if(finalResult && finalResult.status == 'existing'){
+    if (finalResult && finalResult.status == 'existing') {
       res.status(400).json({
         statusCode: 400,
         // message: `This region already has a region head ${finalResult.existingRegionHead}`,
         message: finalResult.conflictMessage
       });
-    } else{
+    } else {
       res.status(201).json({
         statusCode: 201,
         message: "Industry Head created successfully",
@@ -1521,9 +1540,8 @@ const activateOrDeactivateIndustryHead = async (req, res) => {
 
     res.status(200).json({
       statusCode: 200,
-      message: `Industry Head ${
-        isActive ? "activated" : "deactivated"
-      } successfully`,
+      message: `Industry Head ${isActive ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     console.error("Error updating Industry Head status:", err);
@@ -1654,9 +1672,8 @@ const activateOrDeactivateSalesManager = async (req, res) => {
 
     res.status(200).json({
       statusCode: 200,
-      message: `Sales Manager ${
-        isActive ? "activated" : "deactivated"
-      } successfully`,
+      message: `Sales Manager ${isActive ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     console.error("Error updating Sales Manager status:", err);
@@ -1791,9 +1808,8 @@ const activateOrDeactivateAccountsManager = async (req, res) => {
 
     res.status(200).json({
       statusCode: 200,
-      message: `Sales Manager ${
-        isActive ? "activated" : "deactivated"
-      } successfully`,
+      message: `Sales Manager ${isActive ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     console.error("Error updating Sales Manager status:", err);
@@ -1838,7 +1854,7 @@ const createTechnologyGroup = async (req, res) => {
     res.status(statusCode).json({
       statusCode,
       message,
-    });   
+    });
   }
 };
 
@@ -1871,7 +1887,7 @@ const updateTechnologyGroup = async (req, res) => {
     res.status(statusCode).json({
       statusCode,
       message,
-    });   
+    });
   }
 };
 
@@ -1890,9 +1906,8 @@ const activateDeactivateTechnologyGroup = async (req, res) => {
 
     res.status(200).json({
       statusCode: 200,
-      message: `Technology Group ${
-        isActive === 1 ? "activated" : "deactivated"
-      } successfully`,
+      message: `Technology Group ${isActive === 1 ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     res.status(500).json({
@@ -1942,7 +1957,7 @@ const createTechnologySubgroup = async (req, res) => {
     res.status(statusCode).json({
       statusCode,
       message,
-    });   
+    });
   }
 };
 
@@ -1977,7 +1992,7 @@ const updateTechnologySubgroup = async (req, res) => {
     res.status(statusCode).json({
       statusCode,
       message,
-    });   
+    });
   }
 };
 
@@ -1996,9 +2011,8 @@ const activateDeactivateTechnologySubgroup = async (req, res) => {
 
     res.status(200).json({
       statusCode: 200,
-      message: `Technology Subgroup ${
-        isActive === 1 ? "activated" : "deactivated"
-      } successfully`,
+      message: `Technology Subgroup ${isActive === 1 ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     res.status(500).json({
@@ -2055,7 +2069,7 @@ const createTechnologyName = async (req, res) => {
     res.status(statusCode).json({
       statusCode,
       message,
-    });   
+    });
   }
 };
 
@@ -2114,9 +2128,8 @@ const activateDeactivateTechnologyName = async (req, res) => {
     await activateDeactivateTechnologyNameStatus(id, isActive, updatedBy);
     res.status(200).json({
       statusCode: 200,
-      message: `Technology Name ${
-        isActive === 1 ? "activated" : "deactivated"
-      } successfully`,
+      message: `Technology Name ${isActive === 1 ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     res.status(500).json({
@@ -2154,7 +2167,7 @@ const createOEM = async (req, res) => {
       message: "OEM created successfully",
     });
   } catch (err) {
-    console.log('error--',err);
+    console.log('error--', err);
     const { statusCode, message } = errorHandler("oem", err);
     res.status(statusCode).json({
       statusCode,
@@ -2180,7 +2193,7 @@ const updateOEM = async (req, res) => {
       message: "OEM updated successfully",
     });
   } catch (err) {
-    console.log('error--',err);
+    console.log('error--', err);
     const { statusCode, message } = errorHandler("oem", err);
     res.status(statusCode).json({
       statusCode,
@@ -2203,9 +2216,8 @@ const activateDeactivateOEM = async (req, res) => {
     await activateDeactivateOEMStatus(id, isActive, updatedBy);
     res.status(200).json({
       statusCode: 200,
-      message: `OEM ${
-        isActive === 1 ? "activated" : "deactivated"
-      } successfully`,
+      message: `OEM ${isActive === 1 ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     res.status(500).json({
@@ -2243,7 +2255,7 @@ const createPoleStarProduct = async (req, res) => {
       message: "PoleStar Product created successfully",
     });
   } catch (err) {
-    console.log('error--',err);
+    console.log('error--', err);
     const { statusCode, message } = errorHandler("polestarProduct", err);
     res.status(statusCode).json({
       statusCode,
@@ -2275,7 +2287,7 @@ const updatePoleStarProduct = async (req, res) => {
       message: "PoleStar Product updated successfully",
     });
   } catch (err) {
-    console.log('error--',err);
+    console.log('error--', err);
     const { statusCode, message } = errorHandler("polestarProduct", err);
     res.status(statusCode).json({
       statusCode,
@@ -2298,9 +2310,8 @@ const activateDeactivatePoleStarProduct = async (req, res) => {
     await activateDeactivatePoleStarProductStatus(id, isActive, updatedBy);
     res.status(200).json({
       statusCode: 200,
-      message: `PoleStar Product ${
-        isActive === 1 ? "activated" : "deactivated"
-      } successfully`,
+      message: `PoleStar Product ${isActive === 1 ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     res.status(500).json({
@@ -2338,7 +2349,7 @@ const createProjectService = async (req, res) => {
       message: "Project/Service created successfully",
     });
   } catch (err) {
-    console.log('error--',err);
+    console.log('error--', err);
     const { statusCode, message } = errorHandler("projectService", err);
     res.status(statusCode).json({
       statusCode,
@@ -2364,7 +2375,7 @@ const updateProjectServiceHandler = async (req, res) => {
       message: "Project/Service updated successfully",
     });
   } catch (err) {
-    console.log('error--',err);
+    console.log('error--', err);
     const { statusCode, message } = errorHandler("projectService", err);
     res.status(statusCode).json({
       statusCode,
@@ -2387,9 +2398,8 @@ const activateDeactivateProjectServiceHandler = async (req, res) => {
     await activateDeactivateProjectService(id, isActive, updatedBy);
     res.status(200).json({
       statusCode: 200,
-      message: `Project/Service ${
-        isActive === 1 ? "activated" : "deactivated"
-      } successfully`,
+      message: `Project/Service ${isActive === 1 ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     res.status(500).json({
@@ -2486,9 +2496,8 @@ const activateDeactivateFinancialYearHandler = async (req, res) => {
     await activateDeactivateFinancialYear(id, isActive, updatedBy);
     res.status(200).json({
       statusCode: 200,
-      message: `Financial Year ${
-        isActive === 1 ? "activated" : "deactivated"
-      } successfully`,
+      message: `Financial Year ${isActive === 1 ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     res.status(500).json({
@@ -2540,8 +2549,8 @@ const addRegionHead = async (req, res) => {
       updatedBy
     );
     console.log('rrrrrrrrrrrr', finalResult);
-    
-    if(finalResult.status == 'existing'){
+
+    if (finalResult.status == 'existing') {
       res.status(400).json({
         statusCode: 400,
         // message: `This region already has a region head ${finalResult.existingRegionHead}`,
@@ -2553,7 +2562,7 @@ const addRegionHead = async (req, res) => {
         message: "Region Head created successfully",
       });
     }
-    
+
   } catch (err) {
     res.status(500).json({
       statusCode: 500,
@@ -2596,7 +2605,7 @@ const updateRegionHead = async (req, res) => {
       isActive,
       updatedBy
     );
-    if(finalRes.status == 'existing'){
+    if (finalRes.status == 'existing') {
       res.status(400).json({
         statusCode: 400,
         // message: `This region already has a region head: ${finalRes.existingRegionHead}`,
@@ -2627,9 +2636,8 @@ const activateDeactivateRegionHead = async (req, res) => {
     );
     res.status(200).json({
       statusCode: 200,
-      message: `Region Head ${
-        isActive == 1 ? "activated" : "deactivated"
-      } successfully`,
+      message: `Region Head ${isActive == 1 ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     res.status(500).json({
@@ -2754,9 +2762,9 @@ const activateOrDeactivateCurrencyHandler = async (req, res) => {
 
 const getAllCurrenciesHandler = async (req, res) => {
   try {
-   
+
     const currencies = await getAllCurrencies();
-    
+
     res.status(200).json({
       statusCode: 200,
       message: "Currencies retrieved successfully",
@@ -2771,8 +2779,8 @@ const getAllCurrenciesHandler = async (req, res) => {
   }
 };
 
-const getCurrencyHistoryHandler =  async (req, res) => {
-  try { 
+const getCurrencyHistoryHandler = async (req, res) => {
+  try {
     const currencies = await getCurrencyHistory(req.body);
     res.status(200).json({
       statusCode: 200,
@@ -2898,6 +2906,498 @@ const getAllTaxesHandler = async (req, res) => {
 };
 
 
+// Add client
+const addClient = async (req, res) => {
+  const {
+    client_name,
+    vega_client_name,
+    client_type,
+    credit_period,
+    client_status,
+    countryId,
+    companyId,
+    accountId,
+    industryId,
+    IndustryHeadId,
+    IndustryGroupId,
+    IndustrySubGroupId,
+    salesMangerId,
+    accountManagerId,
+    msa_start_date,
+    msa_end_date,
+    msa_flag,
+    nda_flag,
+    non_solicitation_clause_flag,
+    use_logo_permission_flag,
+    updated_by,
+  } = req.body;
+
+  const msaFilePath = req.files.msaFile ? req.files.msaFile[0].path.replace("\\", "/") : null;
+  const ndaFilePath = req.files.ndaFile ? req.files.ndaFile[0].path.replace("\\", "/") : null;
+
+  try {
+    await createClient(
+      client_name,
+      vega_client_name,
+      client_type,
+      credit_period,
+      client_status,
+      countryId,
+      companyId,
+      accountId,
+      industryId,
+      IndustryHeadId,
+      IndustryGroupId,
+      IndustrySubGroupId,
+      salesMangerId,
+      accountManagerId,
+      msa_start_date,
+      msa_end_date,
+      msa_flag,
+      nda_flag,
+      non_solicitation_clause_flag,
+      use_logo_permission_flag,
+      updated_by,
+      msaFilePath,
+      ndaFilePath
+    );
+
+    res.status(201).json({
+      statusCode: 201,
+      message: "Client added successfully",
+    });
+  } catch (err) {
+    console.error("Error adding client:", err);
+    const { statusCode, message } = errorHandler("client", err);
+    res.status(statusCode).json({ statusCode, message });
+  }
+};
+
+// Update client
+const updateClient = async (req, res) => {
+  const {
+    clientId,
+    client_name,
+    vega_client_name,
+    client_type,
+    credit_period,
+    client_status,
+    countryId,
+    companyId,
+    accountId,
+    industryId,
+    IndustryHeadId,
+    IndustryGroupId,
+    IndustrySubGroupId,
+    salesMangerId,
+    accountManagerId,
+    msa_start_date,
+    msa_end_date,
+    msa_flag,
+    nda_flag,
+    non_solicitation_clause_flag,
+    use_logo_permission_flag,
+    updated_by,
+  } = req.body;
+
+  const msaFilePath = req.files.msaFile ? req.files.msaFile[0].path.replace("\\", "/") : null;
+  const ndaFilePath = req.files.ndaFile ? req.files.ndaFile[0].path.replace("\\", "/") : null;
+
+  if (!clientId) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Client ID is required",
+    });
+  }
+
+  try {
+    const client = await getClientById(clientId);
+
+    const updatedMsaFilePath = msaFilePath || client.msaFilePath;
+    const updatedNdaFilePath = ndaFilePath || client.ndaFilePath;
+
+    await updateClientDetails(
+      clientId,
+      client_name,
+      vega_client_name,
+      client_type,
+      credit_period,
+      client_status,
+      countryId,
+      companyId,
+      accountId,
+      industryId,
+      IndustryHeadId,
+      IndustryGroupId,
+      IndustrySubGroupId,
+      salesMangerId,
+      accountManagerId,
+      msa_start_date,
+      msa_end_date,
+      msa_flag,
+      nda_flag,
+      non_solicitation_clause_flag,
+      use_logo_permission_flag,
+      updated_by,
+      updatedMsaFilePath,
+      updatedNdaFilePath
+    );
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Client updated successfully",
+    });
+  } catch (err) {
+    console.error("Error updating client:", err);
+    const { statusCode, message } = errorHandler("client", err);
+    res.status(statusCode).json({ statusCode, message });
+  }
+};
+
+// Activate/Deactivate client
+const activateDeactivateClient = async (req, res) => {
+  const { clientId, isActive, updated_by } = req.body;
+
+  try {
+    await activateDeactivateClientDetails(clientId, isActive, updated_by);
+    res.status(200).json({
+      statusCode: 200,
+      message: `Client ${isActive === 1 ? "activated" : "deactivated"} successfully`,
+    });
+  } catch (err) {
+    console.error("Error activating/deactivating client:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while activating/deactivating client",
+    });
+  }
+};
+
+// Get clients list
+const getClientsList = async (req, res) => {
+  try {
+    const clients = await getClients();
+
+    res.status(200).json({
+      statusCode: 200,
+      clients,
+    });
+  } catch (err) {
+    console.error("Error fetching clients list:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while fetching clients list",
+    });
+  }
+};
+
+
+
+const addClientContact = async (req, res) => {
+  const { client_name, salutation, first_name, last_name, email, phone_number, isActive, updatedBy } = req.body;
+
+  try {
+    await createClientContact(client_name, salutation, first_name, last_name, email, phone_number, isActive, updatedBy);
+    res.status(201).json({
+      statusCode: 201,
+      message: "Client contact created successfully",
+    });
+  } catch (err) {
+    console.error("Error", err);
+    const { statusCode, message } = errorHandler("clientContact", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });
+  }
+};
+
+const updateClientContact = async (req, res) => {
+  const { clientContactId, client_name, salutation, first_name, last_name, email, phone_number, isActive, updatedBy } = req.body;
+
+  if (!clientContactId) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Client Contact ID is required",
+    });
+  }
+
+  try {
+    await updateClientContactDetails(clientContactId, client_name, salutation, first_name, last_name, email, phone_number, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: "Client contact updated successfully",
+    });
+  } catch (err) {
+    console.error("Error", err);
+    const { statusCode, message } = errorHandler("clientContact", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });
+  }
+};
+
+const activateDeactivateClientContact = async (req, res) => {
+  const { clientContactId, isActive, updatedBy } = req.body;
+
+  try {
+    await activateDeactivateClientContactDetails(clientContactId, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: `Client contact ${isActive == 1 ? "activated" : "deactivated"} successfully`,
+    });
+  } catch (err) {
+    console.error("Error", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while activating/deactivating client contact",
+    });
+  }
+};
+
+const getClientContactsList = async (req, res) => {
+  try {
+    const clientContacts = await getClientContacts();
+    res.status(200).json({
+      statusCode: 200,
+      clientContacts,
+    });
+  } catch (err) {
+    console.error("Error", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while fetching client contacts list",
+    });
+  }
+};
+
+
+// Create Client Bill To
+const createClientBillTo = async (req, res) => {
+  const { clientId, countryId, address1, address2, address3, additionalAddressDetails, updatedBy } = req.body;
+
+  try {
+    await insertClientBillTo(clientId, countryId, address1, address2, address3, additionalAddressDetails, updatedBy);
+    res.status(201).json({ statusCode: 201, message: "Client Bill To created successfully" });
+  } catch (err) {
+    res.status(500).json({ statusCode: 500, message: "Server error" });
+  }
+};
+
+// Update Client Bill To
+const updateClientBillTo = async (req, res) => {
+  const { id, clientId, address1, address2, address3, additionalAddressDetails, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({ statusCode: 400, message: "ID is required" });
+  }
+
+  try {
+    await updateClientBillToDetails(id, clientId, address1, address2, address3, additionalAddressDetails, updatedBy);
+    res.status(200).json({ statusCode: 200, message: "Client Bill To updated successfully" });
+  } catch (err) {
+    res.status(500).json({ statusCode: 500, message: "Server error" });
+  }
+};
+
+// Activate/Deactivate Client Bill To
+const activateDeactivateClientBillTo = async (req, res) => {
+  const { id, isActive, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({ statusCode: 400, message: "ID is required" });
+  }
+
+  try {
+    await activateDeactivateClientBillToDetails(id, isActive, updatedBy);
+    res.status(200).json({ statusCode: 200, message: `Client billing info ${isActive === 1 ? "activated" : "deactivated"} successfully` });
+  } catch (err) {
+    res.status(500).json({ statusCode: 500, message: "Server error" });
+  }
+};
+
+// Get Client Bill To
+const getClientBillTo = async (req, res) => {
+  const { clientId } = req.body;
+
+  try {
+    const data = await getClientBillToDetails(clientId);
+    res.status(200).json({ statusCode: 200, data });
+  } catch (err) {
+    res.status(500).json({ statusCode: 500, message: "Server error" });
+  }
+};
+
+
+// Create Client Ship To
+const createClientShipTo = async (req, res) => {
+  const { clientId, countryId, address1, address2, address3, additionalAddressDetails, updatedBy } = req.body;
+
+  try {
+    await insertClientShipTo(clientId, countryId, address1, address2, address3, additionalAddressDetails, updatedBy);
+    res.status(201).json({ statusCode: 201, message: "Client Shipping info created successfully" });
+  } catch (err) {
+    res.status(500).json({ statusCode: 500, message: "Server error" });
+  }
+};
+
+// Update Client Ship To
+const updateClientShipTo = async (req, res) => {
+  const { id, clientId, address1, address2, address3, additionalAddressDetails, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({ statusCode: 400, message: "ID is required" });
+  }
+
+  try {
+    await updateClientShipToDetails(id, clientId, address1, address2, address3, additionalAddressDetails, updatedBy);
+    res.status(200).json({ statusCode: 200, message: "Client Shipping info updated successfully" });
+  } catch (err) {
+    res.status(500).json({ statusCode: 500, message: "Server error" });
+  }
+};
+
+// Activate/Deactivate Client Ship To
+const activateDeactivateClientShipTo = async (req, res) => {
+  const { id, isActive, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({ statusCode: 400, message: "ID is required" });
+  }
+
+  try {
+    await activateDeactivateClientShipToDetails(id, isActive, updatedBy);
+    res.status(200).json({ statusCode: 200, message: `Client Shipping info ${isActive === 1 ? "activated" : "deactivated"} successfully` });
+  } catch (err) {
+    res.status(500).json({ statusCode: 500, message: "Server error" });
+  }
+};
+
+// Get Client Ship To
+const getClientShipTo = async (req, res) => {
+  const { clientId } = req.body;
+
+  try {
+    const data = await getClientShipToDetails(clientId);
+    res.status(200).json({ statusCode: 200, data });
+  } catch (err) {
+    res.status(500).json({ statusCode: 500, message: "Server error" });
+  }
+};
+
+
+const createClientGroup = async (req, res) => {
+  const { groupName, clientId, updatedBy } = req.body;
+
+  try {
+    await insertClientGroup(groupName, clientId, updatedBy);
+
+    res.status(201).json({
+      statusCode: 201,
+      message: "Client group created successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while creating client group",
+    });
+  }
+};
+
+const updateClientGroup = async (req, res) => {
+  const { id, groupName, clientId, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Group ID is required",
+    });
+  }
+
+  try {
+    await updateClientGroupDetails(id, groupName, clientId, updatedBy);
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Client group updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating client group",
+    });
+  }
+};
+
+const activateDeactivateClientGroup = async (req, res) => {
+  const { id, isActive, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Group ID is required",
+    });
+  }
+
+  try {
+    await activateDeactivateClientGroupDetails(id, isActive, updatedBy);
+
+    res.status(200).json({
+      statusCode: 200,
+      message: `Client group ${isActive === 1 ? "activated" : "deactivated"
+        } successfully`,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while activating/deactivating client group",
+    });
+  }
+};
+
+const getClientGroups = async (req, res) => {
+  try {
+    const groups = await getClientGroupsDetails();
+
+    res.status(200).json({
+      statusCode: 200,
+      groups,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while retrieving client groups",
+    });
+  }
+};
+
+
+const updateMSAFile = async (req, res) => {
+  const { clientId, start_date, end_date, updated_by } = req.body;
+  const msaFile = req.file ? req.file.path.replace(/\\/g, "/") : null;
+
+  if (!clientId || !start_date || !end_date || !msaFile) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Missing required fields: clientId, start_date, end_date, msaFile",
+    });
+  }
+
+  try {
+    const result = await updateClientMSA(clientId, start_date, end_date, msaFile, updated_by);
+    res.status(200).json({
+      statusCode: 200,
+      message: "MSA file updated successfully",
+    });
+  } catch (err) {
+    console.error("Error updating MSA file:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Failed to update MSA file",
+    });
+  }
+};
 
 
 
@@ -3010,7 +3510,7 @@ module.exports = {
   getRegionHeadsList,
 
   // currency
-    createCurrencyHandler,
+  createCurrencyHandler,
   updateCurrencyHandler,
   activateOrDeactivateCurrencyHandler,
   getAllCurrenciesHandler,
@@ -3021,5 +3521,35 @@ module.exports = {
   createTaxHandler,
   updateTaxHandler,
   activateOrDeactivateTaxHandler,
-  getAllTaxesHandler
+  getAllTaxesHandler,
+
+  addClient,
+  updateClient,
+  activateDeactivateClient,
+  getClientsList,
+
+  addClientContact,
+  updateClientContact,
+  getClientContactsList,
+  activateDeactivateClientContact,
+
+  // Controller functions for client_bill_to_info
+  createClientBillTo,
+  updateClientBillTo,
+  activateDeactivateClientBillTo,
+  getClientBillTo,
+
+  // Controller functions for client_ship_to_info
+  createClientShipTo,
+  updateClientShipTo,
+  activateDeactivateClientShipTo,
+  getClientShipTo,
+
+
+  createClientGroup,
+  updateClientGroup,
+  activateDeactivateClientGroup,
+  getClientGroups,
+
+  updateMSAFile
 };
