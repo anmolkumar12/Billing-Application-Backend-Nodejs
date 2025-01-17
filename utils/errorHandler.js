@@ -43,8 +43,8 @@ const errorHandler = (apiType, err) => {
         break;
 
         case "company":
-            if (err.code === "ER_DUP_ENTRY" && err.sqlMessage.includes("companyName_UNIQUE")) {
-              message = "Duplicate entry: A Comapny with this name already exists.";
+            if (err.code === "ER_DUP_ENTRY" && err.sqlMessage.includes("unique_company_name_country")) {
+              message = "Duplicate entry: The combination of company name and country already exist ";
               statusCode = 409;
             } else {
               message = err.message || "Error processing region data.";
@@ -55,7 +55,7 @@ const errorHandler = (apiType, err) => {
         if (err.code === "ER_DUP_ENTRY" && err.sqlMessage.includes("unique_account_type_country")) {
           message = "Duplicate entry: The combination of account type and country already exists.";
           statusCode = 409;
-        } else {
+        } else {    
           message = err.message || "Error processing bank account type data.";
         }
         break;
@@ -100,6 +100,8 @@ const errorHandler = (apiType, err) => {
           message = "Duplicate entry: The combination of tech group, subgroup, and name already exists.";
           statusCode = 409;
         } else {
+            console.log('err.message',err.message);
+            console.log('err.sqlMessage',err.sqlMessage);
           message = err.message || "Error processing technology name data.";
         }
         break;

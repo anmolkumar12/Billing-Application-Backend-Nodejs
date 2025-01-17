@@ -114,7 +114,22 @@ const activateDeactivateCountryDetails = async (
 
 const getCountries = async () => {
   try {
-    const query = `SELECT * FROM country_info`;
+    const query = `
+      SELECT 
+        ci.id,
+        ci.code,
+        ci.name,
+        ci.language,
+        ci.phoneCode,
+        ci.addressAdditionalFields,
+        ci.bankAccAdditionalFields,
+        ci.companyAddtionalFields,
+        ci.isactive,
+        u.username AS updated_by,
+        ci.updated_at
+      FROM country_info ci
+      LEFT JOIN users u ON ci.updated_by = u.id
+    `;
 
     const [countries] = await db.execute(query);
     return countries;
@@ -123,6 +138,7 @@ const getCountries = async () => {
     throw err;
   }
 };
+
 
 // State
 const createState = async (
@@ -222,15 +238,22 @@ const getStates = async (countryId = null) => {
   try {
     // Define the base query with an INNER JOIN to include countryName
     let query = `
-      SELECT 
-        s.*, 
-        c.name 
-      FROM 
-        state_info s
-      INNER JOIN 
-        country_info c 
-      ON 
-        s.countryId = c.id
+SELECT 
+    s.*, 
+    c.name,
+    u.username AS updated_by
+FROM 
+    state_info s
+INNER JOIN 
+    country_info c 
+ON 
+    s.countryId = c.id
+LEFT JOIN 
+    users u
+ON 
+    s.updated_by = u.id;
+
+        
     `;
     const queryParams = [];
 
@@ -380,39 +403,44 @@ const activateDeactivateRegionDetails = async (
 
 const getRegions = async (countryId = null) => {
   try {
-    // Define the base query with joins to fetch country name and state names
-    let query = `
-      SELECT 
-        region_info.*, 
-        country_info.name AS countryName,
-        IFNULL(GROUP_CONCAT(state_info.stateName), 'No States') AS stateNames
-      FROM 
-        region_info
-      LEFT JOIN 
-        country_info 
-      ON 
-        region_info.countryId = country_info.id
-      LEFT JOIN 
-        state_info 
-      ON 
-        region_info.stateIds IS NOT NULL AND FIND_IN_SET(state_info.id, region_info.stateIds) > 0`;
+        // Define the base query with joins to fetch country name and state names
+        let query = `
+        SELECT 
+          region_info.*, 
+          country_info.name AS countryName,
+          IFNULL(GROUP_CONCAT(state_info.stateName), 'No States') AS stateNames,
+          u.username AS updated_by
+        FROM 
+          region_info
+        LEFT JOIN 
+          country_info 
+        ON 
+          region_info.countryId = country_info.id
+        LEFT JOIN 
+          state_info 
+        ON 
+          region_info.stateIds IS NOT NULL AND FIND_IN_SET(state_info.id, region_info.stateIds) > 0
+        LEFT JOIN 
+          users u
+        ON 
+          region_info.updated_by = u.id`;
 
+    // Add condition for filtering by `countryId`, if provided
     const queryParams = [];
-
-    // If countryId is provided, filter by it
     if (countryId) {
-      query += " WHERE region_info.countryId = ?";
-      queryParams.push(countryId);
+    query += " WHERE region_info.countryId = ?";
+    queryParams.push(countryId);
     }
 
-    // Group by region to aggregate state names
-    query += " GROUP BY region_info.id";
+    // Add GROUP BY clause
+    query += " GROUP BY region_info.id, country_info.name, u.username";
 
     // Debugging query output for validation
     console.log("Executing query:", query, "with params:", queryParams);
 
     // Execute the query with the appropriate parameters
     const [regions] = await db.execute(query, queryParams);
+
     return regions;
   } catch (err) {
     console.log("Error retrieving regions list:", err);
@@ -579,6 +607,7 @@ const getCompanies = async () => {
       SELECT 
         company_info.*, 
         parent_company.companyName AS parentCompanyName,
+        users.username as updated_by,
         country_info.name AS countryName
       FROM 
         company_info
@@ -589,7 +618,11 @@ const getCompanies = async () => {
       LEFT JOIN 
         country_info
       ON 
-        company_info.countryId = country_info.id`;
+        company_info.countryId = country_info.id
+        left join 
+        users
+        on users.id = company_info.updated_by
+        `;
 
     // Execute the query with no additional filtering
     const [companies] = await db.execute(query);
@@ -688,6 +721,7 @@ const getLocations = async (companyId = null) => {
       SELECT 
         company_location_info.*, 
         country_info.name AS countryName,
+        users.username as updated_by,
         state_info.stateName AS stateName,
         company_info.companyName  -- Include the company name here
       FROM 
@@ -697,7 +731,10 @@ const getLocations = async (companyId = null) => {
       LEFT JOIN 
         state_info ON company_location_info.stateId = state_info.id
       LEFT JOIN 
-        company_info ON company_location_info.companyId = company_info.id  -- Join with company_info table
+        company_info ON company_location_info.companyId = company_info.id 
+        LEFT JOIN users
+        on company_location_info.updated_by = users.id
+         -- Join with company_info table
     `;
 
     const queryParams = [];
@@ -834,11 +871,15 @@ const getBankAccountTypesList = async (countryId = null) => {
     let query = `
       SELECT 
         bank_account_type_info.*, 
-        country_info.name AS countryName
+        country_info.name AS countryName,
+        users.username as updated_by
       FROM 
         bank_account_type_info
       LEFT JOIN 
         country_info ON bank_account_type_info.countryId = country_info.id
+        LEFT JOIN
+        users 
+        on users.id = bank_account_type_info.updated_by
     `;
 
     const queryParams = [];
@@ -998,7 +1039,8 @@ const getCompanyAccountsList = async (companyId = null) => {
         company_account_info.*, 
         company_info.companyName,
         bank_account_type_info.accountTypeName,
-        country_info.name AS countryName
+        country_info.name AS countryName,
+        users.username as updated_by
       FROM 
         company_account_info
       LEFT JOIN 
@@ -1007,6 +1049,9 @@ const getCompanyAccountsList = async (companyId = null) => {
         bank_account_type_info ON company_account_info.bankAccountTypeId = bank_account_type_info.id
       LEFT JOIN 
         country_info ON company_account_info.countryId = country_info.id
+                LEFT JOIN
+        users 
+        on users.id = company_account_info.updated_by
     `;
 
     const queryParams = [];
@@ -1206,8 +1251,11 @@ const updateIndustryMasterStatus = async (
 const getIndustryMastersList = async () => {
   try {
     const query = `
-      SELECT * 
-      FROM industry_master_info;
+      SELECT industry_master_info.*,users.username as updated_by 
+      FROM industry_master_info
+              LEFT JOIN
+        users 
+        on users.id = industry_master_info.updated_by;
     `;
     const [industryMasters] = await db.execute(query);
 
@@ -1299,10 +1347,14 @@ const getGroupIndustriesList = async () => {
   try {
     const query = `
       SELECT group_industry_info.*, 
+      users.username as updated_by,
              (SELECT GROUP_CONCAT(industry_master_info.industryName) 
               FROM industry_master_info 
               WHERE FIND_IN_SET(industry_master_info.id, group_industry_info.industryIds)) AS industryNames
-      FROM group_industry_info
+      FROM group_industry_info   
+       LEFT JOIN
+        users 
+        on users.id = group_industry_info.updated_by
     `;
 
     const [groupIndustries] = await db.execute(query);
@@ -1443,7 +1495,7 @@ const updateIndustryHeadDetails = async (
 const updateIndustryHeadStatus = async (
   industryHeadId,
   isActive,
-  updatedBy
+  updatedBy,
 ) => {
   try {
     const query = `
@@ -1468,6 +1520,7 @@ const getIndustryHeadsList = async () => {
   try {
     const query = `
       SELECT industry_head_master.*, 
+              users.username as updated_by,
              (SELECT GROUP_CONCAT(industry_master_info.industryName) 
               FROM industry_master_info 
               WHERE FIND_IN_SET(industry_master_info.id, industry_head_master.industryIds)) AS industryNames,
@@ -1482,7 +1535,10 @@ const getIndustryHeadsList = async () => {
               WHERE FIND_IN_SET(state_info.id, industry_head_master.stateIds)) AS stateNames, company_info.companyName
       FROM industry_head_master
       LEFT JOIN 
-        company_info ON industry_head_master.companyId = company_info.id
+        company_info ON industry_head_master.companyId  = company_info.id
+        LEFT JOIN
+        users 
+        on users.id = industry_head_master.updated_by
     `;
 
     const [industryHeads] = await db.execute(query);
@@ -1569,16 +1625,17 @@ const updateSalesManagerDetails = async (
 const updateSalesManagerStatus = async (
   salesManagerId,
   isActive,
-  updatedBy
+  updatedBy,
+  deactivationDate
 ) => {
   try {
     const query = `
       UPDATE sales_manager_master
-      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP,deactivationDate = ?
       WHERE id = ?
     `;
 
-    await db.execute(query, [isActive, updatedBy, salesManagerId]);
+    await db.execute(query, [isActive, updatedBy,deactivationDate, salesManagerId]);
   } catch (err) {
     console.error("Error updating Sales Manager status:", err);
     throw err;
@@ -1589,12 +1646,16 @@ const getSalesManagersList = async () => {
   try {
     const query = `
       SELECT sales_manager_master.*, 
+      users.username as updated_by,
              (SELECT GROUP_CONCAT(industry_head_master.industryHeadName)
               FROM industry_head_master 
               WHERE FIND_IN_SET(industry_head_master.id, sales_manager_master.industryHeadIds)) AS industryHeadNames, company_info.companyName
       FROM sales_manager_master
       LEFT JOIN 
         company_info ON sales_manager_master.companyId = company_info.id
+    LEFT JOIN
+        users 
+        on users.id = sales_manager_master.updated_by
     `;
 
     const [salesManagers] = await db.execute(query);
@@ -1676,14 +1737,14 @@ const updateAccountManager = async (
   }
 };
 
-const activateOrDeactivateAccountManager = async (id, isActive, updatedBy) => {
+const activateOrDeactivateAccountManager = async (id, isActive, updatedBy,deactivationDate) => {
   try {
     const query = `
             UPDATE account_manager_master
-            SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+            SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP,deactivationDate = ?
             WHERE id = ?
         `;
-    await db.execute(query, [isActive, updatedBy, id]);
+    await db.execute(query, [isActive, updatedBy,deactivationDate, id]);
   } catch (err) {
     console.error("Error updating Account Manager status:", err);
     throw err;
@@ -1694,12 +1755,17 @@ const getAccountManagersList = async () => {
   try {
     const query = `
             SELECT account_manager_master.*, 
+            users.username as updated_by,
                    (SELECT GROUP_CONCAT(industry_head_master.industryHeadName) 
                     FROM industry_head_master 
                     WHERE FIND_IN_SET(industry_head_master.id, account_manager_master.industryHeadIds)) AS industryHeadNames, company_info.companyName
             FROM account_manager_master
             LEFT JOIN 
             company_info ON account_manager_master.companyId = company_info.id
+                    LEFT JOIN
+            users 
+            on users.id = account_manager_master.updated_by
+            
         `;
     const [accountManagers] = await db.execute(query);
     return accountManagers;
@@ -1787,9 +1853,12 @@ const activateDeactivateGroup = async (groupId, isActive, updatedBy) => {
 const getTechnologyGroupsList = async () => {
   try {
     const query = `
-      SELECT *
+      SELECT technology_group_info.*,users.username as updated_by
       FROM 
         technology_group_info
+                LEFT JOIN
+        users 
+        on users.id = technology_group_info.updated_by
     `;
 
     const [groups] = await db.execute(query);
@@ -1882,11 +1951,15 @@ const getAllTechnologySubgroups = async () => {
     const query = `
       SELECT 
         technology_subgroup_info.*, 
+        users.username as updated_by,
         (SELECT GROUP_CONCAT(technology_group_info.name) 
          FROM technology_group_info 
          WHERE technology_group_info.id = technology_subgroup_info.techGroupIds) AS techGroupNames
       FROM 
         technology_subgroup_info
+        LEFT JOIN
+        users 
+        on users.id = technology_subgroup_info.updated_by
     `;
 
     const [subgroups] = await db.execute(query);
@@ -1922,7 +1995,8 @@ const insertTechnologyName = async (
     return result;
   } catch (err) {
     console.log("Error inserting technology name:", err);
-    throw new Error("Error inserting technology name");
+    throw err;
+
   }
 };
 
@@ -1960,7 +2034,7 @@ const updateTechnologyNameDetails = async (
     return result;
   } catch (err) {
     console.log("Error updating technology name:", err);
-    throw new Error("Error updating technology name details");
+    throw err;
   }
 };
 
@@ -1988,6 +2062,7 @@ const getAllTechnologyNames = async () => {
     const query = `
       SELECT 
         technology_name_info.*, 
+        users.username as updated_by,
         (SELECT GROUP_CONCAT(technology_group_info.name) 
          FROM technology_group_info 
          WHERE FIND_IN_SET(technology_group_info.id, technology_name_info.techGroupIds)) AS techGroupNames,
@@ -1996,6 +2071,9 @@ const getAllTechnologyNames = async () => {
          WHERE FIND_IN_SET(technology_subgroup_info.id, technology_name_info.techSubgroupIds)) AS techSubgroupNames
       FROM 
         technology_name_info
+        LEFT JOIN
+        users 
+        on users.id = technology_name_info.updated_by
     `;
     const [names] = await db.execute(query);
     return names;
@@ -2009,7 +2087,7 @@ const getAllTechnologyNames = async () => {
 const insertOEM = async (oemName, type, productName, isActive, updatedBy) => {
   try {
     const query = `
-      INSERT INTO oem_info (oemName, type, productName, isActive, updatedBy, updated_at)
+      INSERT INTO oem_info (oemName, type, productName, isActive, updated_by, updated_at)
       VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
     const [result] = await db.execute(query, [
@@ -2022,7 +2100,7 @@ const insertOEM = async (oemName, type, productName, isActive, updatedBy) => {
     return result;
   } catch (err) {
     console.log("Error inserting OEM:", err);
-    throw new Error("Error inserting OEM");
+    throw err;
   }
 };
 
@@ -2042,7 +2120,7 @@ const updateOEMDetails = async (
         type = ?, 
         productName = ?, 
         isActive = ?, 
-        updatedBy = ?, 
+        updated_by = ?, 
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
@@ -2057,7 +2135,7 @@ const updateOEMDetails = async (
     return result;
   } catch (err) {
     console.log("Error updating OEM:", err);
-    throw new Error("Error updating OEM details");
+    throw err;
   }
 };
 
@@ -2065,7 +2143,7 @@ const activateDeactivateOEMStatus = async (id, isActive, updatedBy) => {
   try {
     const query = `
       UPDATE oem_info
-      SET isActive = ?, updatedBy = ?, updated_at = CURRENT_TIMESTAMP
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
     const [result] = await db.execute(query, [isActive, updatedBy, id]);
@@ -2079,7 +2157,9 @@ const activateDeactivateOEMStatus = async (id, isActive, updatedBy) => {
 const getAllOEMs = async () => {
   try {
     const query = `
-      SELECT * FROM oem_info
+      SELECT oem_info.*,users.username as updated_by FROM oem_info  LEFT JOIN
+        users 
+        on users.id = oem_info.updated_by
     `;
     const [oems] = await db.execute(query);
     return oems;
@@ -2098,7 +2178,7 @@ const insertPoleStarProduct = async (
 ) => {
   try {
     const query = `
-      INSERT INTO polestar_product_sales_master (productName, description, isActive, updatedBy, updated_at)
+      INSERT INTO polestar_product_sales_master (productName, description, isActive, updated_by, updated_at)
       VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
     const [result] = await db.execute(query, [
@@ -2110,7 +2190,7 @@ const insertPoleStarProduct = async (
     return result;
   } catch (err) {
     console.error("Error inserting PoleStar Product:", err);
-    throw new Error("Error inserting PoleStar Product");
+    throw err;
   }
 };
 
@@ -2128,7 +2208,7 @@ const updatePoleStarProductDetails = async (
         productName = ?, 
         description = ?, 
         isActive = ?, 
-        updatedBy = ?, 
+        updated_by = ?, 
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
@@ -2142,7 +2222,7 @@ const updatePoleStarProductDetails = async (
     return result;
   } catch (err) {
     console.error("Error updating PoleStar Product:", err);
-    throw new Error("Error updating PoleStar Product details");
+    throw err;
   }
 };
 
@@ -2154,7 +2234,7 @@ const activateDeactivatePoleStarProductStatus = async (
   try {
     const query = `
       UPDATE polestar_product_sales_master
-      SET isActive = ?, updatedBy = ?, updated_at = CURRENT_TIMESTAMP
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
     const [result] = await db.execute(query, [isActive, updatedBy, id]);
@@ -2168,7 +2248,10 @@ const activateDeactivatePoleStarProductStatus = async (
 const getAllPoleStarProducts = async () => {
   try {
     const query = `
-      SELECT * FROM polestar_product_sales_master
+      SELECT polestar_product_sales_master.*,users.username as updated_by FROM polestar_product_sales_master 
+      LEFT JOIN
+        users 
+        on users.id = polestar_product_sales_master.updated_by
     `;
     const [products] = await db.execute(query);
     return products;
@@ -2182,7 +2265,7 @@ const getAllPoleStarProducts = async () => {
 const insertProjectService = async (name, description, isActive, updatedBy) => {
   try {
     const query = `
-      INSERT INTO project_service_master (name, description, isActive, updatedBy, updated_at)
+      INSERT INTO project_service_master (name, description, isActive, updated_by, updated_at)
       VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
     const [result] = await db.execute(query, [
@@ -2194,7 +2277,7 @@ const insertProjectService = async (name, description, isActive, updatedBy) => {
     return result;
   } catch (err) {
     console.log("Error inserting Project/Service:", err);
-    throw new Error("Error inserting Project/Service");
+    throw err;
   }
 };
 
@@ -2212,7 +2295,7 @@ const updateProjectService = async (
         name = ?, 
         description = ?, 
         isActive = ?, 
-        updatedBy = ?, 
+        updated_by = ?, 
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
@@ -2226,7 +2309,7 @@ const updateProjectService = async (
     return result;
   } catch (err) {
     console.log("Error updating Project/Service:", err);
-    throw new Error("Error updating Project/Service details");
+    throw err;
   }
 };
 
@@ -2235,7 +2318,7 @@ const activateDeactivateProjectService = async (id, isActive, updatedBy) => {
   try {
     const query = `
       UPDATE project_service_master
-      SET isActive = ?, updatedBy = ?, updated_at = CURRENT_TIMESTAMP
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
     const [result] = await db.execute(query, [isActive, updatedBy, id]);
@@ -2249,7 +2332,10 @@ const activateDeactivateProjectService = async (id, isActive, updatedBy) => {
 const getAllProjectServices = async () => {
   try {
     const query = `
-      SELECT * FROM project_service_master
+      SELECT project_service_master.*,users.username as updated_by FROM project_service_master
+        LEFT JOIN
+        users 
+        on users.id = project_service_master.updated_by
     `;
     const [records] = await db.execute(query);
     return records;
@@ -2269,7 +2355,7 @@ const insertFinancialYear = async (
 ) => {
   try {
     const query = `
-      INSERT INTO financial_year_master (startYear, endYear, financialYearName, isActive, updatedBy, updated_at)
+      INSERT INTO financial_year_master (startYear, endYear, financialYearName, isActive, updated_by, updated_at)
       VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
     const [result] = await db.execute(query, [
@@ -2302,7 +2388,7 @@ const updateFinancialYear = async (
         endYear = ?, 
         financialYearName = ?, 
         isActive = ?, 
-        updatedBy = ?, 
+        updated_by = ?, 
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
@@ -2325,7 +2411,7 @@ const activateDeactivateFinancialYear = async (id, isActive, updatedBy) => {
   try {
     const query = `
       UPDATE financial_year_master
-      SET isActive = ?, updatedBy = ?, updated_at = CURRENT_TIMESTAMP
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
     const [result] = await db.execute(query, [isActive, updatedBy, id]);
@@ -2339,7 +2425,9 @@ const activateDeactivateFinancialYear = async (id, isActive, updatedBy) => {
 const getAllFinancialYears = async () => {
   try {
     const query = `
-      SELECT * FROM financial_year_master
+      SELECT financial_year_master.*,users.username as updated_by FROM financial_year_master LEFT JOIN
+        users 
+        on users.id = financial_year_master.updated_by
     `;
     const [records] = await db.execute(query);
     return records;
@@ -2545,19 +2633,22 @@ const updateRegionHeadDetails = async (
 const activateDeactivateRegionHeadDetails = async (
   regionHeadId,
   isActive,
-  updatedBy
+  updatedBy,
+  deactivationDate
 ) => {
   try {
     const query = `
       UPDATE region_head_info
-      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP,deactivationDate = ?
       WHERE id = ?
     `;
 
     const [result] = await db.execute(query, [
       isActive, // 1 for active, 0 for inactive
       updatedBy ?? null,
-      regionHeadId,
+      deactivationDate,
+      regionHeadId
+      
     ]);
 
     return result;
@@ -2572,6 +2663,7 @@ const getRegionHeads = async () => {
     const query = `
       SELECT 
         region_head_info.*, 
+        users.username as updated_by,
         country_info.name AS countryName,
         company_info.companyName,
         (SELECT GROUP_CONCAT(region_info.regionName) 
@@ -2590,6 +2682,9 @@ const getRegionHeads = async () => {
         company_info 
       ON 
         region_head_info.companyId = company_info.id
+        left join 
+        users
+        on region_head_info.updated_by = users.id
     `;
 
     const [regionHeads] = await db.execute(query);
@@ -2669,7 +2764,7 @@ const activateOrDeactivateCurrency = async (id, isActive, updatedBy) => {
 const getAllCurrencies = async () => {
   try {
     const query = `
-      SELECT * FROM currency_exchange_table
+      SELECT currency_exchange_table.*, 'cron service' as updated_by FROM currency_exchange_table
     `;
     const [records] = await db.execute(query);
     return records;
@@ -2697,7 +2792,7 @@ const getCurrencyHistory = async (data) => {
 const createTax = async (countryCode, taxType, taxFieldName, taxPercentage, updatedBy) => {
   try {
     const query = `
-      INSERT INTO tax_master (countryCode, taxType, taxFieldName, taxPercentage, updatedBy, created_at)
+      INSERT INTO tax_master (countryCode, taxType, taxFieldName, taxPercentage, updated_by, created_at)
       VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
     const [result] = await db.execute(query, [
@@ -2723,7 +2818,7 @@ const updateTax = async (id, countryCode, taxType, taxFieldName, taxPercentage, 
         taxType = ?, 
         taxFieldName = ?, 
         taxPercentage = ?, 
-        updatedBy = ?, 
+        updated_by = ?, 
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
@@ -2746,7 +2841,7 @@ const activateOrDeactivateTax = async (id, isActive, updatedBy) => {
   try {
     const query = `
       UPDATE tax_master
-      SET isActive = ?, updatedBy = ?, updated_at = CURRENT_TIMESTAMP
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
     const [result] = await db.execute(query, [isActive, updatedBy, id]);
@@ -2760,7 +2855,10 @@ const activateOrDeactivateTax = async (id, isActive, updatedBy) => {
 const getAllTaxes = async () => {
   try {
     const query = `
-      SELECT tm.*,cf.name as countryName FROM tax_master tm inner join country_info cf on tm.countryCode = cf.id;
+      SELECT tm.*,cf.name as countryName,users.username as updated_by FROM tax_master tm inner join country_info cf on tm.countryCode = cf.id  
+       LEFT JOIN
+        users 
+        on users.id = tm.updated_by;
     `;
     const [records] = await db.execute(query);
     return records;

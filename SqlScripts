@@ -229,8 +229,8 @@ REATE TABLE project_service_master (
 );
 CREATE TABLE financial_year_master (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  startYear INT NOT NULL,
-  endYear INT NOT NULL,
+  startYear VARCHAR(255) NOT NULL,
+  endYear VARCHAR(255) NOT NULL,
   financialYearName VARCHAR(255) NOT NULL,
   isActive TINYINT(1) DEFAULT 1,
   updatedBy INT NOT NULL,
@@ -282,10 +282,6 @@ ADD UNIQUE INDEX `stateCode_UNIQUE` (`stateCode` ASC) VISIBLE;
 ALTER TABLE `ims_backend`.`region_info` 
 ADD UNIQUE INDEX `regionCode_UNIQUE` (`regionCode` ASC) VISIBLE;
 
--- ALTER TABLE `ims_backend`.`company_info` 
--- ADD UNIQUE INDEX `companyName_UNIQUE` (`companyName` ASC) VISIBLE,
--- ADD UNIQUE INDEX `countryId_UNIQUE` (`countryId` ASC) VISIBLE;
--- ;
 
 ALTER TABLE `bank_account_type_info`
 ADD CONSTRAINT `unique_account_type_country` UNIQUE (`accountTypeName`, `countryId`);
@@ -312,6 +308,44 @@ ADD UNIQUE INDEX `productName_UNIQUE` (`productName` ASC) VISIBLE;
 
 ALTER TABLE `ims_backend`.`project_service_master` 
 ADD UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE;
+
+--   BELOW QUERY CREATED BY ARJUN ON 16-01-2025
+ALTER TABLE company_info 
+ADD CONSTRAINT `unique_company_name_country` UNIQUE (`companyName`, `countryId`);
+
+ALTER TABLE `ims_backend`.`sales_manager_master` 
+ADD COLUMN `deactivationDate` VARCHAR(100) NULL DEFAULT NULL ;
+
+ALTER TABLE `ims_backend`.`account_manager_master` 
+ADD COLUMN `deactivationDate` VARCHAR(100) NULL DEFAULT NULL ;
+
+ALTER TABLE `ims_backend`.`industry_head_master` 
+ADD COLUMN `deactivationDate` VARCHAR(100) NULL DEFAULT NULL ;
+
+--   BELOW QUERY CREATED BY ARJUN ON 17-01-2025
+
+ALTER TABLE `ims_backend`.`region_head_info` 
+ADD COLUMN `deactivationDate` VARCHAR(100) NULL DEFAULT NULL AFTER `updated_at`;
+
+
+alter table technology_name_info
+change column updatedBy updated_by int not null;
+
+ALTER TABLE oem_info
+CHANGE COLUMN updatedBy updated_by INT NOT NULL;
+
+ALTER TABLE polestar_product_sales_master
+CHANGE COLUMN updatedBy updated_by INT NOT NULL;
+
+ALTER TABLE project_service_master
+CHANGE COLUMN updatedBy updated_by INT NOT NULL;
+
+ALTER TABLE financial_year_master
+CHANGE COLUMN updatedBy updated_by INT NOT NULL;
+
+ALTER TABLE tax_master
+CHANGE COLUMN updatedBy updated_by INT NOT NULL;
+
 
 
 
