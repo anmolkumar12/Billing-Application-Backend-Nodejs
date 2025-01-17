@@ -1507,17 +1507,17 @@ const updateIndustryHead = async (req, res) => {
 };
 
 const activateOrDeactivateIndustryHead = async (req, res) => {
-  const { industryHeadId, isActive, updatedBy,deactivationDate } = req.body;
+  const { industryHeadId, isActive, updatedBy } = req.body;
 
   if (!industryHeadId || isActive === undefined) {
     return res.status(400).json({
       statusCode: 400,
-      message: "Industry Head ID and deactivation date are required",
+      message: "Industry Head ID  are required",
     });
   }
 
   try {
-    await updateIndustryHeadStatus(industryHeadId, isActive, updatedBy,deactivationDate);
+    await updateIndustryHeadStatus(industryHeadId, isActive, updatedBy);
 
     res.status(200).json({
       statusCode: 200,
@@ -2618,13 +2618,14 @@ const updateRegionHead = async (req, res) => {
 };
 
 const activateDeactivateRegionHead = async (req, res) => {
-  const { regionHeadId, isActive, updatedBy } = req.body;
+  const { regionHeadId, isActive, updatedBy,deactivationDate } = req.body;
 
   try {
     await activateDeactivateRegionHeadDetails(
       regionHeadId,
       isActive,
-      updatedBy
+      updatedBy,
+      deactivationDate
     );
     res.status(200).json({
       statusCode: 200,
