@@ -4,7 +4,8 @@
   "description": "This is the IMS",
   "main": "app.js",
   "scripts": {
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "start":"nodemon app.js"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +29,7 @@
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.11.3",
     "node-cron": "^3.0.3",
+    "nodemon": "^3.1.9",
     "p-limit": "^6.1.0",
     "patch-package": "^8.0.0",
     "postinstall-postinstall": "^2.1.0",

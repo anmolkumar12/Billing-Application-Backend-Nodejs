@@ -309,7 +309,7 @@ ADD UNIQUE INDEX `productName_UNIQUE` (`productName` ASC) VISIBLE;
 ALTER TABLE `ims_backend`.`project_service_master` 
 ADD UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE;
 
---   BELOW QUERY CREATED ON 16-01-2025
+--   BELOW QUERY CREATED BY ARJUN ON 16-01-2025
 ALTER TABLE company_info 
 ADD CONSTRAINT `unique_company_name_country` UNIQUE (`companyName`, `countryId`);
 
@@ -322,8 +322,32 @@ ADD COLUMN `deactivationDate` VARCHAR(100) NULL DEFAULT NULL ;
 ALTER TABLE `ims_backend`.`industry_head_master` 
 ADD COLUMN `deactivationDate` VARCHAR(100) NULL DEFAULT NULL ;
 
+--   BELOW QUERY CREATED BY ARJUN ON 17-01-2025
+
+ALTER TABLE `ims_backend`.`region_head_info` 
+ADD COLUMN `deactivationDate` VARCHAR(100) NULL DEFAULT NULL AFTER `updated_at`;
+
+
+alter table technology_name_info
+change column updatedBy updated_by int not null;
+
+ALTER TABLE oem_info
+CHANGE COLUMN updatedBy updated_by INT NOT NULL;
+
+ALTER TABLE polestar_product_sales_master
+CHANGE COLUMN updatedBy updated_by INT NOT NULL;
+
+ALTER TABLE project_service_master
+CHANGE COLUMN updatedBy updated_by INT NOT NULL;
+
+ALTER TABLE financial_year_master
+CHANGE COLUMN updatedBy updated_by INT NOT NULL;
+
+ALTER TABLE tax_master
+CHANGE COLUMN updatedBy updated_by INT NOT NULL;
 
 
 
 
--- REMAINING Sub Industry
+
+
