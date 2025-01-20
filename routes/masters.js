@@ -138,7 +138,7 @@ const {
   updateClientGroup,
   activateDeactivateClientGroup,
   getClientGroups,
-
+  
   updateMSAFile
 
 } = require("../controllers/masterController");
@@ -437,7 +437,7 @@ router.post(
   updateClient
 );
 
-router.post("/activateDeactivateClient", authMiddleware, activateDeactivateClient);
+router.post("/toggleClientsActiveStatus", authMiddleware, activateDeactivateClient);
 
 router.post("/getClientsList", authMiddleware, getClientsList);
 
@@ -464,6 +464,12 @@ router.post('/updateClientGroup', authMiddleware, updateClientGroup);
 router.post('/activateDeactivateClientGroup', authMiddleware, activateDeactivateClientGroup);
 router.get('/getClientGroups', authMiddleware, getClientGroups);
 
-
+// API for updating MSA file
+// router.post("/updateMSAFile", authMiddleware, upload.single("msaFile"), updateMSAFile);
+router.post(
+  "/updateMSAFile",
+  upload.single("msaFile"),
+  updateMSAFile
+);
 
 module.exports = router;

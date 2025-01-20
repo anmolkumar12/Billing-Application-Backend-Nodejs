@@ -472,4 +472,7 @@ ADD COLUMN msa_document_id INT DEFAULT NULL,
 ADD FOREIGN KEY (msa_document_id) REFERENCES msa_documents(id);
 
 
+ALTER TABLE msa_documents ADD COLUMN updated_by INT NULL AFTER end_date;
+ALTER TABLE client_info MODIFY countryId INT NULL;
+
 -- REMAINING Sub Industry

@@ -1497,7 +1497,7 @@ const updateIndustryHead = async (req, res) => {
   }
 
   try {
-    await updateIndustryHeadDetails(
+    const finalResult = await updateIndustryHeadDetails(
       companyId,
       industryHeadId,
       industryHeadName,
@@ -1512,10 +1512,23 @@ const updateIndustryHead = async (req, res) => {
       isActive
     );
 
-    res.status(200).json({
-      statusCode: 200,
-      message: "Industry Head updated successfully",
-    });
+    if (finalResult && finalResult.status == 'existing') {
+      res.status(400).json({
+        statusCode: 400,
+        // message: `This region already has a region head ${finalResult.existingRegionHead}`,
+        message: finalResult.conflictMessage
+      });
+    } else {
+      // res.status(201).json({
+      //   statusCode: 201,
+      //   message: "Industry Head created successfully",
+      // });
+      res.status(200).json({
+        statusCode: 200,
+        message: "Industry Head updated successfully",
+      });
+    }
+
   } catch (err) {
     console.error("Error updating industry head:", err);
     res.status(500).json({
@@ -2932,6 +2945,7 @@ const addClient = async (req, res) => {
     nda_flag,
     non_solicitation_clause_flag,
     use_logo_permission_flag,
+    isActive,
     updated_by,
   } = req.body;
 
@@ -2960,6 +2974,7 @@ const addClient = async (req, res) => {
       nda_flag,
       non_solicitation_clause_flag,
       use_logo_permission_flag,
+      isActive,
       updated_by,
       msaFilePath,
       ndaFilePath
@@ -3376,7 +3391,31 @@ const getClientGroups = async (req, res) => {
 };
 
 
+const updateMSAFile = async (req, res) => {
+  const { clientId, start_date, end_date, updated_by } = req.body;
+  const msaFile = req.file ? req.file.path.replace(/\\/g, "/") : null;
 
+  if (!clientId || !start_date || !end_date || !msaFile) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Missing required fields: clientId, start_date, end_date, msaFile",
+    });
+  }
+
+  try {
+    const result = await updateClientMSA(clientId, start_date, end_date, msaFile, updated_by);
+    res.status(201).json({
+      statusCode: 201,
+      message: "MSA file updated successfully",
+    });
+  } catch (err) {
+    console.error("Error updating MSA file:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Failed to update MSA file",
+    });
+  }
+};
 
 
 
@@ -3530,5 +3569,5 @@ module.exports = {
   activateDeactivateClientGroup,
   getClientGroups,
 
-  // updateMSAFile
+  updateMSAFile
 };

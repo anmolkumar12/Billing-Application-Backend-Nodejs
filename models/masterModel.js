@@ -251,7 +251,7 @@ ON
 LEFT JOIN 
     users u
 ON 
-    s.updated_by = u.id;
+    s.updated_by = u.id
 
         
     `;
@@ -1410,22 +1410,62 @@ const insertIndustryHead = async (
     }
 
     // Check for existing stateIds
+    // if (!isRegionWise && stateIdArray.length > 0) {
+    //   const [existingStates] = await db.execute(
+    //     `SELECT stateIds, industryHeadName FROM industry_head_master WHERE isRegionWise = 0 AND companyId = ?`,
+    //     [companyId]
+    //   );
+
+    //   for (const record of existingStates) {
+    //     const existingStateIds = record.stateIds ? record.stateIds.split(",").map(id => id.trim()) : [];
+    //     const overlapStates = stateIdArray.filter(id => existingStateIds.includes(id));
+    //     console.log('overlapStates', overlapStates);
+
+    //     if (overlapStates.length > 0) {
+    //       return { status: 'existing', conflictMessage: `State ID(s) ${overlapStates.join(", ")} already allocated to ${record.industryHeadName}` }
+    //     }
+    //   }
+    // }
+
     if (!isRegionWise && stateIdArray.length > 0) {
       const [existingStates] = await db.execute(
-        `SELECT stateIds, industryHeadName FROM industry_head_master WHERE isRegionWise = 0 AND companyId = ?`,
+        `SELECT 
+            ihm.stateIds, 
+            ihm.industryHeadName, 
+            s.id AS stateId, 
+            s.stateName 
+         FROM 
+            industry_head_master ihm 
+         JOIN 
+            state_info s 
+         ON 
+            FIND_IN_SET(s.id, ihm.stateIds) 
+         WHERE 
+            ihm.isRegionWise = 0 
+            AND ihm.companyId = ?`,
         [companyId]
       );
-
+    
       for (const record of existingStates) {
-        const existingStateIds = record.stateIds ? record.stateIds.split(",").map(id => id.trim()) : [];
+        const existingStateIds = record.stateIds
+          ? record.stateIds.split(",").map(id => id.trim())
+          : [];
         const overlapStates = stateIdArray.filter(id => existingStateIds.includes(id));
-        console.log('overlapStates', overlapStates);
-
+        
         if (overlapStates.length > 0) {
-          return { status: 'existing', conflictMessage: `State ID(s) ${overlapStates.join(", ")} already allocated to ${record.industryHeadName}` }
+          const overlappingStateNames = existingStates
+  .filter(r => overlapStates.includes(String(r.stateId))) // Match `stateId` with `overlapStates`
+  .map(r => r.stateName);
+          console.log('overlappingStateNames', overlapStates, existingStates);
+    
+          return {
+            status: 'existing',
+            conflictMessage: `State ${overlappingStateNames.join(", ")} already allocated to ${record.industryHeadName}`
+          };
         }
       }
     }
+    
 
     const query = `
       INSERT INTO industry_head_master 
@@ -1452,6 +1492,48 @@ const insertIndustryHead = async (
   }
 };
 
+// const updateIndustryHeadDetails = async (
+//   companyId,
+//   industryHeadId,
+//   industryHeadName,
+//   industryIds,
+//   isRegionWise,
+//   countryIds,
+//   regionIds,
+//   stateIds,
+//   startDate,
+//   endDate,
+//   updatedBy,
+//   isActive
+// ) => {
+//   try {
+//     const query = `
+//       UPDATE industry_head_master
+//       SET companyId = ?, industryHeadName = ?, industryIds = ?, isRegionWise = ?, countryIds = ?, regionIds = ?, stateIds = ?, startDate = ?, endDate = ?, updated_by = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
+//       WHERE id = ?
+//     `;
+
+//     await db.execute(query, [
+//       companyId,
+//       industryHeadName,
+//       industryIds,
+//       isRegionWise,
+//       countryIds,
+//       isRegionWise ? regionIds : null,
+//       !isRegionWise ? stateIds : null,
+//       startDate,
+//       endDate,
+//       updatedBy,
+//       isActive,
+//       industryHeadId,
+//     ]);
+//   } catch (err) {
+//     console.error("Error updating industry head:", err);
+//     throw err;
+//   }
+// };
+
+
 const updateIndustryHeadDetails = async (
   companyId,
   industryHeadId,
@@ -1467,6 +1549,41 @@ const updateIndustryHeadDetails = async (
   isActive
 ) => {
   try {
+    const regionIdArray = regionIds ? String(regionIds).split(",").map(id => id.trim()) : [];
+    const stateIdArray = stateIds ? String(stateIds).split(",").map(id => id.trim()) : [];
+
+    // Check for overlapping states
+    if (!isRegionWise && stateIdArray.length > 0) {
+      const [existingStates] = await db.execute(
+        `SELECT industry_head_master.stateIds, industry_head_master.industryHeadName, 
+                industry_head_master.id AS industryHeadId, 
+                s.id AS stateId, s.stateName
+         FROM industry_head_master 
+         JOIN state_info s ON FIND_IN_SET(s.id, industry_head_master.stateIds)
+         WHERE industry_head_master.isRegionWise = 0 
+         AND industry_head_master.companyId = ?
+         AND industry_head_master.id != ?`, // Exclude the current record
+        [companyId, industryHeadId]
+      );
+
+      for (const record of existingStates) {
+        const existingStateIds = record.stateIds ? record.stateIds.split(",").map(id => id.trim()) : [];
+        const overlapStates = stateIdArray.filter(id => existingStateIds.includes(id));
+
+        if (overlapStates.length > 0) {
+          const overlappingStateNames = [...new Set(existingStates
+            .filter(r => overlapStates.includes(String(r.stateId)))
+            .map(r => r.stateName))];
+
+          return {
+            status: 'existing',
+            conflictMessage: `State ${overlappingStateNames.join(", ")} already allocated to ${record.industryHeadName}`
+          };
+        }
+      }
+    }
+
+    // Proceed with updating the record
     const query = `
       UPDATE industry_head_master
       SET companyId = ?, industryHeadName = ?, industryIds = ?, isRegionWise = ?, countryIds = ?, regionIds = ?, stateIds = ?, startDate = ?, endDate = ?, updated_by = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
@@ -1474,6 +1591,7 @@ const updateIndustryHeadDetails = async (
     `;
 
     await db.execute(query, [
+      companyId,
       industryHeadName,
       industryIds,
       isRegionWise,
@@ -1486,11 +1604,14 @@ const updateIndustryHeadDetails = async (
       isActive,
       industryHeadId,
     ]);
+
+    return { status: 'success', message: 'Industry head updated successfully' };
   } catch (err) {
     console.error("Error updating industry head:", err);
     throw err;
   }
 };
+
 
 const updateIndustryHeadStatus = async (
   industryHeadId,
@@ -1521,9 +1642,9 @@ const getIndustryHeadsList = async () => {
     const query = `
       SELECT industry_head_master.*, 
               users.username as updated_by,
-             (SELECT GROUP_CONCAT(industry_master_info.industryName) 
-              FROM industry_master_info 
-              WHERE FIND_IN_SET(industry_master_info.id, industry_head_master.industryIds)) AS industryNames,
+             (SELECT GROUP_CONCAT(group_industry_info.groupIndustryName) 
+              FROM group_industry_info 
+              WHERE FIND_IN_SET(group_industry_info.id, industry_head_master.industryIds)) AS industryNames,
              (SELECT GROUP_CONCAT(country_info.name) 
               FROM country_info 
               WHERE FIND_IN_SET(country_info.id, industry_head_master.countryIds)) AS countryNames,
@@ -2964,9 +3085,10 @@ const createClient = async (
   nda_flag,
   non_solicitation_clause_flag,
   use_logo_permission_flag,
+  isActive,
   updated_by,
   msaFilePath,
-  ndaFilePath
+  ndaFilePath,
 ) => {
   const connection = await db.getConnection(); // Use a transaction for safety
 
@@ -3000,8 +3122,8 @@ const createClient = async (
         countryId, companyId, accountId, industryId, IndustryHeadId, 
         IndustryGroupId, IndustrySubGroupId, salesMangerId, accountManagerId, msa_start_date, 
         msa_end_date, msa_flag, nda_flag, non_solicitation_clause_flag, 
-        use_logo_permission_flag, msaFilePath, ndaFilePath, msa_document_id, updated_by, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        use_logo_permission_flag,isActive, msaFilePath, ndaFilePath, msa_document_id, updated_by, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     const sanitizedClientValues = [
@@ -3025,6 +3147,7 @@ const createClient = async (
       nda_flag ?? null,
       non_solicitation_clause_flag ?? null,
       use_logo_permission_flag ?? null,
+      isActive ?? 1,
       msaFilePath ?? null,
       ndaFilePath ?? null,
       msaDocumentId,
@@ -3085,8 +3208,28 @@ const updateClientDetails = async (
   msaFilePath,
   ndaFilePath
 ) => {
+  const connection = await db.getConnection();
+
   try {
-    const query = `
+    await connection.beginTransaction();
+
+    // Update msa_documents if msaFilePath exists
+    if (msaFilePath) {
+      const msaUpdateQuery = `
+        UPDATE msa_documents
+        SET msa_doc_url = ?, start_date = ?, end_date = ?
+        WHERE client_id = ?
+      `;
+      await connection.execute(msaUpdateQuery, [
+        msaFilePath,
+        msa_start_date ?? null,
+        msa_end_date ?? null,
+        clientId,
+      ]);
+    }
+
+    // Update client_info
+    const clientUpdateQuery = `
       UPDATE client_info
       SET 
         client_name = ?, 
@@ -3116,39 +3259,47 @@ const updateClientDetails = async (
       WHERE id = ?
     `;
 
-    const [result] = await db.execute(query, [
-      client_name,
-      vega_client_name,
-      client_type,
-      credit_period,
-      client_status,
-      countryId,
-      companyId,
-      accountId,
-      industryId,
-      IndustryHeadId,
-      IndustryGroupId,
-      IndustrySubGroupId,
-      salesMangerId,
-      accountManagerId,
-      msa_start_date,
-      msa_end_date,
-      msa_flag,
-      nda_flag,
-      non_solicitation_clause_flag,
-      use_logo_permission_flag,
-      msaFilePath,
-      ndaFilePath,
-      updated_by,
-      clientId,
-    ]);
+// Replace undefined or invalid values with null
+const sanitizedClientValues = [
+  client_name ?? null,
+  vega_client_name ?? null,
+  client_type ?? null,
+  credit_period ?? null,
+  client_status ?? null,
+  countryId ?? null,
+  companyId ?? null,
+  accountId ?? null,
+  industryId ?? null,
+  IndustryHeadId ?? null,
+  IndustryGroupId ?? null,
+  IndustrySubGroupId ?? null,
+  salesMangerId ?? null,
+  accountManagerId ?? null,
+  msa_start_date ?? null,
+  msa_end_date ?? null,
+  msa_flag ?? null,
+  nda_flag ?? null,
+  non_solicitation_clause_flag ?? null,
+  use_logo_permission_flag ?? null,
+  msaFilePath ?? null,
+  ndaFilePath ?? null,
+  updated_by ?? null,
+  clientId,
+];
 
-    return result;
+    await connection.execute(clientUpdateQuery, sanitizedClientValues);
+
+    await connection.commit();
   } catch (err) {
+    await connection.rollback();
     console.error("Error updating client:", err);
     throw err;
+  } finally {
+    connection.release();
   }
 };
+
+
 
 // Activate/Deactivate client
 const activateDeactivateClientDetails = async (clientId, isActive, updated_by) => {
@@ -3214,7 +3365,13 @@ const getClients = async () => {
               WHERE FIND_IN_SET(country_info.id, client_info.countryId)) AS countryName,
         (SELECT GROUP_CONCAT(account_manager_master.name) 
               FROM account_manager_master 
-              WHERE FIND_IN_SET(account_manager_master.id, client_info.accountManagerId)) AS accountManagerNames
+              WHERE FIND_IN_SET(account_manager_master.id, client_info.accountManagerId)) AS accountManagerNames,
+        (SELECT GROUP_CONCAT(company_account_info.bankName) 
+              FROM company_account_info 
+              WHERE FIND_IN_SET(company_account_info.id, client_info.accountId)) AS bankName,
+        (SELECT GROUP_CONCAT(sales_manager_master.name) 
+              FROM sales_manager_master 
+              WHERE FIND_IN_SET(sales_manager_master.id, client_info.salesMangerId)) AS salesMangerName
       FROM client_info
     `;
 
