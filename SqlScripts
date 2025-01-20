@@ -360,3 +360,125 @@ CREATE TABLE client_type_master (
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE TABLE client_contact (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    client_selection INT NOT NULL,
+    salutation ENUM('Mr.', 'Ms.', 'Mrs.') DEFAULT NULL,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    phone_number VARCHAR(15) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (client_selection) REFERENCES client_info(id)
+);
+
+CREATE TABLE client_bill_to_info (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  clientId INT NOT NULL,
+  countryId INT,
+  stateId INT ,
+  address1 VARCHAR(255) NOT NULL,
+  address2 VARCHAR(255),
+  address3 VARCHAR(255),
+  additionalAddressDetails TEXT,
+  isActive TINYINT(1) DEFAULT 1,
+  updated_by INT,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (clientId) REFERENCES company_info(id) ON DELETE CASCADE,
+  FOREIGN KEY (countryId) REFERENCES country_info(id) ON DELETE CASCADE,
+  FOREIGN KEY (stateId) REFERENCES state_info(id) ON DELETE CASCADE
+);
+CREATE TABLE client_ship_to_info (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  clientId INT NOT NULL,
+  countryId INT,
+  stateId INT ,
+  address1 VARCHAR(255) NOT NULL,
+  address2 VARCHAR(255),
+  address3 VARCHAR(255),
+  additionalAddressDetails TEXT,
+  isActive TINYINT(1) DEFAULT 1,
+  updated_by INT,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (clientId) REFERENCES company_info(id) ON DELETE CASCADE,
+  FOREIGN KEY (countryId) REFERENCES country_info(id) ON DELETE CASCADE,
+  FOREIGN KEY (stateId) REFERENCES state_info(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE client_info (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  client_name VARCHAR(255),
+  vega_client_name VARCHAR(255),
+  client_type VARCHAR(50),
+  credit_period INT,
+  client_status VARCHAR(50),
+  country_name VARCHAR(255),
+  companyId INT,
+  account_selection VARCHAR(255),
+  industryId INT,
+  industryHeadNames VARCHAR(255),
+  industry_group VARCHAR(255),
+  industry_sub_group VARCHAR(255),
+  sales_person VARCHAR(255),
+  account_manager VARCHAR(255),
+  msa_start_date DATE,
+  msa_end_date DATE,
+  is_msa_missing TINYINT(1),
+  nda_flag TINYINT(1),
+  non_solicitation_clause TINYINT(1),
+  use_logo_permission TINYINT(1),
+  msaFilePath VARCHAR(255),
+  ndaFilePath VARCHAR(255),
+  updated_by INT,
+  isActive TINYINT(1),
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE client_group_info (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    groupName VARCHAR(255) NOT NULL,
+    clientIds VARCHAR(255) NOT NULL,
+    isActive TINYINT(1) DEFAULT 1, -- 1 for active, 0 for inactive
+    updated_by INT NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE msa_documents (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    msa_doc_url VARCHAR(255) NOT NULL,
+    start_date DATE,
+    end_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by INT,
+    client_id INT,
+    FOREIGN KEY (client_id) REFERENCES client_info(id) 
+);
+
+
+ALTER TABLE client_info
+ADD COLUMN msa_document_id INT DEFAULT NULL,
+ADD FOREIGN KEY (msa_document_id) REFERENCES msa_documents(id);
+
+
+-- REMAINING Sub Industry

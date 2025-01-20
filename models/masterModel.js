@@ -1422,7 +1422,7 @@ const insertIndustryHead = async (
         console.log('overlapStates', overlapStates);
 
         if (overlapStates.length > 0) {
-          return { status: 'existing states', conflictMessage: `State ID(s) ${overlapStates.join(", ")} already allocated to ${record.industryHeadName}` }
+          return { status: 'existing', conflictMessage: `State ID(s) ${overlapStates.join(", ")} already allocated to ${record.industryHeadName}` }
         }
       }
     }
@@ -2933,6 +2933,861 @@ const getAllClientTypes = async () => {
 
 
 
+// Create a new client
+// const createClient = async (
+//   client_name,
+//   vega_client_name,
+//   client_type,
+//   credit_period,
+//   client_status,
+//   countryId,
+//   companyId,
+//   accountId,
+//   industryId,
+//   IndustryHeadId,
+//   IndustryGroupId,
+//   IndustrySubGroupId,
+//   salesMangerId,
+//   accountManagerId,
+//   msa_start_date,
+//   msa_end_date,
+//   msa_flag,
+//   nda_flag,
+//   non_solicitation_clause_flag,
+//   use_logo_permission_flag,
+//   updated_by,
+//   msaFilePath,
+//   ndaFilePath
+// ) => {
+//   try {
+//     const sanitizedValues = [
+//       client_name ?? null,
+//       vega_client_name ?? null,
+//       client_type ?? null,
+//       credit_period ?? null,
+//       client_status ?? null,
+//       countryId ?? null,
+//       companyId ?? null,
+//       accountId ?? null,
+//       industryId ?? null,
+//       IndustryHeadId ?? null,
+//       IndustryGroupId ?? null,
+//       IndustrySubGroupId ?? null,
+//       salesMangerId ?? null,
+//       accountManagerId ?? null,
+//       msa_start_date ?? null,
+//       msa_end_date ?? null,
+//       msa_flag ?? null,
+//       nda_flag ?? null,
+//       non_solicitation_clause_flag ?? null,
+//       use_logo_permission_flag ?? null,
+//       msaFilePath ?? null,
+//       ndaFilePath ?? null,
+//       updated_by ?? null,
+//     ];
+
+//     const query = `
+//       INSERT INTO client_info (
+//         client_name, vega_client_name, client_type, credit_period, client_status, 
+//         countryId, companyId, accountId, industryId, IndustryHeadId, 
+//         IndustryGroupId, IndustrySubGroupId, salesMangerId, accountManagerId, msa_start_date, 
+//         msa_end_date, msa_flag, nda_flag, non_solicitation_clause_flag, 
+//         use_logo_permission_flag, msaFilePath, ndaFilePath, updated_by, updated_at
+//       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+//     `;
+
+//     const [result] = await db.execute(query, sanitizedValues);
+
+//     return result;
+//   } catch (err) {
+//     console.error("Error creating client:", err);
+//     throw err;
+//   }
+// };
+
+
+// Create a new client
+const createClient = async (
+  client_name,
+  vega_client_name,
+  client_type,
+  credit_period,
+  client_status,
+  countryId,
+  companyId,
+  accountId,
+  industryId,
+  IndustryHeadId,
+  IndustryGroupId,
+  IndustrySubGroupId,
+  salesMangerId,
+  accountManagerId,
+  msa_start_date,
+  msa_end_date,
+  msa_flag,
+  nda_flag,
+  non_solicitation_clause_flag,
+  use_logo_permission_flag,
+  updated_by,
+  msaFilePath,
+  ndaFilePath
+) => {
+  const connection = await db.getConnection(); // Use a transaction for safety
+
+  try {
+    await connection.beginTransaction();
+
+    let msaDocumentId = null;
+
+    // Insert into msa_documents if msaFilePath exists
+    if (msaFilePath) {
+      const msaQuery = `
+        INSERT INTO msa_documents (
+          msa_doc_url, start_date, end_date, created_by, client_id
+        ) VALUES (?, ?, ?, ?, NULL)
+      `;
+
+      const [msaResult] = await connection.execute(msaQuery, [
+        msaFilePath,
+        msa_start_date ?? null,
+        msa_end_date ?? null,
+        updated_by ?? null,
+      ]);
+
+      msaDocumentId = msaResult.insertId;
+    }
+
+    // Insert into client_info
+    const clientQuery = `
+      INSERT INTO client_info (
+        client_name, vega_client_name, client_type, credit_period, client_status, 
+        countryId, companyId, accountId, industryId, IndustryHeadId, 
+        IndustryGroupId, IndustrySubGroupId, salesMangerId, accountManagerId, msa_start_date, 
+        msa_end_date, msa_flag, nda_flag, non_solicitation_clause_flag, 
+        use_logo_permission_flag, msaFilePath, ndaFilePath, msa_document_id, updated_by, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+
+    const sanitizedClientValues = [
+      client_name ?? null,
+      vega_client_name ?? null,
+      client_type ?? null,
+      credit_period ?? null,
+      client_status ?? null,
+      countryId ?? null,
+      companyId ?? null,
+      accountId ?? null,
+      industryId ?? null,
+      IndustryHeadId ?? null,
+      IndustryGroupId ?? null,
+      IndustrySubGroupId ?? null,
+      salesMangerId ?? null,
+      accountManagerId ?? null,
+      msa_start_date ?? null,
+      msa_end_date ?? null,
+      msa_flag ?? null,
+      nda_flag ?? null,
+      non_solicitation_clause_flag ?? null,
+      use_logo_permission_flag ?? null,
+      msaFilePath ?? null,
+      ndaFilePath ?? null,
+      msaDocumentId,
+      updated_by ?? null,
+    ];
+
+    const [clientResult] = await connection.execute(clientQuery, sanitizedClientValues);
+    const clientId = clientResult.insertId;
+
+    // Update msa_documents with the client_id
+    if (msaDocumentId) {
+      const updateMsaQuery = `
+        UPDATE msa_documents
+        SET client_id = ?
+        WHERE id = ?
+      `;
+
+      await connection.execute(updateMsaQuery, [clientId, msaDocumentId]);
+    }
+
+    await connection.commit();
+
+    return clientResult;
+  } catch (err) {
+    await connection.rollback();
+    console.error("Error creating client:", err);
+    throw err;
+  } finally {
+    connection.release();
+  }
+};
+
+
+// Update client details
+const updateClientDetails = async (
+  clientId,
+  client_name,
+  vega_client_name,
+  client_type,
+  credit_period,
+  client_status,
+  countryId,
+  companyId,
+  accountId,
+  industryId,
+  IndustryHeadId,
+  IndustryGroupId,
+  IndustrySubGroupId,
+  salesMangerId,
+  accountManagerId,
+  msa_start_date,
+  msa_end_date,
+  msa_flag,
+  nda_flag,
+  non_solicitation_clause_flag,
+  use_logo_permission_flag,
+  updated_by,
+  msaFilePath,
+  ndaFilePath
+) => {
+  try {
+    const query = `
+      UPDATE client_info
+      SET 
+        client_name = ?, 
+        vega_client_name = ?, 
+        client_type = ?, 
+        credit_period = ?, 
+        client_status = ?, 
+        countryId = ?, 
+        companyId = ?, 
+        accountId = ?, 
+        industryId = ?, 
+        IndustryHeadId = ?, 
+        IndustryGroupId = ?, 
+        IndustrySubGroupId = ?, 
+        salesMangerId = ?, 
+        accountManagerId = ?, 
+        msa_start_date = ?, 
+        msa_end_date = ?, 
+        msa_flag = ?, 
+        nda_flag = ?, 
+        non_solicitation_clause_flag = ?, 
+        use_logo_permission_flag = ?, 
+        msaFilePath = ?, 
+        ndaFilePath = ?, 
+        updated_by = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      client_name,
+      vega_client_name,
+      client_type,
+      credit_period,
+      client_status,
+      countryId,
+      companyId,
+      accountId,
+      industryId,
+      IndustryHeadId,
+      IndustryGroupId,
+      IndustrySubGroupId,
+      salesMangerId,
+      accountManagerId,
+      msa_start_date,
+      msa_end_date,
+      msa_flag,
+      nda_flag,
+      non_solicitation_clause_flag,
+      use_logo_permission_flag,
+      msaFilePath,
+      ndaFilePath,
+      updated_by,
+      clientId,
+    ]);
+
+    return result;
+  } catch (err) {
+    console.error("Error updating client:", err);
+    throw err;
+  }
+};
+
+// Activate/Deactivate client
+const activateDeactivateClientDetails = async (clientId, isActive, updated_by) => {
+  try {
+    const query = `
+      UPDATE client_info
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [isActive, updated_by, clientId]);
+    return result;
+  } catch (err) {
+    console.error("Error activating/deactivating client:", err);
+    throw err;
+  }
+};
+
+// Get client by ID
+const getClientById = async (clientId) => {
+  try {
+    const query = `
+      SELECT msaFilePath, ndaFilePath
+      FROM client_info
+      WHERE id = ?
+    `;
+
+    const [rows] = await db.execute(query, [clientId]);
+    if (rows.length > 0) {
+      return rows[0];
+    } else {
+      throw new Error("Client not found");
+    }
+  } catch (err) {
+    console.error("Error fetching client by ID:", err);
+    throw err;
+  }
+};
+
+// Get all clients
+const getClients = async () => {
+  try {
+    const query = `
+      SELECT 
+        client_info.*, 
+        (SELECT GROUP_CONCAT(company_info.companyName) 
+              FROM company_info 
+              WHERE FIND_IN_SET(company_info.id, client_info.companyId)) AS companyName,
+        (SELECT GROUP_CONCAT(industry_master_info.industryName) 
+              FROM industry_master_info 
+              WHERE FIND_IN_SET(industry_master_info.id, client_info.IndustryGroupId)) AS industryGroupNames,
+        (SELECT GROUP_CONCAT(industry_master_info.subIndustryCategory) 
+              FROM industry_master_info 
+              WHERE FIND_IN_SET(industry_master_info.id, client_info.IndustrySubGroupId)) AS industrySubGroupNames,
+        (SELECT GROUP_CONCAT(industry_head_master.industryHeadName) 
+              FROM industry_head_master 
+              WHERE FIND_IN_SET(industry_head_master.id, client_info.IndustryHeadId)) AS industryHeadName,
+        (SELECT GROUP_CONCAT(group_industry_info.groupIndustryName) 
+              FROM group_industry_info 
+              WHERE FIND_IN_SET(group_industry_info.id, client_info.industryId)) AS industryName,
+        (SELECT GROUP_CONCAT(country_info.name) 
+              FROM country_info 
+              WHERE FIND_IN_SET(country_info.id, client_info.countryId)) AS countryName,
+        (SELECT GROUP_CONCAT(account_manager_master.name) 
+              FROM account_manager_master 
+              WHERE FIND_IN_SET(account_manager_master.id, client_info.accountManagerId)) AS accountManagerNames
+      FROM client_info
+    `;
+
+    const [clients] = await db.execute(query);
+    return clients;
+  } catch (err) {
+    console.error("Error fetching clients list:", err);
+    throw err;
+  }
+};
+
+
+
+const createClientContact = async (client_name, salutation, first_name, last_name, email, phone_number, isActive, updatedBy) => {
+  try {
+    // Replace undefined values with null
+    const params = [
+      client_name ?? null,
+      salutation ?? null,
+      first_name ?? null,
+      last_name ?? null,
+      email ?? null,
+      phone_number ?? null,
+      isActive ?? 1,      // Assuming 1 (Active) by default
+      updatedBy ?? null
+    ];
+
+    const query = `
+      INSERT INTO client_contact (
+        client_name, salutation, first_name, last_name, email, phone_number, isActive, updated_by, updated_at
+      ) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+
+    const [result] = await db.execute(query, params);
+    return result;
+
+  } catch (err) {
+    console.error("Error in createClientContact:", err);
+    throw err;
+  }
+};
+
+
+const updateClientContactDetails = async (clientContactId, client_name, salutation, first_name, last_name, email, phone_number, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE client_contact
+      SET 
+        client_name = ?,
+        salutation = ?,
+        first_name = ?,
+        last_name = ?,
+        email = ?,
+        phone_number = ?,
+        isActive = ?,
+        updated_by = ?,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [client_name, salutation, first_name, last_name, email, phone_number, isActive, updatedBy, clientContactId]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+const activateDeactivateClientContactDetails = async (clientContactId, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE client_contact
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [isActive, updatedBy, clientContactId]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+const getClientContacts = async () => {
+  try {
+    const query = `
+      SELECT * FROM client_contact
+    `;
+    const [clientContacts] = await db.execute(query);
+    return clientContacts;
+  } catch (err) {
+    console.error("Error retrieving client contacts list:", err);
+    throw err;
+  }
+};
+
+
+// Insert into client_bill_to_info
+const insertClientBillTo = async (
+  clientId,
+  countryId,
+  address1,
+  address2,
+  address3,
+  additionalAddressDetails,
+  updatedBy
+) => {
+  try {
+    const query = `
+      INSERT INTO client_bill_to_info 
+      (clientId, countryId, address1, address2, address3, additionalAddressDetails, updated_by, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+
+    const [result] = await db.execute(query, [
+      clientId,
+      countryId,
+      address1,
+      address2,
+      address3,
+      JSON.stringify(additionalAddressDetails),
+      updatedBy,
+    ]);
+
+    return result;
+  } catch (err) {
+    console.error("Error inserting into client_bill_to_info:", err);
+    throw err;
+  }
+};
+
+// Update client_bill_to_info
+const updateClientBillToDetails = async (
+  id,
+  clientId,
+  address1,
+  address2,
+  address3,
+  additionalAddressDetails,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE client_bill_to_info
+      SET 
+        clientId = ?, 
+        address1 = ?, 
+        address2 = ?, 
+        address3 = ?, 
+        additionalAddressDetails = ?, 
+        updated_by = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      clientId,
+      address1,
+      address2,
+      address3,
+      JSON.stringify(additionalAddressDetails),
+      updatedBy,
+      id,
+    ]);
+
+    return result;
+  } catch (err) {
+    console.error("Error updating client_bill_to_info:", err);
+    throw err;
+  }
+};
+
+// Activate or deactivate client_bill_to_info
+const activateDeactivateClientBillToDetails = async (id, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE client_bill_to_info
+      SET 
+        isActive = ?, 
+        updated_by = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [isActive, updatedBy, id]);
+    return result;
+  } catch (err) {
+    console.error("Error activating/deactivating client_bill_to_info:", err);
+    throw err;
+  }
+};
+
+// Get client_bill_to_info
+const getClientBillToDetails = async (clientId = null) => {
+  try {
+    let query = `
+      SELECT 
+        client_bill_to_info.*, 
+        client_info.client_name,         
+        country_info.name AS countryName
+      FROM 
+        client_bill_to_info
+      LEFT JOIN 
+        client_info ON client_bill_to_info.clientId = client_info.id
+      LEFT JOIN 
+        country_info 
+      ON 
+        client_bill_to_info.countryId = country_info.id
+    `;
+
+    const queryParams = [];
+
+    if (clientId) {
+      query += " WHERE client_bill_to_info.clientId = ?";
+      queryParams.push(clientId);
+    }
+
+    const [result] = await db.execute(query, queryParams);
+    return result;
+  } catch (err) {
+    console.error("Error retrieving client_bill_to_info:", err);
+    throw err;
+  }
+};
+
+
+// Insert into client_ship_to_info
+const insertClientShipTo = async (
+  clientId,
+  countryId,
+  address1,
+  address2,
+  address3,
+  additionalAddressDetails,
+  updatedBy
+) => {
+  try {
+    const query = `
+      INSERT INTO client_ship_to_info 
+      (clientId, countryId, address1, address2, address3, additionalAddressDetails, updated_by, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+
+    const [result] = await db.execute(query, [
+      clientId,
+      countryId,
+      address1,
+      address2,
+      address3,
+      JSON.stringify(additionalAddressDetails),
+      updatedBy,
+    ]);
+
+    return result;
+  } catch (err) {
+    console.error("Error inserting into client_ship_to_info:", err);
+    throw err;
+  }
+};
+
+// Update client_ship_to_info
+const updateClientShipToDetails = async (
+  id,
+  clientId,
+  address1,
+  address2,
+  address3,
+  additionalAddressDetails,
+  updatedBy
+) => {
+  try {
+    const query = `
+      UPDATE client_ship_to_info
+      SET 
+        clientId = ?, 
+        address1 = ?, 
+        address2 = ?, 
+        address3 = ?, 
+        additionalAddressDetails = ?, 
+        updated_by = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      clientId,
+      address1,
+      address2,
+      address3,
+      JSON.stringify(additionalAddressDetails),
+      updatedBy,
+      id,
+    ]);
+
+    return result;
+  } catch (err) {
+    console.error("Error updating client_ship_to_info:", err);
+    throw err;
+  }
+};
+
+// Activate or deactivate client_ship_to_info
+const activateDeactivateClientShipToDetails = async (id, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE client_ship_to_info
+      SET 
+        isActive = ?, 
+        updated_by = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [isActive, updatedBy, id]);
+    return result;
+  } catch (err) {
+    console.error("Error activating/deactivating client_ship_to_info:", err);
+    throw err;
+  }
+};
+
+// Get client_ship_to_info
+const getClientShipToDetails = async (clientId = null) => {
+  try {
+
+    let query = `
+    SELECT 
+      client_ship_to_info.*, 
+      client_info.client_name,         
+      country_info.name AS countryName
+    FROM 
+      client_ship_to_info
+    LEFT JOIN 
+      client_info ON client_ship_to_info.clientId = client_info.id
+    LEFT JOIN 
+      country_info 
+    ON 
+      client_ship_to_info.countryId = country_info.id
+  `;
+
+    const queryParams = [];
+
+    if (clientId) {
+      query += " WHERE client_ship_to_info.clientId = ?";
+      queryParams.push(clientId);
+    }
+
+    const [result] = await db.execute(query, queryParams);
+    return result;
+  } catch (err) {
+    console.error("Error retrieving client_ship_to_info:", err);
+    throw err;
+  }
+};
+
+
+// Insert into client_group_info
+const insertClientGroup = async (groupName, clientIds, updatedBy) => {
+  try {
+    const query = `
+      INSERT INTO client_group_info 
+      (groupName, clientIds, updated_by, updated_at)
+      VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+
+    const [result] = await db.execute(query, [
+      groupName,
+      clientIds, // Store clientIds as JSON array
+      updatedBy,
+    ]);
+
+    return result;
+  } catch (err) {
+    console.error("Error inserting into client_group_info:", err);
+    throw err;
+  }
+};
+
+// Update client_group_info
+const updateClientGroupDetails = async (id, groupName, clientIds, updatedBy) => {
+  try {
+    const query = `
+      UPDATE client_group_info
+      SET 
+        groupName = ?, 
+        clientIds = ?, 
+        updated_by = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [
+      groupName,
+      clientIds,
+      updatedBy,
+      id,
+    ]);
+
+    return result;
+  } catch (err) {
+    console.error("Error updating client_group_info:", err);
+    throw err;
+  }
+};
+
+// Activate or deactivate client_group_info
+const activateDeactivateClientGroupDetails = async (id, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE client_group_info
+      SET 
+        isActive = ?, 
+        updated_by = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [isActive, updatedBy, id]);
+    return result;
+  } catch (err) {
+    console.error("Error activating/deactivating client_group_info:", err);
+    throw err;
+  }
+};
+
+// Get client_group_info
+const getClientGroupsDetails = async () => {
+  try {
+    const query = `
+      SELECT client_group_info.* , 
+      (SELECT GROUP_CONCAT(client_info.client_name) 
+              FROM client_info 
+              WHERE FIND_IN_SET(client_info.id, client_group_info.clientIds)) AS clientName
+      FROM client_group_info
+    `;
+
+    const [result] = await db.execute(query);
+    return result;
+  } catch (err) {
+    console.error("Error retrieving client_group_info:", err);
+    throw err;
+  }
+};
+
+const updateClientMSA = async (clientId, start_date, end_date, msaFile, updated_by) => {
+  try {
+    const connection = await db.getConnection();
+    await connection.beginTransaction();
+
+    const [clientRows] = await connection.execute(
+      "SELECT * FROM client_info WHERE id = ?",
+      [clientId]
+    );
+
+    if (clientRows.length === 0) {
+      throw new Error("Client not found");
+    }
+
+    const updateClientQuery = `
+      UPDATE client_info
+      SET msa_start_date = ?, msa_end_date = ?, msaFilePath = ?
+      WHERE id = ?
+    `;
+
+    await connection.execute(updateClientQuery, [
+      start_date,
+      end_date,
+      msaFile,
+      clientId,
+    ]);
+
+    const insertMSAQuery = `
+      INSERT INTO msa_documents (
+        msa_doc_url, start_date, end_date, created_by, client_id
+      ) VALUES (?, ?, ?, ?, ?)
+    `;
+
+    const [msaResult] = await connection.execute(insertMSAQuery, [
+      msaFile,
+      start_date,
+      end_date,
+      updated_by,
+      clientId,
+    ]);
+
+    const newMSADocumentId = msaResult.insertId;
+
+    const updateClientMSAIdQuery = `
+      UPDATE client_info
+      SET msa_document_id = ?
+      WHERE id = ?
+    `;
+
+    await connection.execute(updateClientMSAIdQuery, [
+      newMSADocumentId,
+      clientId,
+    ]);
+
+    await connection.commit();
+
+    return { message: "MSA file updated successfully" };
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+
+
 
 module.exports = {
   createCountry,
@@ -3059,5 +3914,38 @@ module.exports = {
   insertClientType,
   updateClientType,
   activateDeactivateClientType,
-  getAllClientTypes
+  getAllClientTypes,
+  
+  createClient,
+  updateClientDetails,
+  activateDeactivateClientDetails,
+  getClientById,
+  getClients,
+
+  createClientContact,
+  updateClientContactDetails,
+  activateDeactivateClientContactDetails,
+  getClientContacts,
+
+
+  // Functions for client_bill_to_info
+  insertClientBillTo,
+  updateClientBillToDetails,
+  activateDeactivateClientBillToDetails,
+  getClientBillToDetails,
+
+  // Functions for client_ship_to_info
+  insertClientShipTo,
+  updateClientShipToDetails,
+  activateDeactivateClientShipToDetails,
+  getClientShipToDetails,
+
+
+  // Functions for client_group_info
+  insertClientGroup,
+  updateClientGroupDetails,
+  activateDeactivateClientGroupDetails,
+  getClientGroupsDetails,
+
+  updateClientMSA
 };

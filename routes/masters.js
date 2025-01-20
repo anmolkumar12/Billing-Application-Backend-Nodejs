@@ -121,7 +121,32 @@ const {
   activateDeactivateClientTypeHandler,
   getClientTypes,
   
+  addClient,
+  updateClient,
+  activateDeactivateClient,
+  getClientsList,
 
+  addClientContact,
+  updateClientContact,
+  getClientContactsList,
+  activateDeactivateClientContact,
+
+  createClientBillTo,
+  updateClientBillTo,
+  activateDeactivateClientBillTo,
+  getClientBillTo,
+  createClientShipTo,
+  updateClientShipTo,
+  activateDeactivateClientShipTo,
+  getClientShipTo,
+
+
+  createClientGroup,
+  updateClientGroup,
+  activateDeactivateClientGroup,
+  getClientGroups,
+
+  updateMSAFile
 
 } = require("../controllers/masterController");
 const multer = require("multer");
@@ -402,5 +427,54 @@ router.post("/createClientType", authMiddleware, createClientType);
 router.post("/updateClientType", authMiddleware, updateClientTypeHandler);
 router.post("/activateDeactivateClientType", authMiddleware, activateDeactivateClientTypeHandler);
 router.get("/getClientType", authMiddleware, getClientTypes);
+// Client routes
+router.post(
+  "/addClient",
+  authMiddleware,
+  upload.fields([
+    { name: "msaFile", maxCount: 1 },
+    { name: "ndaFile", maxCount: 1 },
+  ]),
+  addClient
+);
+
+router.post(
+  "/updateClient",
+  authMiddleware,
+  upload.fields([
+    { name: "msaFile", maxCount: 1 },
+    { name: "ndaFile", maxCount: 1 },
+  ]),
+  updateClient
+);
+
+router.post("/activateDeactivateClient", authMiddleware, activateDeactivateClient);
+
+router.post("/getClientsList", authMiddleware, getClientsList);
+
+// Routes for Client Contact
+router.post("/addClientContact", authMiddleware, addClientContact);
+router.post("/updateClientContact", authMiddleware, updateClientContact);
+router.post("/activateDeactivateClientContact", authMiddleware, activateDeactivateClientContact);
+router.post("/getClientContactsList", authMiddleware, getClientContactsList);
+
+// Client Bill To and Ship To Master
+router.post("/addClientBillingInfo", authMiddleware, createClientBillTo);
+router.post("/updateClientBillingInfo", authMiddleware, updateClientBillTo);
+router.post("/activateDeactivateClientBillTo", authMiddleware, activateDeactivateClientBillTo);
+router.post("/getClientBillTo", authMiddleware, getClientBillTo);
+
+router.post("/addClientShippingInfo", authMiddleware, createClientShipTo);
+router.post("/updateClientShippingInfo", authMiddleware, updateClientShipTo);
+router.post("/activateDeactivateClientShipTo", authMiddleware, activateDeactivateClientShipTo);
+router.post("/getClientShipTo", authMiddleware, getClientShipTo);
+
+// Routes for client_group_info
+router.post('/createClientGroup', authMiddleware, createClientGroup);
+router.post('/updateClientGroup', authMiddleware, updateClientGroup);
+router.post('/activateDeactivateClientGroup', authMiddleware, activateDeactivateClientGroup);
+router.get('/getClientGroups', authMiddleware, getClientGroups);
+
+
 
 module.exports = router;
