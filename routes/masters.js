@@ -114,6 +114,13 @@ const {
   updateTaxHandler,
   activateOrDeactivateTaxHandler,
   getAllTaxesHandler,
+
+  
+  createClientType,
+  updateClientTypeHandler,
+  activateDeactivateClientTypeHandler,
+  getClientTypes,
+  
   addClient,
   updateClient,
   activateDeactivateClient,
@@ -416,6 +423,10 @@ router.post(
 router.post("/getRegionHeadsList", authMiddleware, getRegionHeadsList);
 
 
+router.post("/createClientType", authMiddleware, createClientType);
+router.post("/updateClientType", authMiddleware, updateClientTypeHandler);
+router.post("/activateDeactivateClientType", authMiddleware, activateDeactivateClientTypeHandler);
+router.get("/getClientType", authMiddleware, getClientTypes);
 // Client routes
 router.post(
   "/addClient",
