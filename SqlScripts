@@ -401,11 +401,9 @@ CREATE TABLE client_bill_to_info (
   additionalAddressDetails TEXT,
   isActive TINYINT(1) DEFAULT 1,
   updated_by INT,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (clientId) REFERENCES company_info(id) ON DELETE CASCADE,
-  FOREIGN KEY (countryId) REFERENCES country_info(id) ON DELETE CASCADE,
-  FOREIGN KEY (stateId) REFERENCES state_info(id) ON DELETE CASCADE
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 CREATE TABLE client_ship_to_info (
   id INT AUTO_INCREMENT PRIMARY KEY,
   clientId INT NOT NULL,
@@ -417,10 +415,7 @@ CREATE TABLE client_ship_to_info (
   additionalAddressDetails TEXT,
   isActive TINYINT(1) DEFAULT 1,
   updated_by INT,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (clientId) REFERENCES company_info(id) ON DELETE CASCADE,
-  FOREIGN KEY (countryId) REFERENCES country_info(id) ON DELETE CASCADE,
-  FOREIGN KEY (stateId) REFERENCES state_info(id) ON DELETE CASCADE
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
