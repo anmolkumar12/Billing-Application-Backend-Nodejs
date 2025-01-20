@@ -238,20 +238,20 @@ const getStates = async (countryId = null) => {
   try {
     // Define the base query with an INNER JOIN to include countryName
     let query = `
-SELECT 
-    s.*, 
-    c.name,
-    u.username AS updated_by
-FROM 
-    state_info s
-INNER JOIN 
-    country_info c 
-ON 
-    s.countryId = c.id
-LEFT JOIN 
-    users u
-ON 
-    s.updated_by = u.id;
+      SELECT 
+          s.*, 
+          c.name,
+          u.username AS updated_by
+      FROM 
+          state_info s
+      INNER JOIN 
+          country_info c 
+      ON 
+          s.countryId = c.id
+      LEFT JOIN 
+          users u
+      ON 
+          s.updated_by = u.id
 
         
     `;
@@ -2868,6 +2868,70 @@ const getAllTaxes = async () => {
   }
 };
 
+const insertClientType = async (clientType, isActive, updatedBy) => {
+  try {
+    const query = `
+      INSERT INTO client_type_master (client_type, isActive, updated_by, updated_at)
+      VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+    `;
+    const [result] = await db.execute(query, [clientType, isActive, updatedBy]);
+    return result;
+  } catch (err) {
+    console.log("Error inserting Client Type:", err);
+    throw err;
+  }
+};
+
+const updateClientType = async (id, clientType, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE client_type_master
+      SET 
+        client_type = ?, 
+        isActive = ?, 
+        updated_by = ?, 
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [clientType, isActive, updatedBy, id]);
+    return result;
+  } catch (err) {
+    console.log("Error updating Client Type:", err);
+    throw err;
+  }
+};
+
+const activateDeactivateClientType = async (id, isActive, updatedBy) => {
+  try {
+    const query = `
+      UPDATE client_type_master
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [isActive, updatedBy, id]);
+    return result;
+  } catch (err) {
+    console.log("Error activating or deactivating Client Type:", err);
+    throw new Error("Error activating/deactivating Client Type");
+  }
+};
+
+const getAllClientTypes = async () => {
+  try {
+    const query = `
+      SELECT client_type_master.*, users.username AS updated_by 
+      FROM client_type_master
+      LEFT JOIN users ON users.id = client_type_master.updated_by
+    `;
+    const [records] = await db.execute(query);
+    return records;
+  } catch (err) {
+    console.error("Database Error:", err);
+    throw new Error("Error retrieving Client Types");
+  }
+};
+
+
 
 
 module.exports = {
@@ -2990,4 +3054,10 @@ module.exports = {
   updateTax,
   activateOrDeactivateTax,
   getAllTaxes,
+
+  // client type
+  insertClientType,
+  updateClientType,
+  activateDeactivateClientType,
+  getAllClientTypes
 };

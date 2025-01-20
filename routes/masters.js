@@ -113,7 +113,14 @@ const {
   createTaxHandler,
   updateTaxHandler,
   activateOrDeactivateTaxHandler,
-  getAllTaxesHandler
+  getAllTaxesHandler,
+
+  
+  createClientType,
+  updateClientTypeHandler,
+  activateDeactivateClientTypeHandler,
+  getClientTypes,
+  
 
 
 } = require("../controllers/masterController");
@@ -389,5 +396,11 @@ router.post(
   activateDeactivateRegionHead
 );
 router.post("/getRegionHeadsList", authMiddleware, getRegionHeadsList);
+
+
+router.post("/createClientType", authMiddleware, createClientType);
+router.post("/updateClientType", authMiddleware, updateClientTypeHandler);
+router.post("/activateDeactivateClientType", authMiddleware, activateDeactivateClientTypeHandler);
+router.get("/getClientType", authMiddleware, getClientTypes);
 
 module.exports = router;

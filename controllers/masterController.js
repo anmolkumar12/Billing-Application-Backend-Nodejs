@@ -121,6 +121,11 @@ const {
   activateOrDeactivateTax,
   getAllTaxes,
 
+  insertClientType,
+  updateClientType,
+  activateDeactivateClientType,
+  getAllClientTypes
+
 
 } = require("../models/masterModel");
 
@@ -2899,6 +2904,92 @@ const getAllTaxesHandler = async (req, res) => {
   }
 };
 
+const createClientType = async (req, res) => {
+  const { clientType, isActive, updatedBy } = req.body;
+
+  try {
+    await insertClientType(clientType, isActive, updatedBy);
+    res.status(201).json({
+      statusCode: 201,
+      message: "Client Type created successfully",
+    });
+  } catch (err) {
+    console.log("Error:", err);
+    const { statusCode, message } = errorHandler("clientType", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });
+  }
+};
+
+const updateClientTypeHandler = async (req, res) => {
+  const { id, clientType, isActive, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Client Type ID is required",
+    });
+  }
+
+  try {
+    await updateClientType(id, clientType, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: "Client Type updated successfully",
+    });
+  } catch (err) {
+    console.log("Error:", err);
+    const { statusCode, message } = errorHandler("clientType", err);
+    res.status(statusCode).json({
+      statusCode,
+      message,
+    });
+  }
+};
+
+const activateDeactivateClientTypeHandler = async (req, res) => {
+  const { id, isActive, updatedBy } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Client Type ID is required",
+    });
+  }
+
+  try {
+    await activateDeactivateClientType(id, isActive, updatedBy);
+    res.status(200).json({
+      statusCode: 200,
+      message: `Client Type ${isActive === 1 ? "activated" : "deactivated"} successfully`,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while activating/deactivating Client Type",
+    });
+  }
+};
+
+const getClientTypes = async (req, res) => {
+  try {
+    const records = await getAllClientTypes();
+    res.status(200).json({
+      statusCode: 200,
+      records,
+    });
+  } catch (err) {
+    console.error("Error fetching Client Types:", err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+
 
 
 
@@ -3023,5 +3114,12 @@ module.exports = {
   createTaxHandler,
   updateTaxHandler,
   activateOrDeactivateTaxHandler,
-  getAllTaxesHandler
+  getAllTaxesHandler,
+
+  //  client type
+  createClientType,
+  updateClientTypeHandler,
+  activateDeactivateClientTypeHandler,
+  getClientTypes
+
 };
