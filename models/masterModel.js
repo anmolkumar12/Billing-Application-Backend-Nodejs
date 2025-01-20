@@ -1981,7 +1981,7 @@ const insertTechnologyName = async (
 ) => {
   try {
     const query = `
-      INSERT INTO technology_name_info (techGroupIds, techSubgroupIds, techName, description, isActive, updatedBy, updated_at)
+      INSERT INTO technology_name_info (techGroupIds, techSubgroupIds, techName, description, isActive, updated_by, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
     const [result] = await db.execute(query, [
@@ -2018,7 +2018,7 @@ const updateTechnologyNameDetails = async (
         techName = ?, 
         description = ?, 
         isActive = ?, 
-        updatedBy = ?, 
+        updated_by = ?, 
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
@@ -2046,7 +2046,7 @@ const activateDeactivateTechnologyNameStatus = async (
   try {
     const query = `
       UPDATE technology_name_info
-      SET isActive = ?, updatedBy = ?, updated_at = CURRENT_TIMESTAMP
+      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
     const [result] = await db.execute(query, [isActive, updatedBy, id]);
@@ -3915,7 +3915,7 @@ module.exports = {
   updateClientType,
   activateDeactivateClientType,
   getAllClientTypes,
-  
+
   createClient,
   updateClientDetails,
   activateDeactivateClientDetails,
