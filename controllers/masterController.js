@@ -1427,6 +1427,8 @@ const getGroupIndustries = async (req, res) => {
 const createIndustryHead = async (req, res) => {
 
   const {
+    code,
+    industry_head_email,
     companyId,
     industryHeadName,
     industryIds,
@@ -1441,7 +1443,11 @@ const createIndustryHead = async (req, res) => {
   } = req.body;
 
   try {
+    console.log('hhhhhhhhhhh--->>>>', code, industry_head_email);
+
     const finalResult = await insertIndustryHead(
+      code,
+      industry_head_email,
       companyId,
       industryHeadName,
       industryIds,
@@ -1480,6 +1486,8 @@ const createIndustryHead = async (req, res) => {
 
 const updateIndustryHead = async (req, res) => {
   const {
+    code,
+    industry_head_email,
     companyId,
     industryHeadId,
     industryHeadName,
@@ -1503,6 +1511,8 @@ const updateIndustryHead = async (req, res) => {
 
   try {
     const finalResult = await updateIndustryHeadDetails(
+      code,
+      industry_head_email,
       companyId,
       industryHeadId,
       industryHeadName,
@@ -1676,7 +1686,7 @@ const updateSalesManager = async (req, res) => {
 };
 
 const activateOrDeactivateSalesManager = async (req, res) => {
-  const { salesManagerId, isActive, updatedBy,deactivationDate } = req.body;
+  const { salesManagerId, isActive, updatedBy, deactivationDate } = req.body;
 
   if (!salesManagerId || isActive === undefined) {
     return res.status(400).json({
@@ -1686,7 +1696,7 @@ const activateOrDeactivateSalesManager = async (req, res) => {
   }
 
   try {
-    await updateSalesManagerStatus(salesManagerId, isActive, updatedBy,deactivationDate);
+    await updateSalesManagerStatus(salesManagerId, isActive, updatedBy, deactivationDate);
 
     res.status(200).json({
       statusCode: 200,
@@ -1808,7 +1818,7 @@ const updateAccountsManager = async (req, res) => {
 };
 
 const activateOrDeactivateAccountsManager = async (req, res) => {
-  const { salesManagerId, isActive, updatedBy,deactivationDate } = req.body;
+  const { salesManagerId, isActive, updatedBy, deactivationDate } = req.body;
 
   if (!salesManagerId || isActive === undefined) {
     return res.status(400).json({
@@ -1827,9 +1837,8 @@ const activateOrDeactivateAccountsManager = async (req, res) => {
 
     res.status(200).json({
       statusCode: 200,
-      message: `Account Manager ${
-        isActive ? "activated" : "deactivated"
-      } successfully`,
+      message: `Account Manager ${isActive ? "activated" : "deactivated"
+        } successfully`,
     });
   } catch (err) {
     console.error("Error updating Sales Manager status:", err);
@@ -2646,7 +2655,7 @@ const updateRegionHead = async (req, res) => {
 };
 
 const activateDeactivateRegionHead = async (req, res) => {
-  const { regionHeadId, isActive, updatedBy,deactivationDate } = req.body;
+  const { regionHeadId, isActive, updatedBy, deactivationDate } = req.body;
 
   try {
     await activateDeactivateRegionHeadDetails(
