@@ -403,8 +403,8 @@ const activateDeactivateRegionDetails = async (
 
 const getRegions = async (countryId = null) => {
   try {
-        // Define the base query with joins to fetch country name and state names
-        let query = `
+    // Define the base query with joins to fetch country name and state names
+    let query = `
         SELECT 
           region_info.*, 
           country_info.name AS countryName,
@@ -428,8 +428,8 @@ const getRegions = async (countryId = null) => {
     // Add condition for filtering by `countryId`, if provided
     const queryParams = [];
     if (countryId) {
-    query += " WHERE region_info.countryId = ?";
-    queryParams.push(countryId);
+      query += " WHERE region_info.countryId = ?";
+      queryParams.push(countryId);
     }
 
     // Add GROUP BY clause
@@ -1367,6 +1367,8 @@ const getGroupIndustriesList = async () => {
 
 // Industry Head Master
 const insertIndustryHead = async (
+  code,
+  industry_head_email,
   companyId,
   industryHeadName,
   industryIds,
@@ -1380,7 +1382,7 @@ const insertIndustryHead = async (
   isActive
 ) => {
   try {
-
+    
     // Convert regionIds and stateIds to arrays for comparison
     const regionIdArray = regionIds ? String(regionIds).split(",").map(id => id.trim()) : [];
     const stateIdArray = stateIds ? String(stateIds).split(",").map(id => id.trim()) : [];
@@ -1445,19 +1447,19 @@ const insertIndustryHead = async (
             AND ihm.companyId = ?`,
         [companyId]
       );
-    
+
       for (const record of existingStates) {
         const existingStateIds = record.stateIds
           ? record.stateIds.split(",").map(id => id.trim())
           : [];
         const overlapStates = stateIdArray.filter(id => existingStateIds.includes(id));
-        
+
         if (overlapStates.length > 0) {
           const overlappingStateNames = existingStates
-  .filter(r => overlapStates.includes(String(r.stateId))) // Match `stateId` with `overlapStates`
-  .map(r => r.stateName);
+            .filter(r => overlapStates.includes(String(r.stateId))) // Match `stateId` with `overlapStates`
+            .map(r => r.stateName);
           console.log('overlappingStateNames', overlapStates, existingStates);
-    
+
           return {
             status: 'existing',
             conflictMessage: `State ${overlappingStateNames.join(", ")} already allocated to ${record.industryHeadName}`
@@ -1465,22 +1467,24 @@ const insertIndustryHead = async (
         }
       }
     }
-    
+
 
     const query = `
       INSERT INTO industry_head_master 
-      (companyId, industryHeadName, industryIds, isRegionWise, countryIds, regionIds, stateIds, startDate, endDate, updated_by, isActive, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      (code, industry_head_email, companyId, industryHeadName, industryIds, isRegionWise, countryIds, regionIds, stateIds, startDate, endDate, updated_by, isActive, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     await db.execute(query, [
+      code,
+      industry_head_email,
       companyId,
       industryHeadName,
       industryIds,
       isRegionWise,
       countryIds,
-      isRegionWise ? regionIds : null,
-      !isRegionWise ? stateIds : null,
+      isRegionWise ? regionIds || null : null, // Ensure null is passed if regionIds is undefined
+      !isRegionWise ? stateIds || null : null, // Ensure null is passed if stateIds is undefined
       startDate,
       endDate,
       updatedBy,
@@ -1535,6 +1539,8 @@ const insertIndustryHead = async (
 
 
 const updateIndustryHeadDetails = async (
+  code,
+  industry_head_email,
   companyId,
   industryHeadId,
   industryHeadName,
@@ -1586,11 +1592,13 @@ const updateIndustryHeadDetails = async (
     // Proceed with updating the record
     const query = `
       UPDATE industry_head_master
-      SET companyId = ?, industryHeadName = ?, industryIds = ?, isRegionWise = ?, countryIds = ?, regionIds = ?, stateIds = ?, startDate = ?, endDate = ?, updated_by = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
+      SET code = ?, industry_head_email = ?, companyId = ?, industryHeadName = ?, industryIds = ?, isRegionWise = ?, countryIds = ?, regionIds = ?, stateIds = ?, startDate = ?, endDate = ?, updated_by = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
 
     await db.execute(query, [
+      code,
+      industry_head_email,
       companyId,
       industryHeadName,
       industryIds,
@@ -1756,7 +1764,7 @@ const updateSalesManagerStatus = async (
       WHERE id = ?
     `;
 
-    await db.execute(query, [isActive, updatedBy,deactivationDate, salesManagerId]);
+    await db.execute(query, [isActive, updatedBy, deactivationDate, salesManagerId]);
   } catch (err) {
     console.error("Error updating Sales Manager status:", err);
     throw err;
@@ -1858,14 +1866,14 @@ const updateAccountManager = async (
   }
 };
 
-const activateOrDeactivateAccountManager = async (id, isActive, updatedBy,deactivationDate) => {
+const activateOrDeactivateAccountManager = async (id, isActive, updatedBy, deactivationDate) => {
   try {
     const query = `
             UPDATE account_manager_master
             SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP,deactivationDate = ?
             WHERE id = ?
         `;
-    await db.execute(query, [isActive, updatedBy,deactivationDate, id]);
+    await db.execute(query, [isActive, updatedBy, deactivationDate, id]);
   } catch (err) {
     console.error("Error updating Account Manager status:", err);
     throw err;
@@ -2769,7 +2777,7 @@ const activateDeactivateRegionHeadDetails = async (
       updatedBy ?? null,
       deactivationDate,
       regionHeadId
-      
+
     ]);
 
     return result;
@@ -3323,33 +3331,33 @@ const updateClientDetails = async (
       WHERE id = ?
     `;
 
-// Replace undefined or invalid values with null
-const sanitizedClientValues = [
-  client_name ?? null,
-  vega_client_name ?? null,
-  client_type ?? null,
-  credit_period ?? null,
-  client_status ?? null,
-  countryId ?? null,
-  companyId ?? null,
-  accountId ?? null,
-  industryId ?? null,
-  IndustryHeadId ?? null,
-  IndustryGroupId ?? null,
-  IndustrySubGroupId ?? null,
-  salesMangerId ?? null,
-  accountManagerId ?? null,
-  msa_start_date ?? null,
-  msa_end_date ?? null,
-  msa_flag ?? null,
-  nda_flag ?? null,
-  non_solicitation_clause_flag ?? null,
-  use_logo_permission_flag ?? null,
-  msaFilePath ?? null,
-  ndaFilePath ?? null,
-  updated_by ?? null,
-  clientId,
-];
+    // Replace undefined or invalid values with null
+    const sanitizedClientValues = [
+      client_name ?? null,
+      vega_client_name ?? null,
+      client_type ?? null,
+      credit_period ?? null,
+      client_status ?? null,
+      countryId ?? null,
+      companyId ?? null,
+      accountId ?? null,
+      industryId ?? null,
+      IndustryHeadId ?? null,
+      IndustryGroupId ?? null,
+      IndustrySubGroupId ?? null,
+      salesMangerId ?? null,
+      accountManagerId ?? null,
+      msa_start_date ?? null,
+      msa_end_date ?? null,
+      msa_flag ?? null,
+      nda_flag ?? null,
+      non_solicitation_clause_flag ?? null,
+      use_logo_permission_flag ?? null,
+      msaFilePath ?? null,
+      ndaFilePath ?? null,
+      updated_by ?? null,
+      clientId,
+    ];
 
     await connection.execute(clientUpdateQuery, sanitizedClientValues);
 
