@@ -300,7 +300,7 @@ const createRegion = async (
         regionHeadEmail, 
         fromDate
       )
-      VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     const [result] = await db.execute(query, [
@@ -313,7 +313,7 @@ const createRegion = async (
       regionHeadName ?? null,
       regionHeadEcode ?? null,
       regionHeadEmail ?? null,
-      fromDate, // Pass fromDate as a parameter
+      // fromDate, // Pass fromDate as a parameter
     ]);
 
     return result;
@@ -347,7 +347,7 @@ const updateRegionDetails = async (
       regionHeadName ?? null,
       regionHeadEcode ?? null,
       regionHeadEmail ?? null,
-      fromDate ?? null, // Include fromDate in the update
+      // fromDate ?? null, // Include fromDate in the update
       regionId,
     ];
 
@@ -364,7 +364,7 @@ const updateRegionDetails = async (
         regionHeadName = ?,
         regionHeadEcode = ?,
         regionHeadEmail = ?,
-        fromDate = ?
+        fromDate = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
 
@@ -1178,7 +1178,7 @@ const insertIndustryMaster = async (
 
     const [result] = await db.execute(query, [
       industryName,
-      subIndustryCategory,
+      subIndustryCategory ?? '',
       updatedBy,
       isActive,
     ]);
@@ -1211,7 +1211,7 @@ const updateIndustryMasterDetails = async (
 
     const [result] = await db.execute(query, [
       industryName,
-      subIndustryCategory,
+      subIndustryCategory ?? "",
       updatedBy,
       isActive,
       industryMasterId,
