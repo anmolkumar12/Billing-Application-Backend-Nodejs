@@ -355,6 +355,52 @@ CREATE TABLE client_type_master (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+CREATE TABLE po_contract_info (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    clientId INT NOT NULL, -- Assuming it links to the client table
+
+    client_name VARCHAR(255) DEFAULT NULL,
+    clientBillTo TEXT DEFAULT NULL, -- Comma-separated IDs for multiSelect
+    clientShipAddress TEXT DEFAULT NULL, -- Comma-separated IDs for multiSelect
+    clientContact TEXT DEFAULT NULL, -- Comma-separated IDs for multiSelect
+    billFrom TEXT DEFAULT NULL, -- Comma-separated IDs for multiSelect
+    companyName VARCHAR(255) DEFAULT NULL,
+    companyLocation VARCHAR(255) DEFAULT NULL,
+    creditPeriod INT DEFAULT NULL,
+    poAmount VARCHAR(100) DEFAULT NULL, -- Monetary value
+    dueAmount VARCHAR(100) DEFAULT NULL, -- Monetary value
+
+    start_date VARCHAR(100) DEFAULT NULL, -- Start date of the PO (changed to VARCHAR)
+    end_date VARCHAR(100) DEFAULT NULL, -- End date of the PO (changed to VARCHAR)
+
+    projectService TEXT DEFAULT NULL, -- Comma-separated IDs for multiSelect
+    technolgyGroup TEXT DEFAULT NULL, -- Comma-separated IDs for multiSelect
+    technolgySubGroup TEXT DEFAULT NULL, -- Comma-separated IDs for multiSelect
+    technolgy TEXT DEFAULT NULL, -- Comma-separated IDs for multiSelect
+    oem TEXT DEFAULT NULL, -- Comma-separated IDs for multiSelect
+    product TEXT DEFAULT NULL, -- Comma-separated IDs for multiSelect
+
+    docType VARCHAR(100) DEFAULT NULL, -- Predefined document types
+    poNumber VARCHAR(255) DEFAULT NULL,
+
+    isActive INT DEFAULT 1, -- Status indicator (1 for active, 0 for inactive)
+
+    -- New columns
+    srNumber VARCHAR(255) DEFAULT NULL, -- Serial number
+    industryGroups TEXT DEFAULT NULL, -- Comma-separated IDs for multiSelect
+    subIndustries TEXT DEFAULT NULL, -- Comma-separated IDs for multiSelect
+    industryHead TEXT DEFAULT NULL, -- Comma-separated IDs for multiSelect
+    salesManager TEXT DEFAULT NULL, -- Comma-separated IDs for multiSelect
+    accountManager TEXT DEFAULT NULL, -- Comma-separated IDs for multiSelect
+    filePath VARCHAR(255) DEFAULT NULL, -- Path for file storage
+    noOfResources varchar(50) DEFAULT NULL,
+    resourcesData JSON default null,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Record creation timestamp
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Record update timestamp
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 
 
 

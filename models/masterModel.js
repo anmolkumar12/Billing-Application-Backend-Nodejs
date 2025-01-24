@@ -3888,6 +3888,388 @@ const getClientGroupsDetails = async () => {
   }
 };
 
+//  get PO configuration data
+const getPoContractConfigurationModel = async () => {
+
+  try {
+    const query = `
+      SELECT 
+        c.id AS client_id,
+        c.client_name,
+        
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'id', b.id,
+                'countryId', b.countryId,
+                'stateId', b.stateId,
+                'address1', b.address1,
+                'address2', b.address2,
+                'address3', b.address3,
+                'additionalAddressDetails', b.additionalAddressDetails
+            )
+        ) AS clientBill,
+        
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'id', s.id,
+                'countryId', s.countryId,
+                'stateId', s.stateId,
+                'address1', s.address1,
+                'address2', s.address2,
+                'address3', s.address3,
+                'additionalAddressDetails', s.additionalAddressDetails
+            )
+        ) AS clientShip,
+        
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'id', con.id,
+                'salutation', con.salutation,
+                'first_name', con.first_name,
+                'last_name', con.last_name,
+                'email', con.email,
+                'phone_number', con.phone_number,
+                'name',concat(con.first_name,' ',con.last_name)
+            )
+        ) AS contacts,
+        
+        JSON_OBJECT(
+            'id', ci.id,
+            'countryId', ci.countryId,
+            'companyName', ci.companyName,
+            'Website', ci.Website,
+            'Email', ci.Email
+        ) AS companyInfo,
+        
+        JSON_OBJECT(
+            'id', cl.id,
+            'countryId', cl.countryId,
+            'stateId', cl.stateId,
+            'address1', cl.address1,
+            'address2', cl.address2,
+            'address3', cl.address3,
+            'additionalAddressDetails', cl.additionalAddressDetails
+        ) AS companyLocation
+
+        FROM 
+            client_info c
+        LEFT JOIN 
+            client_bill_to_info b ON c.id = b.clientId AND b.isActive = 1
+        LEFT JOIN 
+            client_ship_to_info s ON c.id = s.clientId AND s.isActive = 1
+        LEFT JOIN 
+            client_contact con ON c.client_name = con.client_name AND con.isActive = 1
+        LEFT JOIN 
+            company_info ci ON c.companyId = ci.id AND ci.isactive = 1
+        LEFT JOIN 
+            company_location_info cl ON ci.id = cl.companyId AND cl.isActive = 1
+
+        WHERE 
+            c.isActive = 1
+
+        GROUP BY 
+            c.id, c.client_name, cl.id
+    `;
+
+    const [result] = await db.execute(query);
+    return result;
+  } catch (err) {
+    console.error("Error retrieving PO contact configuration:", err);
+    throw err;
+  }
+};
+
+
+
+const getPoContractConfigurationData = async () => {
+  try {
+    const queries = [
+      'SELECT * FROM project_service_master;',
+      'SELECT * FROM technology_group_info;',
+      'SELECT * FROM technology_subgroup_info;',
+      'SELECT * FROM technology_name_info;',
+      'SELECT * FROM oem_info;',
+      'SELECT * FROM polestar_product_sales_master;',
+    ];
+
+    // Execute all queries in parallel
+    const [
+      projectService,
+      technologyGroup,
+      technologySubGroup,
+      technologyName,
+      oem,
+      product
+    ] = await Promise.all(queries.map(query => db.execute(query).then(([rows]) => rows)));
+
+    // Construct result
+    const result = {
+      projectService: projectService || [],
+      technolgyGroup: technologyGroup || [],
+      technolgySubGroup: technologySubGroup || [],
+      technolgy: technologyName || [],
+      oem: oem || [],
+      product: product || [],
+    };
+    return result;
+  } catch (err) {
+    console.error('Error retrieving PO contract configuration:', err);
+    throw err;
+  }
+};
+const getPoCascadingConfigurationData = async () => {
+  try {
+    const [groupIndustryData] = await db.execute(`
+      SELECT id AS groupIndustryId, groupIndustryName, industryIds 
+      FROM group_industry_info
+      WHERE isActive = 1
+    `);
+
+    const [industryData] = await db.execute(`
+      SELECT id AS industryId, industryName, subIndustryCategory, updated_by 
+      FROM industry_master_info
+      WHERE isActive = 1
+    `);
+
+    const [industryHeadData] = await db.execute(`
+      SELECT id AS industryHeadId, industryHeadName, industryIds, isRegionWise, countryIds, regionIds, stateIds 
+      FROM industry_head_master
+      WHERE isActive = 1 AND startDate <= CURDATE() AND endDate >= CURDATE()
+    `);
+
+    const [salesManagerData] = await db.execute(`
+      SELECT id AS salesManagerId, name AS salesManagerName, industryHeadIds 
+      FROM sales_manager_master
+      WHERE isActive = 1
+    `);
+
+    const [accountManagerData] = await db.execute(`
+      SELECT id AS accountManagerId, name AS accountManagerName, industryHeadIds 
+      FROM account_manager_master
+      WHERE isActive = 1
+    `);
+
+    const result = {
+      groupIndustryData: groupIndustryData || [],
+      industryData: industryData || [],
+      industryHeadData: industryHeadData || [],
+      salesManagerData: salesManagerData || [],
+      accountManagerData: accountManagerData || [],
+    };
+
+    return result;
+  } catch (err) {
+    console.error('Error retrieving PO Cascading configuration:', err);
+    throw err;
+  }
+};
+
+const insertPoContract = async (
+  clientId,
+  client_name,
+  clientBillTo,
+  clientShipAddress,
+  clientContact,
+  billFrom,
+  companyName,
+  companyLocation,
+  creditPeriod,
+  poAmount,
+  dueAmount,
+  start_date,
+  end_date,
+  projectService,
+  technolgyGroup,
+  technolgySubGroup,
+  technolgy,
+  oem,
+  product,
+  docType,
+  poNumber,
+  srNumber,
+  industryGroups,
+  subIndustries,
+  industryHead,
+  salesManager,
+  accountManager,
+  filePath,
+  noOfResources,
+  resourcesData,
+  masterNames
+) => {
+  try {
+    const query = `
+      INSERT INTO po_contract_info (
+        clientId, client_name, clientBillTo, clientShipAddress, clientContact,
+        billFrom, companyName, companyLocation, creditPeriod, poAmount,
+        dueAmount, start_date, end_date, projectService, technolgyGroup,
+        technolgySubGroup, technolgy, oem, product, docType, poNumber,
+        srNumber, industryGroups, subIndustries, industryHead, salesManager,
+        accountManager, filePath,noOfResources,resourcesData,masterNames
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)
+    `;
+    const [result] = await db.execute(query, [
+      clientId,
+      client_name || null,
+      clientBillTo || null,
+      clientShipAddress || null,
+      clientContact || null,
+      billFrom || null,
+      companyName || null,
+      companyLocation || null,
+      creditPeriod || null,
+      poAmount || null,
+      dueAmount || null,
+      start_date || null,
+      end_date || null,
+      projectService || null,
+      technolgyGroup || null,
+      technolgySubGroup || null,
+      technolgy || null,
+      oem || null,
+      product || null,
+      docType || null,
+      poNumber || null,
+      srNumber || null,
+      industryGroups || null,
+      subIndustries || null,
+      industryHead || null,
+      salesManager || null,
+      accountManager || null,
+      filePath || null,
+      noOfResources || null,
+      resourcesData || null,
+      masterNames || null
+    ]);
+    return result;
+  } catch (err) {
+    console.error("Error inserting PO contract:", err);
+    throw err;
+  }
+};
+
+const updatePoContract = async (
+  id,
+  client_name,
+  clientBillTo,
+  clientShipAddress,
+  clientContact,
+  billFrom,
+  companyName,
+  companyLocation,
+  creditPeriod,
+  poAmount,
+  dueAmount,
+  start_date,
+  end_date,
+  projectService,
+  technolgyGroup,
+  technolgySubGroup,
+  technolgy,
+  oem,
+  product,
+  docType,
+  poNumber,
+  srNumber,
+  industryGroups,
+  subIndustries,
+  industryHead,
+  salesManager,
+  accountManager,
+  filePath,
+  noOfResources,
+  resourcesData,
+  masterNames
+) => {
+  try {
+    const query = `
+      UPDATE po_contract_info
+      SET
+        client_name = ?, clientBillTo = ?, clientShipAddress = ?, clientContact = ?,
+        billFrom = ?, companyName = ?, companyLocation = ?, creditPeriod = ?,
+        poAmount = ?, dueAmount = ?, start_date = ?, end_date = ?, projectService = ?,
+        technolgyGroup = ?, technolgySubGroup = ?, technolgy = ?, oem = ?, product = ?,
+        docType = ?, poNumber = ?, srNumber = ?, industryGroups = ?, subIndustries = ?,
+        industryHead = ?, salesManager = ?, accountManager = ?,filePath = ?, noOfResources = ?,
+      resourcesData = ?,masterNames = ?
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [
+      client_name || null,
+      clientBillTo || null,
+      clientShipAddress || null,
+      clientContact || null,
+      billFrom || null,
+      companyName || null,
+      companyLocation || null,
+      creditPeriod || null,
+      poAmount || null,
+      dueAmount || null,
+      start_date || null,
+      end_date || null,
+      projectService || null,
+      technolgyGroup || null,
+      technolgySubGroup || null,
+      technolgy || null,
+      oem || null,
+      product || null,
+      docType || null,
+      poNumber || null,
+      srNumber || null,
+      industryGroups || null,
+      subIndustries || null,
+      industryHead || null,
+      salesManager || null,
+      accountManager || null,
+      filePath || null,
+      noOfResources || null,
+      resourcesData || null,
+      masterNames || null,
+      id,
+    ]);
+    return result;
+  } catch (err) {
+    console.error("Error updating PO contract:", err);
+    throw err;
+  }
+};
+
+const activateDeactivatePoContract = async (id, isActive) => {
+  try {
+    const query = `
+      UPDATE po_contract_info
+      SET isActive = ?
+      WHERE id = ?
+    `;
+    const [result] = await db.execute(query, [isActive, id]);
+    return result;
+  } catch (err) {
+    console.error("Error updating PO contract status:", err);
+    throw err;
+  }
+};
+
+const getAllPoContracts = async () => {
+  try {
+    const query = `
+      SELECT * FROM po_contract_info WHERE isActive = 1
+    `;
+    const [contracts] = await db.execute(query);
+    return contracts;
+  } catch (err) {
+    console.error("Error retrieving PO contracts:", err);
+    throw err;
+  }
+};
+
+
+
+
+
+
+
+
+
 const updateClientMSA = async (clientId, start_date, end_date, msaFile, updated_by) => {
   try {
     const connection = await db.getConnection();
@@ -4111,6 +4493,13 @@ module.exports = {
   updateClientGroupDetails,
   activateDeactivateClientGroupDetails,
   getClientGroupsDetails,
+  getPoContractConfigurationModel,
+  getPoContractConfigurationData,
+  getPoCascadingConfigurationData,
+  insertPoContract,
+  updatePoContract,
+  activateDeactivatePoContract,
+  getAllPoContracts,
 
   updateClientMSA
 };
