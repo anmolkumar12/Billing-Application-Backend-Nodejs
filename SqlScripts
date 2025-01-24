@@ -429,7 +429,7 @@ CREATE TABLE client_info (
   country_name VARCHAR(255),
   companyId INT,
   account_selection VARCHAR(255),
-  industryId INT,
+  industryId VARCHAR(50),
   industryHeadNames VARCHAR(255),
   industry_group VARCHAR(255),
   industry_sub_group VARCHAR(255),
@@ -489,3 +489,45 @@ ALTER TABLE client_ship_to_info
 ADD COLUMN isDefaultAddress TINYINT(1) NOT NULL;
 ALTER TABLE company_location_info
 ADD COLUMN isDefaultAddress TINYINT(1) NOT NULL;
+
+-- 23-01-2025
+ALTER TABLE state_info
+MODIFY COLUMN stateCode VARCHAR(50) NULL;
+ALTER TABLE client_info
+MODIFY COLUMN IndustryGroupId VARCHAR(50) NULL;
+ALTER TABLE client_info
+MODIFY COLUMN salesMangerId VARCHAR(50) NULL;
+ALTER TABLE client_info
+MODIFY COLUMN accountManagerId VARCHAR(50) NULL;
+ALTER TABLE financial_year_master
+MODIFY COLUMN startYear date NULL;
+ALTER TABLE financial_year_master
+MODIFY COLUMN endYear date NULL;
+ALTER TABLE industry_head_master 
+ADD COLUMN `code` VARCHAR(50) NULL DEFAULT NULL ;
+ALTER TABLE industry_head_master 
+ADD COLUMN `industry_head_email` VARCHAR(50) NULL DEFAULT NULL ;
+ALTER TABLE industry_head_master 
+MODIFY COLUMN `endDate` VARCHAR(50) NULL DEFAULT NULL ;
+ALTER TABLE company_account_info 
+MODIFY COLUMN `bankAccountTypeId` VARCHAR(50) NULL DEFAULT NULL ;
+
+SHOW CREATE TABLE company_account_info;
+
+ALTER TABLE company_account_info 
+DROP FOREIGN KEY company_account_info_ibfk_3;
+
+ALTER TABLE company_account_info 
+MODIFY COLUMN `bankAccountTypeId` VARCHAR(50) NULL DEFAULT NULL;
+
+ALTER TABLE client_info 
+MODIFY COLUMN `industryId` VARCHAR(50) NULL DEFAULT NULL ;
+
+ALTER TABLE client_info 
+MODIFY COLUMN `IndustrySubGroupId` VARCHAR(50) NULL DEFAULT NULL ;
+
+-- ALTER TABLE client_info 
+-- MODIFY COLUMN `msa_end_date` VARCHAR(50) NULL DEFAULT NULL ;
+
+-- ALTER TABLE client_info 
+-- MODIFY COLUMN `msa_start_date` VARCHAR(50) NULL DEFAULT NULL ;

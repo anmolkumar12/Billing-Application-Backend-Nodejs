@@ -1400,7 +1400,7 @@ const insertIndustryHead = async (
     // Convert regionIds and stateIds to arrays for comparison
     const regionIdArray = regionIds ? String(regionIds).split(",").map(id => id.trim()) : [];
     const stateIdArray = stateIds ? String(stateIds).split(",").map(id => id.trim()) : [];
-    console.log('regionIdArray', regionIdArray, stateIdArray);
+    console.log('regionIdArray', code);
 
     // Check for existing regionIds
     if (isRegionWise && regionIdArray.length > 0) {
@@ -1638,18 +1638,21 @@ const updateIndustryHeadDetails = async (
 const updateIndustryHeadStatus = async (
   industryHeadId,
   isActive,
+  deactivationDate,
   updatedBy,
+
 ) => {
   try {
     const query = `
       UPDATE industry_head_master
-      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      SET isActive = ?, updated_by = ?, endDate =?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
 
     const [result] = await db.execute(query, [
       isActive,
       updatedBy,
+      deactivationDate,
       industryHeadId,
     ]);
     return result;
@@ -2952,8 +2955,10 @@ const createTax = async (countryCode, taxType, taxFieldName, taxPercentage, upda
   }
 };
 
-const updateTax = async (id, countryCode, taxType, taxFieldName, taxPercentage, updatedBy) => {
+const updateTax = async (id, countryCode, taxType, taxFieldName, taxPercentage, isActive, updatedBy) => {
   try {
+    console.log('uuuuuuuuuu', updatedBy);
+    
     const query = `
       UPDATE tax_master
       SET 
@@ -2961,6 +2966,7 @@ const updateTax = async (id, countryCode, taxType, taxFieldName, taxPercentage, 
         taxType = ?, 
         taxFieldName = ?, 
         taxPercentage = ?, 
+        isActive = ?,
         updated_by = ?, 
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
@@ -2970,6 +2976,7 @@ const updateTax = async (id, countryCode, taxType, taxFieldName, taxPercentage, 
       taxType,
       taxFieldName,
       taxPercentage,
+      isActive,
       updatedBy,
       id,
     ]);
@@ -3436,7 +3443,10 @@ const getClients = async () => {
               WHERE FIND_IN_SET(company_info.id, client_info.companyId)) AS companyName,
         (SELECT GROUP_CONCAT(industry_master_info.industryName) 
               FROM industry_master_info 
-              WHERE FIND_IN_SET(industry_master_info.id, client_info.IndustryGroupId)) AS industryGroupNames,
+              WHERE FIND_IN_SET(industry_master_info.id, client_info.IndustryGroupId)) AS currentIndustryGroupNames,
+        (SELECT GROUP_CONCAT(group_industry_info.groupIndustryName) 
+              FROM group_industry_info 
+              WHERE FIND_IN_SET(group_industry_info.id, client_info.IndustryGroupId)) AS industryGroupNames,
         (SELECT GROUP_CONCAT(industry_master_info.subIndustryCategory) 
               FROM industry_master_info 
               WHERE FIND_IN_SET(industry_master_info.id, client_info.IndustrySubGroupId)) AS industrySubGroupNames,
@@ -3445,7 +3455,10 @@ const getClients = async () => {
               WHERE FIND_IN_SET(industry_head_master.id, client_info.IndustryHeadId)) AS industryHeadName,
         (SELECT GROUP_CONCAT(group_industry_info.groupIndustryName) 
               FROM group_industry_info 
-              WHERE FIND_IN_SET(group_industry_info.id, client_info.industryId)) AS industryName,
+              WHERE FIND_IN_SET(group_industry_info.id, client_info.industryId)) AS currentIndustryName,
+        (SELECT GROUP_CONCAT(industry_master_info.industryName) 
+              FROM industry_master_info 
+              WHERE FIND_IN_SET(industry_master_info.id, client_info.industryId)) AS industryName,
         (SELECT GROUP_CONCAT(country_info.name) 
               FROM country_info 
               WHERE FIND_IN_SET(country_info.id, client_info.countryId)) AS countryName,

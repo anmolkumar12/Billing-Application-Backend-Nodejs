@@ -1566,7 +1566,7 @@ const updateIndustryHead = async (req, res) => {
 };
 
 const activateOrDeactivateIndustryHead = async (req, res) => {
-  const { industryHeadId, isActive, updatedBy } = req.body;
+  const { industryHeadId, isActive, deactivationDate, updatedBy } = req.body;
 
   if (!industryHeadId || isActive === undefined) {
     return res.status(400).json({
@@ -1576,7 +1576,7 @@ const activateOrDeactivateIndustryHead = async (req, res) => {
   }
 
   try {
-    await updateIndustryHeadStatus(industryHeadId, isActive, updatedBy);
+    await updateIndustryHeadStatus(industryHeadId, isActive, deactivationDate, updatedBy);
 
     res.status(200).json({
       statusCode: 200,
@@ -2883,6 +2883,8 @@ const updateTaxHandler = async (req, res) => {
   }
 
   try {
+    console.log('uuuuuuuuuu11', updatedBy);
+
     await updateTax(id, countryCode, taxType, taxFieldName, taxPercentage, isActive, updatedBy);
     res.status(200).json({
       statusCode: 200,
