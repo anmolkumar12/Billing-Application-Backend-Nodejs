@@ -419,34 +419,66 @@ CREATE TABLE client_ship_to_info (
 );
 
 
-CREATE TABLE client_info (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  client_name VARCHAR(255),
-  vega_client_name VARCHAR(255),
-  client_type VARCHAR(50),
-  credit_period INT,
-  client_status VARCHAR(50),
-  country_name VARCHAR(255),
-  companyId INT,
-  account_selection VARCHAR(255),
-  industryId VARCHAR(50),
-  industryHeadNames VARCHAR(255),
-  industry_group VARCHAR(255),
-  industry_sub_group VARCHAR(255),
-  sales_person VARCHAR(255),
-  account_manager VARCHAR(255),
-  msa_start_date DATE,
-  msa_end_date DATE,
-  is_msa_missing TINYINT(1),
-  nda_flag TINYINT(1),
-  non_solicitation_clause TINYINT(1),
-  use_logo_permission TINYINT(1),
-  msaFilePath VARCHAR(255),
-  ndaFilePath VARCHAR(255),
-  updated_by INT,
-  isActive TINYINT(1),
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+-- CREATE TABLE client_info (
+--   id INT AUTO_INCREMENT PRIMARY KEY,
+--   client_name VARCHAR(255),
+--   vega_client_name VARCHAR(255),
+--   client_type VARCHAR(50),
+--   credit_period INT,
+--   client_status VARCHAR(50),
+--   country_name VARCHAR(255),
+--   companyId INT,
+--   account_selection VARCHAR(255),
+--   industryId VARCHAR(50),
+--   industryHeadNames VARCHAR(255),
+--   industry_group VARCHAR(255),
+--   industry_sub_group VARCHAR(255),
+--   sales_person VARCHAR(255),
+--   account_manager VARCHAR(255),
+--   msa_start_date DATE,
+--   msa_end_date DATE,
+--   is_msa_missing TINYINT(1),
+--   nda_flag TINYINT(1),
+--   non_solicitation_clause TINYINT(1),
+--   use_logo_permission TINYINT(1),
+--   msaFilePath VARCHAR(255),
+--   ndaFilePath VARCHAR(255),
+--   updated_by INT,
+--   isActive TINYINT(1),
+--   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+-- );
+
+CREATE TABLE `client_info` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `client_name` varchar(255) NOT NULL,
+   `vega_client_name` varchar(255) DEFAULT NULL,
+   `client_type` varchar(50) DEFAULT NULL,
+   `credit_period` int DEFAULT NULL,
+   `client_status` varchar(50) DEFAULT NULL,
+   `countryId` int DEFAULT NULL,
+   `companyId` varchar(255) DEFAULT NULL,
+   `accountId` varchar(255) DEFAULT NULL,
+   `industryId` varchar(50) DEFAULT NULL,
+   `IndustryHeadId` int DEFAULT NULL,
+   `IndustryGroupId` varchar(50) DEFAULT NULL,
+   `IndustrySubGroupId` int DEFAULT NULL,
+   `salesMangerId` varchar(50) DEFAULT NULL,
+   `accountManagerId` varchar(50) DEFAULT NULL,
+   `msa_start_date` varchar(50) DEFAULT NULL,
+   `msa_end_date` varchar(50) DEFAULT NULL,
+   `msa_flag` tinyint(1) DEFAULT '0',
+   `nda_flag` tinyint(1) DEFAULT '0',
+   `non_solicitation_clause_flag` tinyint(1) DEFAULT '0',
+   `use_logo_permission_flag` tinyint(1) DEFAULT '0',
+   `updated_by` int DEFAULT NULL,
+   `isActive` tinyint(1) DEFAULT NULL,
+   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   `msaFilePath` varchar(500) DEFAULT NULL,
+   `ndaFilePath` varchar(500) DEFAULT NULL,
+   `msa_document_id` int DEFAULT NULL,
+   PRIMARY KEY (`id`),
+   KEY `msa_document_id` (`msa_document_id`),
+ );
 
 
 CREATE TABLE client_group_info (
@@ -531,3 +563,5 @@ MODIFY COLUMN `IndustrySubGroupId` VARCHAR(50) NULL DEFAULT NULL ;
 
 -- ALTER TABLE client_info 
 -- MODIFY COLUMN `msa_start_date` VARCHAR(50) NULL DEFAULT NULL ;
+
+
