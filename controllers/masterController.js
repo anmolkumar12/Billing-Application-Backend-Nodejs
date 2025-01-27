@@ -691,16 +691,19 @@ const getCompaniesList = async (req, res) => {
 };
 
 // Company Location Master
+// Company Location Master
 const createCompanyLocation = async (req, res) => {
   const {
-    companyId, // Company ID (foreign key referencing company_info table)
-    countryId, // Country ID (foreign key referencing country_info table)
-    stateId, // State ID (foreign key referencing state_info table)
+    companyId,
+    countryId,
+    stateId,
     address1,
     address2,
-    address3, // Address fields
-    additionalAddressDetails, // Text for additional address details based on country
-    updatedBy, // User updating the company location
+    address3,
+    additionalAddressDetails,
+    isDefaultAddress,
+    isActive,
+    updatedBy,
   } = req.body;
 
   try {
@@ -712,6 +715,8 @@ const createCompanyLocation = async (req, res) => {
       address2,
       address3,
       additionalAddressDetails,
+      isDefaultAddress,
+      isActive,
       updatedBy
     );
 
@@ -720,6 +725,7 @@ const createCompanyLocation = async (req, res) => {
       message: "Company Location created successfully",
     });
   } catch (err) {
+    console.error("Error creating company location:", err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error",
@@ -729,15 +735,17 @@ const createCompanyLocation = async (req, res) => {
 
 const updateCompanyLocation = async (req, res) => {
   const {
-    locationId, // ID of the company location to update
-    companyId, // Company ID
-    countryId, // Country ID
-    stateId, // State ID
+    locationId,
+    companyId,
+    countryId,
+    stateId,
     address1,
     address2,
-    address3, // Address fields
-    additionalAddressDetails, // Additional address details
-    updatedBy, // User updating the company location
+    address3,
+    additionalAddressDetails,
+    isDefaultAddress,
+    isActive,
+    updatedBy,
   } = req.body;
 
   if (!locationId) {
@@ -757,6 +765,8 @@ const updateCompanyLocation = async (req, res) => {
       address2,
       address3,
       additionalAddressDetails,
+      isDefaultAddress,
+      isActive,
       updatedBy
     );
 
@@ -765,12 +775,14 @@ const updateCompanyLocation = async (req, res) => {
       message: "Company Location updated successfully",
     });
   } catch (err) {
+    console.error("Error updating company location:", err);
     res.status(500).json({
       statusCode: 500,
       message: "Server error while updating company location",
     });
   }
 };
+
 
 const getCompanyLocations = async (req, res) => {
   const { companyId } = req.body; // Get companyId from query params
@@ -1565,7 +1577,7 @@ const updateIndustryHead = async (req, res) => {
 };
 
 const activateOrDeactivateIndustryHead = async (req, res) => {
-  const { industryHeadId, isActive, updatedBy } = req.body;
+  const { industryHeadId, isActive, deactivationDate, updatedBy } = req.body;
 
   if (!industryHeadId || isActive === undefined) {
     return res.status(400).json({
@@ -1575,7 +1587,7 @@ const activateOrDeactivateIndustryHead = async (req, res) => {
   }
 
   try {
-    await updateIndustryHeadStatus(industryHeadId, isActive, updatedBy);
+    await updateIndustryHeadStatus(industryHeadId, isActive, deactivationDate, updatedBy);
 
     res.status(200).json({
       statusCode: 200,
@@ -2882,6 +2894,8 @@ const updateTaxHandler = async (req, res) => {
   }
 
   try {
+    console.log('uuuuuuuuuu11', updatedBy);
+
     await updateTax(id, countryCode, taxType, taxFieldName, taxPercentage, isActive, updatedBy);
     res.status(200).json({
       statusCode: 200,
@@ -3304,26 +3318,45 @@ const getClientContactsList = async (req, res) => {
 
 // Create Client Bill To
 const createClientBillTo = async (req, res) => {
-  const { clientId, countryId, address1, address2, address3, additionalAddressDetails, updatedBy } = req.body;
+  const {
+    clientId,
+    countryId,
+    address1,
+    address2,
+    address3,
+    additionalAddressDetails,
+    isDefaultAddress,
+    updated_by // Use `updated_by` to match the payload
+  } = req.body;
 
   try {
-    await insertClientBillTo(clientId, countryId, address1, address2, address3, additionalAddressDetails, updatedBy);
+    await insertClientBillTo(
+      clientId,
+      countryId,
+      address1,
+      address2,
+      address3,
+      additionalAddressDetails,
+      isDefaultAddress,
+      updated_by // Pass `updated_by` as `updatedBy`
+    );
     res.status(201).json({ statusCode: 201, message: "Client Bill To created successfully" });
   } catch (err) {
+    console.error("Error inserting into client_bill_to_info:", err);
     res.status(500).json({ statusCode: 500, message: "Server error" });
   }
 };
 
 // Update Client Bill To
 const updateClientBillTo = async (req, res) => {
-  const { id, clientId, address1, address2, address3, additionalAddressDetails, updatedBy } = req.body;
+  const { id, clientId, countryId, address1, address2, address3, additionalAddressDetails,isDefaultAddress, updatedBy } = req.body;
 
   if (!id) {
     return res.status(400).json({ statusCode: 400, message: "ID is required" });
   }
 
   try {
-    await updateClientBillToDetails(id, clientId, address1, address2, address3, additionalAddressDetails, updatedBy);
+    await updateClientBillToDetails(id, clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, updatedBy);
     res.status(200).json({ statusCode: 200, message: "Client Bill To updated successfully" });
   } catch (err) {
     res.status(500).json({ statusCode: 500, message: "Server error" });
@@ -3360,27 +3393,47 @@ const getClientBillTo = async (req, res) => {
 
 
 // Create Client Ship To
+// Create Client Ship To
 const createClientShipTo = async (req, res) => {
-  const { clientId, countryId, address1, address2, address3, additionalAddressDetails, updatedBy } = req.body;
+  const {
+    clientId,
+    countryId,
+    address1,
+    address2,
+    address3,
+    additionalAddressDetails,
+    isDefaultAddress,
+    updated_by // Corrected to match the payload
+  } = req.body;
 
   try {
-    await insertClientShipTo(clientId, countryId, address1, address2, address3, additionalAddressDetails, updatedBy);
+    await insertClientShipTo(
+      clientId,
+      countryId,
+      address1,
+      address2,
+      address3,
+      additionalAddressDetails,
+      isDefaultAddress,
+      updated_by // Pass the correct field
+    );
     res.status(201).json({ statusCode: 201, message: "Client Shipping info created successfully" });
   } catch (err) {
+    console.error("Error creating client shipping info:", err);
     res.status(500).json({ statusCode: 500, message: "Server error" });
   }
 };
 
 // Update Client Ship To
 const updateClientShipTo = async (req, res) => {
-  const { id, clientId, address1, address2, address3, additionalAddressDetails, updatedBy } = req.body;
+  const { id, clientId, countryId, address1, address2, address3, additionalAddressDetails,isDefaultAddress, updatedBy } = req.body;
 
   if (!id) {
     return res.status(400).json({ statusCode: 400, message: "ID is required" });
   }
 
   try {
-    await updateClientShipToDetails(id, clientId, address1, address2, address3, additionalAddressDetails, updatedBy);
+    await updateClientShipToDetails(id, clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, updatedBy);
     res.status(200).json({ statusCode: 200, message: "Client Shipping info updated successfully" });
   } catch (err) {
     res.status(500).json({ statusCode: 500, message: "Server error" });

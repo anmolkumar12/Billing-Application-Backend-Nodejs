@@ -633,7 +633,7 @@ const getCompanies = async () => {
   }
 };
 
-// Compnay location master
+// Insert Company Location
 const insertCompanyLocation = async (
   companyId,
   countryId,
@@ -642,32 +642,39 @@ const insertCompanyLocation = async (
   address2,
   address3,
   additionalAddressDetails,
+  isDefaultAddress,
+  isActive,
   updatedBy
 ) => {
   try {
     const query = `
-      INSERT INTO company_location_info (companyId, countryId, stateId, address1, address2, address3, additionalAddressDetails, updated_by, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      INSERT INTO company_location_info 
+      (companyId, countryId, stateId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, isActive, updated_by, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
-    const [result] = await db.execute(query, [
-      companyId,
-      countryId,
-      stateId,
-      address1,
-      address2,
-      address3,
-      additionalAddressDetails,
-      updatedBy,
-    ]);
+    const sanitizedValues = [
+      companyId ?? null,
+      countryId ?? null,
+      stateId ?? null,
+      address1 ?? null,
+      address2 ?? null,
+      address3 ?? null,
+      JSON.stringify(additionalAddressDetails) ?? null,
+      isDefaultAddress ?? null,
+      isActive ?? null,
+      updatedBy ?? null,
+    ];
 
+    const [result] = await db.execute(query, sanitizedValues);
     return result;
   } catch (err) {
-    console.log("Error inserting company location:", err);
+    console.error("Error inserting company location:", err);
     throw err;
   }
 };
 
+// Update Company Location
 const updateLocationDetails = async (
   locationId,
   companyId,
@@ -677,21 +684,11 @@ const updateLocationDetails = async (
   address2,
   address3,
   additionalAddressDetails,
+  isDefaultAddress,
+  isActive,
   updatedBy
 ) => {
   try {
-    const sanitizedValues = [
-      companyId ?? null,
-      countryId ?? null,
-      stateId ?? null,
-      address1 ?? null,
-      address2 ?? null,
-      address3 ?? null,
-      additionalAddressDetails ?? null,
-      updatedBy ?? null,
-      locationId,
-    ];
-
     const query = `
       UPDATE company_location_info
       SET 
@@ -702,18 +699,35 @@ const updateLocationDetails = async (
         address2 = ?, 
         address3 = ?, 
         additionalAddressDetails = ?, 
+        isDefaultAddress = ?, 
+        isActive = ?, 
         updated_by = ?, 
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
 
+    const sanitizedValues = [
+      companyId ?? null,
+      countryId ?? null,
+      stateId ?? null,
+      address1 ?? null,
+      address2 ?? null,
+      address3 ?? null,
+      JSON.stringify(additionalAddressDetails) ?? null,
+      isDefaultAddress ?? null,
+      isActive ?? null,
+      updatedBy ?? null,
+      locationId,
+    ];
+
     const [result] = await db.execute(query, sanitizedValues);
     return result;
   } catch (err) {
-    console.log("Error updating company location:", err);
+    console.error("Error updating company location:", err);
     throw err;
   }
 };
+
 
 const getLocations = async (companyId = null) => {
   try {
@@ -1386,7 +1400,7 @@ const insertIndustryHead = async (
     // Convert regionIds and stateIds to arrays for comparison
     const regionIdArray = regionIds ? String(regionIds).split(",").map(id => id.trim()) : [];
     const stateIdArray = stateIds ? String(stateIds).split(",").map(id => id.trim()) : [];
-    console.log('regionIdArray', regionIdArray, stateIdArray);
+    console.log('regionIdArray', code);
 
     // Check for existing regionIds
     if (isRegionWise && regionIdArray.length > 0) {
@@ -1624,18 +1638,21 @@ const updateIndustryHeadDetails = async (
 const updateIndustryHeadStatus = async (
   industryHeadId,
   isActive,
+  deactivationDate,
   updatedBy,
+
 ) => {
   try {
     const query = `
       UPDATE industry_head_master
-      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      SET isActive = ?, updated_by = ?, endDate =?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
 
     const [result] = await db.execute(query, [
       isActive,
       updatedBy,
+      deactivationDate,
       industryHeadId,
     ]);
     return result;
@@ -2938,8 +2955,10 @@ const createTax = async (countryCode, taxType, taxFieldName, taxPercentage, upda
   }
 };
 
-const updateTax = async (id, countryCode, taxType, taxFieldName, taxPercentage, updatedBy) => {
+const updateTax = async (id, countryCode, taxType, taxFieldName, taxPercentage, isActive, updatedBy) => {
   try {
+    console.log('uuuuuuuuuu', updatedBy);
+    
     const query = `
       UPDATE tax_master
       SET 
@@ -2947,6 +2966,7 @@ const updateTax = async (id, countryCode, taxType, taxFieldName, taxPercentage, 
         taxType = ?, 
         taxFieldName = ?, 
         taxPercentage = ?, 
+        isActive = ?,
         updated_by = ?, 
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
@@ -2956,6 +2976,7 @@ const updateTax = async (id, countryCode, taxType, taxFieldName, taxPercentage, 
       taxType,
       taxFieldName,
       taxPercentage,
+      isActive,
       updatedBy,
       id,
     ]);
@@ -3422,7 +3443,10 @@ const getClients = async () => {
               WHERE FIND_IN_SET(company_info.id, client_info.companyId)) AS companyName,
         (SELECT GROUP_CONCAT(industry_master_info.industryName) 
               FROM industry_master_info 
-              WHERE FIND_IN_SET(industry_master_info.id, client_info.IndustryGroupId)) AS industryGroupNames,
+              WHERE FIND_IN_SET(industry_master_info.id, client_info.IndustryGroupId)) AS currentIndustryGroupNames,
+        (SELECT GROUP_CONCAT(group_industry_info.groupIndustryName) 
+              FROM group_industry_info 
+              WHERE FIND_IN_SET(group_industry_info.id, client_info.IndustryGroupId)) AS industryGroupNames,
         (SELECT GROUP_CONCAT(industry_master_info.subIndustryCategory) 
               FROM industry_master_info 
               WHERE FIND_IN_SET(industry_master_info.id, client_info.IndustrySubGroupId)) AS industrySubGroupNames,
@@ -3431,7 +3455,10 @@ const getClients = async () => {
               WHERE FIND_IN_SET(industry_head_master.id, client_info.IndustryHeadId)) AS industryHeadName,
         (SELECT GROUP_CONCAT(group_industry_info.groupIndustryName) 
               FROM group_industry_info 
-              WHERE FIND_IN_SET(group_industry_info.id, client_info.industryId)) AS industryName,
+              WHERE FIND_IN_SET(group_industry_info.id, client_info.industryId)) AS currentIndustryName,
+        (SELECT GROUP_CONCAT(industry_master_info.industryName) 
+              FROM industry_master_info 
+              WHERE FIND_IN_SET(industry_master_info.id, client_info.industryId)) AS industryName,
         (SELECT GROUP_CONCAT(country_info.name) 
               FROM country_info 
               WHERE FIND_IN_SET(country_info.id, client_info.countryId)) AS countryName,
@@ -3549,24 +3576,28 @@ const insertClientBillTo = async (
   address2,
   address3,
   additionalAddressDetails,
+  isDefaultAddress,
   updatedBy
 ) => {
   try {
+    const sanitizedValues = [
+      clientId ?? null,
+      countryId ?? null,
+      address1 ?? null,
+      address2 ?? null,
+      address3 ?? null,
+      JSON.stringify(additionalAddressDetails) ?? null,
+      isDefaultAddress ?? null,
+      updatedBy ?? null // Explicitly handle `undefined` and convert to `null`
+    ];
+
     const query = `
       INSERT INTO client_bill_to_info 
-      (clientId, countryId, address1, address2, address3, additionalAddressDetails, updated_by, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      (clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, updated_by, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
-    const [result] = await db.execute(query, [
-      clientId,
-      countryId,
-      address1,
-      address2,
-      address3,
-      JSON.stringify(additionalAddressDetails),
-      updatedBy,
-    ]);
+    const [result] = await db.execute(query, sanitizedValues);
 
     return result;
   } catch (err) {
@@ -3579,35 +3610,42 @@ const insertClientBillTo = async (
 const updateClientBillToDetails = async (
   id,
   clientId,
+  countryId,
   address1,
   address2,
   address3,
   additionalAddressDetails,
+  isDefaultAddress,
   updatedBy
 ) => {
   try {
+    const sanitizedValues = [
+      clientId ?? null,
+      countryId ?? null,
+      address1 ?? null,
+      address2 ?? null,
+      address3 ?? null,
+      JSON.stringify(additionalAddressDetails) ?? null,
+      isDefaultAddress, // Explicitly pass isDefaultAddress without coalescing to null
+      updatedBy ?? null,
+      id // Ensure 'id' is the last parameter
+    ];
     const query = `
       UPDATE client_bill_to_info
       SET 
         clientId = ?, 
+        countryId = ?,
         address1 = ?, 
         address2 = ?, 
         address3 = ?, 
         additionalAddressDetails = ?, 
+        isDefaultAddress = ?,
         updated_by = ?, 
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
 
-    const [result] = await db.execute(query, [
-      clientId,
-      address1,
-      address2,
-      address3,
-      JSON.stringify(additionalAddressDetails),
-      updatedBy,
-      id,
-    ]);
+    const [result] = await db.execute(query, sanitizedValues);
 
     return result;
   } catch (err) {
@@ -3678,24 +3716,28 @@ const insertClientShipTo = async (
   address2,
   address3,
   additionalAddressDetails,
+  isDefaultAddress,
   updatedBy
 ) => {
   try {
+    const sanitizedValues = [
+      clientId ?? null,
+      countryId ?? null,
+      address1 ?? null,
+      address2 ?? null,
+      address3 ?? null,
+      JSON.stringify(additionalAddressDetails) ?? null,
+      isDefaultAddress ?? null,
+      updatedBy ?? null // Ensure this is not undefined
+    ];
+
     const query = `
       INSERT INTO client_ship_to_info 
-      (clientId, countryId, address1, address2, address3, additionalAddressDetails, updated_by, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      (clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, updated_by, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
-    const [result] = await db.execute(query, [
-      clientId,
-      countryId,
-      address1,
-      address2,
-      address3,
-      JSON.stringify(additionalAddressDetails),
-      updatedBy,
-    ]);
+    const [result] = await db.execute(query, sanitizedValues);
 
     return result;
   } catch (err) {
@@ -3708,35 +3750,43 @@ const insertClientShipTo = async (
 const updateClientShipToDetails = async (
   id,
   clientId,
+  countryId,
   address1,
   address2,
   address3,
   additionalAddressDetails,
+  isDefaultAddress,
   updatedBy
 ) => {
   try {
+    const sanitizedValues = [
+      clientId ?? null,
+      countryId ?? null,
+      address1 ?? null,
+      address2 ?? null,
+      address3 ?? null,
+      JSON.stringify(additionalAddressDetails) ?? null,
+      isDefaultAddress, // Explicitly pass isDefaultAddress without coalescing to null
+      updatedBy ?? null,
+      id // Ensure 'id' is the last parameter
+    ];
+
     const query = `
       UPDATE client_ship_to_info
       SET 
-        clientId = ?, 
+        clientId = ?,
+        countryId = ?, 
         address1 = ?, 
         address2 = ?, 
         address3 = ?, 
         additionalAddressDetails = ?, 
+        isDefaultAddress = ?,
         updated_by = ?, 
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
 
-    const [result] = await db.execute(query, [
-      clientId,
-      address1,
-      address2,
-      address3,
-      JSON.stringify(additionalAddressDetails),
-      updatedBy,
-      id,
-    ]);
+    const [result] = await db.execute(query, sanitizedValues);
 
     return result;
   } catch (err) {
