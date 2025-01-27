@@ -4084,7 +4084,7 @@ const getPoCascadingConfigurationData = async () => {
     const [industryHeadData] = await db.execute(`
       SELECT id AS industryHeadId, industryHeadName, industryIds, isRegionWise, countryIds, regionIds, stateIds 
       FROM industry_head_master
-      WHERE isActive = 1 AND startDate <= CURDATE() AND endDate >= CURDATE()
+      WHERE isActive = 1
     `);
 
     const [salesManagerData] = await db.execute(`
