@@ -495,7 +495,11 @@ router.post('/insertPoContract', authMiddleware, upload.fields([
   { name: "file", maxCount: 1 },
   // { name: "digitalSign", maxCount: 1 },
 ]), insertPoContractHandler);
-router.post('/updatePoContract', authMiddleware, updatePoContractHandler);
+router.post('/updatePoContract', authMiddleware, upload.fields([
+  { name: "file", maxCount: 1 },
+  // { name: "digitalSign", maxCount: 1 },
+]), updatePoContractHandler);
+// router.post('/updatePoContract', authMiddleware, updatePoContractHandler);
 router.post('/activateDeactivatePoContract', authMiddleware, activateDeactivatePoContractHandler);
 
 

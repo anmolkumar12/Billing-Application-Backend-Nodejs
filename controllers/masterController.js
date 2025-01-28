@@ -554,7 +554,7 @@ const addCompany = async (req, res) => {
   } = req.body;
 
   // Access the files from req.files
-  
+
   const logoPath = req.files.logo ? req.files.logo[0].path.replace("\\", "/") : null;
   const digitalSignPath = req.files.digitalSign ? req.files.digitalSign[0].path.replace("\\", "/") : null;
 
@@ -3349,7 +3349,7 @@ const createClientBillTo = async (req, res) => {
 
 // Update Client Bill To
 const updateClientBillTo = async (req, res) => {
-  const { id, clientId, countryId, address1, address2, address3, additionalAddressDetails,isDefaultAddress, updatedBy } = req.body;
+  const { id, clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, updatedBy } = req.body;
 
   if (!id) {
     return res.status(400).json({ statusCode: 400, message: "ID is required" });
@@ -3426,7 +3426,7 @@ const createClientShipTo = async (req, res) => {
 
 // Update Client Ship To
 const updateClientShipTo = async (req, res) => {
-  const { id, clientId, countryId, address1, address2, address3, additionalAddressDetails,isDefaultAddress, updatedBy } = req.body;
+  const { id, clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, updatedBy } = req.body;
 
   if (!id) {
     return res.status(400).json({ statusCode: 400, message: "ID is required" });
@@ -3555,269 +3555,267 @@ const getClientGroups = async (req, res) => {
 };
 
 const getPoContractConfiguration = async (req, res) => {
-      try {
-        const sqlResults = await getPoContractConfigurationModel();
-        res.status(200).json({
-          statusCode: 200,
-          data:sqlResults,
-        });
-      } catch (err) {
-        console.log('error---------->',err);
-        res.status(500).json({
-          statusCode: 500,
-          message: err || "Server error while retrieving client groups",
-        });
-      }
-    };
+  try {
+    const sqlResults = await getPoContractConfigurationModel();
+    res.status(200).json({
+      statusCode: 200,
+      data: sqlResults,
+    });
+  } catch (err) {
+    console.log('error---------->', err);
+    res.status(500).json({
+      statusCode: 500,
+      message: err || "Server error while retrieving client groups",
+    });
+  }
+};
 const getPoConfigMastersDataHandler = async (req, res) => {
-      try {
-        const sqlResults = await getPoContractConfigurationData();
+  try {
+    const sqlResults = await getPoContractConfigurationData();
 
-        res.status(200).json({
-          statusCode: 200,
-          data:sqlResults,
-        });
-      } catch (err) {
-        console.log('error---------->',err);
-        res.status(500).json({
-          statusCode: 500,
-          message: err || "Server error while retrieving client groups",
-        });
-      }
-    };
-    const getPoCascadingDataHandler = async (req, res) => {
-      try {
-        const sqlResults = await getPoCascadingConfigurationData();
+    res.status(200).json({
+      statusCode: 200,
+      data: sqlResults,
+    });
+  } catch (err) {
+    console.log('error---------->', err);
+    res.status(500).json({
+      statusCode: 500,
+      message: err || "Server error while retrieving client groups",
+    });
+  }
+};
+const getPoCascadingDataHandler = async (req, res) => {
+  try {
+    const sqlResults = await getPoCascadingConfigurationData();
 
-        res.status(200).json({
-          statusCode: 200,
-          data:sqlResults,
-        });
-      } catch (err) {
-        console.log('error---------->',err);
-        res.status(500).json({
-          statusCode: 500,
-          message: err || "Server error while retrieving client groups",
-        });
-      }
-    };
-    
+    res.status(200).json({
+      statusCode: 200,
+      data: sqlResults,
+    });
+  } catch (err) {
+    console.log('error---------->', err);
+    res.status(500).json({
+      statusCode: 500,
+      message: err || "Server error while retrieving client groups",
+    });
+  }
+};
 
-    const insertPoContractHandler = async (req, res) => {
-      const {
-        clientId,
-        client_name,
-        clientBillTo,
-        clientShipAddress,
-        clientContact,
-        billFrom,
-        companyName,
-        companyLocation,
-        creditPeriod,
-        poAmount,
-        dueAmount,
-        start_date,
-        end_date,
-        projectService,
-        technolgyGroup,
-        technolgySubGroup,
-        technolgy,
-        oem,
-        product,
-        docType,
-        poNumber,
-        srNumber,
-        industryGroups,
-        subIndustries,
-        industryHead,
-        salesManager,
-        accountManager,noOfResources,resourcesData,masterNames
-      } = req.body;
-    
-      // Retrieve the file path if a file is uploaded
-      const filePath = req.files && req.files.file ? req.files.file[0].path.replace("\\", "/") : null;
-       
-      // Validate required fields
-      if (!clientId) {
-        return res.status(400).json({
-          statusCode: 400,
-          message: "Client ID is required",
-        });
-      }
 
-      console.log('we are there in creating the file');
-      try {
-        await insertPoContract(
-          clientId,
-          client_name,
-          clientBillTo,
-          clientShipAddress,
-          clientContact,
-          billFrom,
-          companyName,
-          companyLocation,
-          creditPeriod,
-          poAmount,
-          dueAmount,
-          start_date,
-          end_date,
-          projectService,
-          technolgyGroup,
-          technolgySubGroup,
-          technolgy,
-          oem,
-          product,
-          docType,
-          poNumber,
-          srNumber,
-          industryGroups,
-          subIndustries,
-          industryHead,
-          salesManager,
-          accountManager,filePath,noOfResources,resourcesData,masterNames);
-        // Respond with a success message
-        res.status(201).json({
-          statusCode: 201,
-          message: "PO contract created successfully",
-        });
-      } catch (err) {
-        // Handle errors
-        console.log('errr->',err);
-        res.status(500).json({
-          statusCode: 500,
-          message: "Server error while creating PO contract",
-          error: err,
-        });
-      }
-    };
-    
+const insertPoContractHandler = async (req, res) => {
+  const {
+    clientId,
+    client_name,
+    clientBillTo,
+    clientShipAddress,
+    clientContact,
+    billFrom,
+    companyName,
+    companyLocation,
+    creditPeriod,
+    poAmount,
+    dueAmount,
+    start_date,
+    end_date,
+    projectService,
+    technolgyGroup,
+    technolgySubGroup,
+    technolgy,
+    oem,
+    product,
+    docType,
+    poNumber,
+    srNumber,
+    industryGroups,
+    subIndustries,
+    industryHead,
+    salesManager,
+    accountManager, noOfResources, resourcesData, masterNames
+  } = req.body;
 
-    const updatePoContractHandler = async (req, res) => {
-      const {
-        id,
-        client_name,
-        clientBillTo,
-        clientShipAddress,
-        clientContact,
-        billFrom,
-        companyName,
-        companyLocation,
-        creditPeriod,
-        poAmount,
-        dueAmount,
-        start_date,
-        end_date,
-        projectService,
-        technolgyGroup,
-        technolgySubGroup,
-        technolgy,
-        oem,
-        product,
-        docType,
-        poNumber,
-        srNumber,
-        industryGroups,
-        subIndustries,
-        industryHead,
-        salesManager,
-        accountManager,
-        filePath,noOfResources,resourcesData,masterNames
-      } = req.body;
-      if(!filePath){
-        filePath = req.files && req.files.file ? req.files.file[0].path.replace("\\", "/") : null;
-      }
-    
-      if (!id) {
-        return res.status(400).json({
-          statusCode: 400,
-          message: "PO contract ID is required",
-        });
-      }
-      try {
-        await updatePoContract(
-          id,
-          client_name,
-          clientBillTo,
-          clientShipAddress,
-          clientContact,
-          billFrom,
-          companyName,
-          companyLocation,
-          creditPeriod,
-          poAmount,
-          dueAmount,
-          start_date,
-          end_date,
-          projectService,
-          technolgyGroup,
-          technolgySubGroup,
-          technolgy,
-          oem,
-          product,
-          docType,
-          poNumber,
-          srNumber,
-          industryGroups,
-          subIndustries,
-          industryHead,
-          salesManager,
-          accountManager,filePath,noOfResources,resourcesData,masterNames);
-        res.status(200).json({
-          statusCode: 200,
-          message: "PO contract updated successfully",
-        });
-      } catch (err) {
-        res.status(500).json({
-          statusCode: 500,
-          message: "Server error while updating PO contract",
-          error: err,
-        });
-      }
-    };
-    
-        
+  // Retrieve the file path if a file is uploaded
+  const filePath = req.files && req.files.file ? req.files.file[0].path.replace("\\", "/") : null;
+
+  // Validate required fields
+  if (!clientId) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Client ID is required",
+    });
+  }
+
+  console.log('we are there in creating the file');
+  try {
+    await insertPoContract(
+      clientId,
+      client_name,
+      clientBillTo,
+      clientShipAddress,
+      clientContact,
+      billFrom,
+      companyName,
+      companyLocation,
+      creditPeriod,
+      poAmount,
+      dueAmount,
+      start_date,
+      end_date,
+      projectService,
+      technolgyGroup,
+      technolgySubGroup,
+      technolgy,
+      oem,
+      product,
+      docType,
+      poNumber,
+      srNumber,
+      industryGroups,
+      subIndustries,
+      industryHead,
+      salesManager,
+      accountManager, filePath, noOfResources, resourcesData, masterNames);
+    // Respond with a success message
+    res.status(201).json({
+      statusCode: 201,
+      message: "PO contract created successfully",
+    });
+  } catch (err) {
+    // Handle errors
+    console.log('errr->', err);
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while creating PO contract",
+      error: err,
+    });
+  }
+};
+
+
+const updatePoContractHandler = async (req, res) => {
+  const {
+    id,
+    client_name,
+    clientBillTo,
+    clientShipAddress,
+    clientContact,
+    billFrom,
+    companyName,
+    companyLocation,
+    creditPeriod,
+    poAmount,
+    dueAmount,
+    start_date,
+    end_date,
+    projectService,
+    technolgyGroup,
+    technolgySubGroup,
+    technolgy,
+    oem,
+    product,
+    docType,
+    poNumber,
+    srNumber,
+    industryGroups,
+    subIndustries,
+    industryHead,
+    salesManager,
+    accountManager,
+    noOfResources, resourcesData, masterNames
+  } = req.body;
+  const filePath = req.files && req.files.file ? req.files.file[0].path.replace("\\", "/") : null;
+
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "PO contract ID is required",
+    });
+  }
+  try {
+    await updatePoContract(
+      id,
+      client_name,
+      clientBillTo,
+      clientShipAddress,
+      clientContact,
+      billFrom,
+      companyName,
+      companyLocation,
+      creditPeriod,
+      poAmount,
+      dueAmount,
+      start_date,
+      end_date,
+      projectService,
+      technolgyGroup,
+      technolgySubGroup,
+      technolgy,
+      oem,
+      product,
+      docType,
+      poNumber,
+      srNumber,
+      industryGroups,
+      subIndustries,
+      industryHead,
+      salesManager,
+      accountManager, filePath, noOfResources, resourcesData, masterNames);
+    res.status(200).json({
+      statusCode: 200,
+      message: "PO contract updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating PO contract",
+      error: err,
+    });
+  }
+};
+
+
 
 const activateDeactivatePoContractHandler = async (req, res) => {
-      const { id, isActive } = req.body;
-    
-      if (!id) {
-        return res.status(400).json({
-          statusCode: 400,
-          message: "PO contract ID is required",
-        });
-      }
-      try {
-        const sqlResults = await activateDeactivatePoContract(id,isActive);
-        const status = isActive === 1 ? "activated" : "deactivated";
-        res.status(200).json({
-          statusCode: 200,
-          message: `PO contract ${status} successfully`,
-        });
-      } catch (err) {
-        res.status(500).json({
-          statusCode: 500,
-          message: "Server error while updating PO contract status",
-        });
-      }
-    };
-       
- 
-const getPoContractsDataHandler = async (req, res) => {
-      try {
-        const sqlResults = await getAllPoContracts();
-        res.status(200).json({
-          statusCode: 200,
-          poContracts: sqlResults || [],
-        });
-      } catch (err) {
-        res.status(500).json({
-          statusCode: 500,
-          message: "Server error while retrieving PO contracts",
-        });
-      }
-    };
+  const { id, isActive } = req.body;
 
-       
+  if (!id) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "PO contract ID is required",
+    });
+  }
+  try {
+    const sqlResults = await activateDeactivatePoContract(id, isActive);
+    const status = isActive === 1 ? "activated" : "deactivated";
+    res.status(200).json({
+      statusCode: 200,
+      message: `PO contract ${status} successfully`,
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while updating PO contract status",
+    });
+  }
+};
+
+
+const getPoContractsDataHandler = async (req, res) => {
+  try {
+    const sqlResults = await getAllPoContracts();
+    res.status(200).json({
+      statusCode: 200,
+      poContracts: sqlResults || [],
+    });
+  } catch (err) {
+    res.status(500).json({
+      statusCode: 500,
+      message: "Server error while retrieving PO contracts",
+    });
+  }
+};
+
+
 
 
 const updateMSAFile = async (req, res) => {

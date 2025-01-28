@@ -4301,8 +4301,9 @@ const activateDeactivatePoContract = async (id, isActive) => {
 
 const getAllPoContracts = async () => {
   try {
+    // SELECT * FROM po_contract_info WHERE isActive = 1
     const query = `
-      SELECT * FROM po_contract_info WHERE isActive = 1
+      SELECT * FROM po_contract_info
     `;
     const [contracts] = await db.execute(query);
     return contracts;
