@@ -145,6 +145,14 @@ const {
   updateClientGroup,
   activateDeactivateClientGroup,
   getClientGroups,
+
+  getPoContractConfiguration,
+  getPoConfigMastersDataHandler,
+  getPoCascadingDataHandler,
+  insertPoContractHandler,
+  updatePoContractHandler,
+  activateDeactivatePoContractHandler,
+  getPoContractsDataHandler,
   
   updateMSAFile
 
@@ -474,6 +482,26 @@ router.post('/createClientGroup', authMiddleware, createClientGroup);
 router.post('/updateClientGroup', authMiddleware, updateClientGroup);
 router.post('/activateDeactivateClientGroup', authMiddleware, activateDeactivateClientGroup);
 router.get('/getClientGroups', authMiddleware, getClientGroups);
+
+
+//  Routes For PO Contract Config
+router.post('/getPoContractConfiguration',authMiddleware,getPoContractConfiguration);
+router.post('/getPoContractMasterData',authMiddleware,getPoConfigMastersDataHandler);
+router.post('/getAllCascadingData',authMiddleware,getPoCascadingDataHandler);
+
+
+router.post('/getPoContractsData', authMiddleware, getPoContractsDataHandler);
+router.post('/insertPoContract', authMiddleware, upload.fields([
+  { name: "file", maxCount: 1 },
+  // { name: "digitalSign", maxCount: 1 },
+]), insertPoContractHandler);
+router.post('/updatePoContract', authMiddleware, upload.fields([
+  { name: "file", maxCount: 1 },
+  // { name: "digitalSign", maxCount: 1 },
+]), updatePoContractHandler);
+// router.post('/updatePoContract', authMiddleware, updatePoContractHandler);
+router.post('/activateDeactivatePoContract', authMiddleware, activateDeactivatePoContractHandler);
+
 
 // API for updating MSA file
 // router.post("/updateMSAFile", authMiddleware, upload.single("msaFile"), updateMSAFile);

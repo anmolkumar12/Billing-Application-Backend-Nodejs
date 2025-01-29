@@ -355,6 +355,48 @@ CREATE TABLE client_type_master (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- 
+CREATE TABLE `po_contract_info` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `clientId` int NOT NULL,
+  `client_name` varchar(255) DEFAULT NULL,
+  `clientBillTo` text,
+  `clientShipAddress` text,
+  `clientContact` text,
+  `billFrom` text,
+  `companyName` varchar(255) DEFAULT NULL,
+  `companyLocation` varchar(255) DEFAULT NULL,
+  `creditPeriod` int DEFAULT NULL,
+  `poAmount` varchar(100) DEFAULT NULL,
+  `dueAmount` varchar(100) DEFAULT NULL,
+  `start_date` varchar(100) DEFAULT NULL,
+  `end_date` varchar(100) DEFAULT NULL,
+  `projectService` text,
+  `technolgyGroup` text,
+  `technolgySubGroup` text,
+  `technolgy` text,
+  `oem` text,
+  `product` text,
+  `docType` varchar(100) DEFAULT NULL,
+  `poNumber` varchar(255) DEFAULT NULL,
+  `isActive` int DEFAULT '1',
+  `srNumber` varchar(255) DEFAULT NULL,
+  `industryGroups` text,
+  `subIndustries` text,
+  `industryHead` text,
+  `salesManager` text,
+  `accountManager` text,
+  `filePath` varchar(255) DEFAULT NULL,
+  `noOfResources` varchar(50) DEFAULT NULL,
+  `resourcesData` json DEFAULT NULL,
+  `masterNames` json DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
 
 
 
