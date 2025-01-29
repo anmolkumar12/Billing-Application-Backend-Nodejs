@@ -4123,6 +4123,7 @@ const insertPoContract = async (
   billFrom,
   companyName,
   companyLocation,
+  po_name,
   creditPeriod,
   poAmount,
   dueAmount,
@@ -4151,12 +4152,12 @@ const insertPoContract = async (
     const query = `
       INSERT INTO po_contract_info (
         clientId, client_name, clientBillTo, clientShipAddress, clientContact,
-        billFrom, companyName, companyLocation, creditPeriod, poAmount,
+        billFrom, companyName, companyLocation, po_name, creditPeriod, poAmount,
         dueAmount, start_date, end_date, projectService, technolgyGroup,
         technolgySubGroup, technolgy, oem, product, docType, poNumber,
         srNumber, industryGroups, subIndustries, industryHead, salesManager,
         accountManager, filePath,noOfResources,resourcesData,masterNames
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)
     `;
     const [result] = await db.execute(query, [
       clientId,
@@ -4167,6 +4168,7 @@ const insertPoContract = async (
       billFrom || null,
       companyName || null,
       companyLocation || null,
+      po_name || null,
       creditPeriod || null,
       poAmount || null,
       dueAmount || null,
@@ -4207,6 +4209,7 @@ const updatePoContract = async (
   billFrom,
   companyName,
   companyLocation,
+  po_name,
   creditPeriod,
   poAmount,
   dueAmount,
@@ -4236,7 +4239,7 @@ const updatePoContract = async (
       UPDATE po_contract_info
       SET
         client_name = ?, clientBillTo = ?, clientShipAddress = ?, clientContact = ?,
-        billFrom = ?, companyName = ?, companyLocation = ?, creditPeriod = ?,
+        billFrom = ?, companyName = ?, companyLocation = ?, po_name = ?, creditPeriod = ?,
         poAmount = ?, dueAmount = ?, start_date = ?, end_date = ?, projectService = ?,
         technolgyGroup = ?, technolgySubGroup = ?, technolgy = ?, oem = ?, product = ?,
         docType = ?, poNumber = ?, srNumber = ?, industryGroups = ?, subIndustries = ?,
@@ -4252,6 +4255,7 @@ const updatePoContract = async (
       billFrom || null,
       companyName || null,
       companyLocation || null,
+      po_name || null,
       creditPeriod || null,
       poAmount || null,
       dueAmount || null,
