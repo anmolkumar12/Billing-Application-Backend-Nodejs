@@ -153,8 +153,11 @@ const {
   updatePoContractHandler,
   activateDeactivatePoContractHandler,
   getPoContractsDataHandler,
-  
-  updateMSAFile
+  updateMSAFile,
+  insertInvoiceHandler,
+  updateInvoiceHandler,
+  activateDeactivateInvoiceHandler,
+  getInvoicesDataHandler
 
 } = require("../controllers/masterController");
 const multer = require("multer");
@@ -510,5 +513,16 @@ router.post(
   upload.single("msaFile"),
   updateMSAFile
 );
+
+
+router.post('/getInvoicesData', authMiddleware, getInvoicesDataHandler);
+router.post('/insertInvoice', authMiddleware, upload.fields([
+  { name: "file", maxCount: 1 }
+]), insertInvoiceHandler);
+router.post('/updateInvoice', authMiddleware, upload.fields([
+  { name: "file", maxCount: 1 }
+]), updateInvoiceHandler);
+router.post('/activateDeactivateInvoice', authMiddleware, activateDeactivateInvoiceHandler);
+
 
 module.exports = router;

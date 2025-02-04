@@ -1396,7 +1396,7 @@ const insertIndustryHead = async (
   isActive
 ) => {
   try {
-    
+
     // Convert regionIds and stateIds to arrays for comparison
     const regionIdArray = regionIds ? String(regionIds).split(",").map(id => id.trim()) : [];
     const stateIdArray = stateIds ? String(stateIds).split(",").map(id => id.trim()) : [];
@@ -2958,7 +2958,7 @@ const createTax = async (countryCode, taxType, taxFieldName, taxPercentage, upda
 const updateTax = async (id, countryCode, taxType, taxFieldName, taxPercentage, isActive, updatedBy) => {
   try {
     console.log('uuuuuuuuuu', updatedBy);
-    
+
     const query = `
       UPDATE tax_master
       SET 
@@ -4318,13 +4318,6 @@ const getAllPoContracts = async () => {
 };
 
 
-
-
-
-
-
-
-
 const updateClientMSA = async (clientId, start_date, end_date, msaFile, updated_by) => {
   try {
     const connection = await db.getConnection();
@@ -4384,6 +4377,270 @@ const updateClientMSA = async (clientId, start_date, end_date, msaFile, updated_
     return { message: "MSA file updated successfully" };
   } catch (err) {
     console.error(err);
+    throw err;
+  }
+};
+
+// ----------- INVOICE -------------
+
+// const insertInvoice = async (
+//   client_name,
+//   client_id,
+//   contract_name,
+//   contract_id,
+//   po_number,
+//   po_amount,
+//   remain_po_amount,
+//   invoice_date,
+//   clientBillTo,
+//   clientShipAddress,
+//   clientContact,
+//   company_name,
+//   bill_from,
+//   invoice_bill_from_id,
+//   contract_type,
+//   tax_type,
+//   tax_type_id,
+//   tax_code,
+//   tax_code_id,
+//   invoice_amount,
+//   note_one,
+//   note_two,
+//   updated_by,
+//   isActive,
+//   filePath,
+//   total_amount,
+//   gst_total,
+//   final_amount,
+//   invoiceData,
+//   clientContact_name, // ✅ Added new fields
+//   clientBillTo_name,
+//   clientShipAddress_name
+// ) => {
+//   try {
+//     const query = `
+//       INSERT INTO invoice_info (
+//         client_name, client_id, contract_name, contract_id, po_number, po_amount,
+//         remain_po_amount, invoice_date, clientBillTo, clientShipAddress, clientContact,
+//         company_name, bill_from, invoice_bill_from_id, contract_type, tax_type, tax_type_id,
+//         tax_code, tax_code_id, invoice_amount, note_one, note_two, updated_by, isActive, 
+//         filePath, total_amount, gst_total, final_amount, clientContact_name, clientBillTo_name, clientShipAddress_name
+//       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+//     `;
+
+//     const [invoiceResult] = await db.execute(query, [
+//       client_name, client_id, contract_name, contract_id, po_number, po_amount,
+//       remain_po_amount, invoice_date, clientBillTo, clientShipAddress, clientContact,
+//       company_name, bill_from, invoice_bill_from_id, contract_type, tax_type, tax_type_id,
+//       tax_code, tax_code_id, invoice_amount, note_one, note_two, updated_by, isActive,
+//       filePath, total_amount, gst_total, final_amount, clientContact_name, clientBillTo_name, clientShipAddress_name // ✅ Added new parameters
+//     ]);
+
+//     const invoice_id = invoiceResult.insertId; // Get the inserted invoice_id
+
+//     // Insert multiple invoice items
+//     const invoiceDataQuery = `
+//       INSERT INTO invoice_data (
+//         invoice_id, description, sacCode, amount, totalAmount, gstTotal, finalAmount, taxBreakdown
+//       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+//     `;
+
+//     for (const item of invoiceData.invoiceItems) {
+//       await db.execute(invoiceDataQuery, [
+//         invoice_id,
+//         item.description || null,
+//         item.sacCode || null,
+//         item.amount || 0,
+//         invoiceData.totalAmount || 0,
+//         invoiceData.gstTotal || 0,
+//         invoiceData.finalAmount || 0,
+//         JSON.stringify(invoiceData.taxBreakdown) || null
+//       ]);
+//     }
+
+//     return { invoice: invoiceResult };
+
+//   } catch (err) {
+//     console.error("Error inserting invoice:", err);
+//     throw err;
+//   }
+// };
+
+const insertInvoice = async (
+  client_name,
+  client_id,
+  invoice_name, // ✅ Ensure this is included
+  contract_name,
+  contract_id,
+  po_number,
+  po_amount,
+  remain_po_amount,
+  invoice_date,
+  clientBillTo,
+  clientShipAddress,
+  clientContact,
+  company_name,
+  bill_from,
+  invoice_bill_from_id,
+  contract_type,
+  tax_type,
+  tax_type_id,
+  tax_code,
+  tax_code_id,
+  invoice_amount,
+  note_one,
+  note_two,
+  updated_by,
+  isActive,
+  filePath,
+  total_amount,
+  gst_total,
+  final_amount,
+  invoiceData,
+  clientContact_name,
+  clientBillTo_name,
+  clientShipAddress_name
+) => {
+  try {
+    // Step 1: Fetch the latest invoice number for the given invoice_name prefix
+    const getLastInvoiceQuery = `
+      SELECT invoice_name FROM invoice_info 
+      WHERE invoice_name LIKE ? 
+      ORDER BY invoice_name DESC 
+      LIMIT 1
+    `;
+
+    const [lastInvoice] = await db.execute(getLastInvoiceQuery, [`${invoice_name}/%`]);
+    
+    let newInvoiceNumber = "0001"; // Default for the first record
+
+    if (lastInvoice.length > 0) {
+      const lastInvoiceName = lastInvoice[0].invoice_name;
+      const lastNumber = parseInt(lastInvoiceName.split("/").pop(), 10) || 0;
+      newInvoiceNumber = String(lastNumber + 1).padStart(4, "0"); // Ensure 4-digit format
+    }
+
+    // Generate the final invoice_name
+    const finalInvoiceName = `${invoice_name}/${newInvoiceNumber}`;
+
+    // Step 2: Insert the invoice with the correct number of values
+    const query = `
+      INSERT INTO invoice_info (
+        invoice_name, client_name, client_id, contract_name, contract_id, po_number, po_amount,
+        remain_po_amount, invoice_date, clientBillTo, clientShipAddress, clientContact,
+        company_name, bill_from, invoice_bill_from_id, contract_type, tax_type, tax_type_id,
+        tax_code, tax_code_id, invoice_amount, note_one, note_two, updated_by, isActive, 
+        filePath, total_amount, gst_total, final_amount, clientContact_name, clientBillTo_name, clientShipAddress_name
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      finalInvoiceName, // ✅ Ensure invoice_name is included
+      client_name, client_id, contract_name, contract_id, po_number, po_amount,
+      remain_po_amount, invoice_date, clientBillTo, clientShipAddress, clientContact,
+      company_name, bill_from, invoice_bill_from_id, contract_type, tax_type, tax_type_id,
+      tax_code, tax_code_id, invoice_amount, note_one, note_two, updated_by, isActive,
+      filePath, total_amount, gst_total, final_amount, clientContact_name, clientBillTo_name, clientShipAddress_name
+    ];
+
+    const [invoiceResult] = await db.execute(query, values);
+
+    const invoice_id = invoiceResult.insertId; // Get the inserted invoice_id
+
+    // Step 3: Insert multiple invoice items
+    const invoiceDataQuery = `
+      INSERT INTO invoice_data (
+        invoice_id, description, sacCode, amount, totalAmount, gstTotal, finalAmount, taxBreakdown
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    for (const item of invoiceData.invoiceItems) {
+      await db.execute(invoiceDataQuery, [
+        invoice_id,
+        item.description || null,
+        item.sacCode || null,
+        item.amount || 0,
+        invoiceData.totalAmount || 0,
+        invoiceData.gstTotal || 0,
+        invoiceData.finalAmount || 0,
+        JSON.stringify(invoiceData.taxBreakdown) || null
+      ]);
+    }
+
+    return { invoice: invoiceResult, invoice_name: finalInvoiceName };
+
+  } catch (err) {
+    console.error("Error inserting invoice:", err);
+    throw err;
+  }
+};
+
+
+
+
+
+const updateInvoice = async (id, ...invoiceFields) => {
+  try {
+    const query = `
+      UPDATE invoice_info
+      SET
+        client_name = ?, client_id = ?, contract_name = ?, contract_id = ?, po_number = ?,
+        po_amount = ?, remain_po_amount = ?, invoice_date = ?, clientBillTo = ?, clientShipAddress = ?,
+        clientContact = ?, company_name = ?, bill_from = ?, invoice_bill_from_id = ?, contract_type = ?,
+        tax_type = ?, tax_type_id = ?, tax_code = ?, tax_code_id = ?, invoice_amount = ?, note_one = ?,
+        note_two = ?, updated_by = ?, isActive = ?, filePath = ?
+      WHERE id = ?
+    `;
+
+    const [result] = await db.execute(query, [...invoiceFields, id]);
+    return result;
+  } catch (err) {
+    console.error("Error updating invoice:", err);
+    throw err;
+  }
+};
+
+const activateDeactivateInvoice = async (id, isActive) => {
+  try {
+    const query = `UPDATE invoice_info SET isActive = ? WHERE id = ?`;
+    const [result] = await db.execute(query, [isActive, id]);
+    return result;
+  } catch (err) {
+    console.error("Error updating invoice status:", err);
+    throw err;
+  }
+};
+
+const getAllInvoices = async () => {
+  try {
+    const query = `
+      SELECT 
+        ii.*, 
+        COALESCE(
+          JSON_ARRAYAGG(
+            JSON_OBJECT(
+              'invoice_data_id', id.id,
+              'description', id.description,
+              'sacCode', id.sacCode,
+              'amount', id.amount,
+              'totalAmount', id.totalAmount,
+              'gstTotal', id.gstTotal,
+              'finalAmount', id.finalAmount,
+              'taxBreakdown', id.taxBreakdown,
+              'created_at', id.created_at,
+              'updated_at', id.updated_at
+            )
+          ), '[]'
+        ) AS invoiceInfo
+      FROM invoice_info ii
+      LEFT JOIN invoice_data id ON ii.id = id.invoice_id
+      GROUP BY ii.id
+    `;
+
+    const [invoices] = await db.execute(query);
+    return invoices;
+  } catch (err) {
+    console.error("Error retrieving invoices:", err);
     throw err;
   }
 };
@@ -4555,6 +4812,9 @@ module.exports = {
   updatePoContract,
   activateDeactivatePoContract,
   getAllPoContracts,
-
-  updateClientMSA
+  updateClientMSA,
+  insertInvoice,
+  updateInvoice,
+  activateDeactivateInvoice,
+  getAllInvoices
 };

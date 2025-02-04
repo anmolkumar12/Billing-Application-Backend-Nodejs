@@ -164,7 +164,12 @@ const {
   activateDeactivatePoContract,
   getAllPoContracts,
 
-  updateClientMSA
+  updateClientMSA,
+
+  insertInvoice,
+  updateInvoice,
+  activateDeactivateInvoice,
+  getAllInvoices
 
 } = require("../models/masterModel");
 
@@ -3850,6 +3855,320 @@ const updateMSAFile = async (req, res) => {
 
 
 
+// ----------------- INVOICE --------------
+
+// const insertInvoiceHandler = async (req, res) => {
+//   const {
+//     client_name,
+//     client_id,
+//     contract_name,
+//     contract_id,
+//     po_number,
+//     po_amount,
+//     remain_po_amount,
+//     invoice_date,
+//     clientBillTo,
+//     clientShipAddress,
+//     clientContact,
+//     company_name,
+//     bill_from,
+//     invoice_bill_from_id,
+//     contract_type,
+//     tax_type,
+//     tax_type_id,
+//     tax_code,
+//     tax_code_id,
+//     invoice_amount,
+//     note_one,
+//     note_two,
+//     updated_by,
+//     isActive,
+//     total_amount,
+//     gst_total,
+//     final_amount,
+//     invoiceData,
+//     clientContact_name, // ✅ Added missing fields
+//     clientBillTo_name,
+//     clientShipAddress_name
+//   } = req.body;
+
+//   let parsedInvoiceData;
+//   try {
+//     parsedInvoiceData = typeof invoiceData === "string" ? JSON.parse(invoiceData) : invoiceData;
+//   } catch (error) {
+//     return res.status(400).json({
+//       statusCode: 400,
+//       message: "Invalid invoiceData format",
+//       error: error.message
+//     });
+//   }
+
+//   const filePath = req.files && req.files.file ? req.files.file[0].path.replace("\\", "/") : null;
+
+//   if (!client_id) {
+//     return res.status(400).json({ statusCode: 400, message: "Client ID is required" });
+//   }
+
+//   if (!parsedInvoiceData || !Array.isArray(parsedInvoiceData.invoiceItems)) {
+//     return res.status(400).json({
+//       statusCode: 400,
+//       message: "Invalid invoiceData format. 'invoiceItems' must be an array."
+//     });
+//   }
+
+//   try {
+//     await insertInvoice(
+//       client_name,
+//       client_id,
+//       contract_name,
+//       contract_id,
+//       po_number,
+//       po_amount,
+//       remain_po_amount,
+//       invoice_date,
+//       clientBillTo,
+//       clientShipAddress,
+//       clientContact,
+//       company_name,
+//       bill_from,
+//       invoice_bill_from_id,
+//       contract_type,
+//       tax_type,
+//       tax_type_id,
+//       tax_code,
+//       tax_code_id,
+//       invoice_amount,
+//       note_one,
+//       note_two,
+//       updated_by,
+//       isActive,
+//       filePath,
+//       total_amount,
+//       gst_total,
+//       final_amount,
+//       parsedInvoiceData,
+//       clientContact_name, // ✅ Pass to insertInvoice function
+//       clientBillTo_name,
+//       clientShipAddress_name
+//     );
+
+//     res.status(201).json({ statusCode: 201, message: "Invoice created successfully" });
+//   } catch (err) {
+//     console.error("Error creating invoice:", err);
+//     res.status(500).json({ statusCode: 500, message: "Server error while creating invoice", error: err });
+//   }
+// };
+
+
+const insertInvoiceHandler = async (req, res) => {
+  const {
+    client_name,
+    client_id,
+    contract_name,
+    contract_id,
+    po_number,
+    po_amount,
+    remain_po_amount,
+    invoice_date,
+    clientBillTo,
+    clientShipAddress,
+    clientContact,
+    company_name,
+    bill_from,
+    invoice_bill_from_id,
+    contract_type,
+    tax_type,
+    tax_type_id,
+    tax_code,
+    tax_code_id,
+    invoice_amount,
+    note_one,
+    note_two,
+    updated_by,
+    isActive,
+    total_amount,
+    gst_total,
+    final_amount,
+    invoiceData,
+    clientContact_name,
+    clientBillTo_name,
+    clientShipAddress_name
+  } = req.body;
+
+  let parsedInvoiceData;
+  try {
+    parsedInvoiceData = typeof invoiceData === "string" ? JSON.parse(invoiceData) : invoiceData;
+  } catch (error) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Invalid invoiceData format",
+      error: error.message
+    });
+  }
+
+  const filePath = req.files && req.files.file ? req.files.file[0].path.replace("\\", "/") : null;
+
+  if (!client_id) {
+    return res.status(400).json({ statusCode: 400, message: "Client ID is required" });
+  }
+
+  if (!parsedInvoiceData || !Array.isArray(parsedInvoiceData.invoiceItems)) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Invalid invoiceData format. 'invoiceItems' must be an array."
+    });
+  }
+
+  // Generate invoice_name prefix
+  const invoiceNamePrefix = `${client_name.split(" ").map(word => word[0]).join("").toUpperCase()}/${invoice_date.slice(2, 4)}-${(parseInt(invoice_date.slice(2, 4)) + 1)}`;
+
+  try {
+    const { invoice_name } = await insertInvoice(
+      client_name,
+      client_id,
+      invoiceNamePrefix, // ✅ Pass prefix to backend
+      contract_name,
+      contract_id,
+      po_number,
+      po_amount,
+      remain_po_amount,
+      invoice_date,
+      clientBillTo,
+      clientShipAddress,
+      clientContact,
+      company_name,
+      bill_from,
+      invoice_bill_from_id,
+      contract_type,
+      tax_type,
+      tax_type_id,
+      tax_code,
+      tax_code_id,
+      invoice_amount,
+      note_one,
+      note_two,
+      updated_by,
+      isActive,
+      filePath,
+      total_amount,
+      gst_total,
+      final_amount,
+      parsedInvoiceData,
+      clientContact_name,
+      clientBillTo_name,
+      clientShipAddress_name
+    );
+
+    res.status(201).json({ statusCode: 201, message: "Invoice created successfully", invoice_name });
+
+  } catch (err) {
+    console.error("Error creating invoice:", err);
+    res.status(500).json({ statusCode: 500, message: "Server error while creating invoice", error: err });
+  }
+};
+
+
+
+
+const updateInvoiceHandler = async (req, res) => {
+  const {
+    id,
+    client_name,
+    client_id,
+    contract_name,
+    contract_id,
+    po_number,
+    po_amount,
+    remain_po_amount,
+    invoice_date,
+    clientBillTo,
+    clientShipAddress,
+    clientContact,
+    company_name,
+    bill_from,
+    invoice_bill_from_id,
+    contract_type,
+    tax_type,
+    tax_type_id,
+    tax_code,
+    tax_code_id,
+    invoice_amount,
+    note_one,
+    note_two,
+    updated_by,
+    isActive
+  } = req.body;
+
+  const filePath = req.files && req.files.file ? req.files.file[0].path.replace("\\", "/") : null;
+
+  if (!id) {
+    return res.status(400).json({ statusCode: 400, message: "Invoice ID is required" });
+  }
+
+  try {
+    await updateInvoice(
+      id,
+      client_name,
+      client_id,
+      contract_name,
+      contract_id,
+      po_number,
+      po_amount,
+      remain_po_amount,
+      invoice_date,
+      clientBillTo,
+      clientShipAddress,
+      clientContact,
+      company_name,
+      bill_from,
+      invoice_bill_from_id,
+      contract_type,
+      tax_type,
+      tax_type_id,
+      tax_code,
+      tax_code_id,
+      invoice_amount,
+      note_one,
+      note_two,
+      updated_by,
+      isActive,
+      filePath
+    );
+
+    res.status(200).json({ statusCode: 200, message: "Invoice updated successfully" });
+  } catch (err) {
+    res.status(500).json({ statusCode: 500, message: "Server error while updating invoice", error: err });
+  }
+};
+
+const activateDeactivateInvoiceHandler = async (req, res) => {
+  const { id, isActive } = req.body;
+
+  if (!id) {
+    return res.status(400).json({ statusCode: 400, message: "Invoice ID is required" });
+  }
+
+  try {
+    await activateDeactivateInvoice(id, isActive);
+    const status = isActive === 1 ? "activated" : "deactivated";
+    res.status(200).json({ statusCode: 200, message: `Invoice ${status} successfully` });
+  } catch (err) {
+    res.status(500).json({ statusCode: 500, message: "Server error while updating invoice status" });
+  }
+};
+
+const getInvoicesDataHandler = async (req, res) => {
+  try {
+    const invoices = await getAllInvoices();
+    res.status(200).json({ statusCode: 200, invoices: invoices || [] });
+  } catch (err) {
+    res.status(500).json({ statusCode: 500, message: "Server error while retrieving invoices" });
+  }
+};
+
+
+
+
 
 
 module.exports = {
@@ -4014,8 +4333,9 @@ module.exports = {
   updatePoContractHandler,
   activateDeactivatePoContractHandler,
   getPoContractsDataHandler,
-
-
-
-  updateMSAFile
+  updateMSAFile,
+  insertInvoiceHandler,
+  updateInvoiceHandler,
+  activateDeactivateInvoiceHandler,
+  getInvoicesDataHandler
 };
