@@ -3976,7 +3976,7 @@ const insertInvoiceHandler = async (req, res) => {
     company_name,
     bill_from,
     invoice_bill_from_id,
-    contract_type,
+    // contract_type,
     tax_type,
     tax_type_id,
     tax_code,
@@ -3992,7 +3992,9 @@ const insertInvoiceHandler = async (req, res) => {
     invoiceData,
     clientContact_name,
     clientBillTo_name,
-    clientShipAddress_name
+    clientShipAddress_name,
+    projectService,
+    projectService_names,
   } = req.body;
 
   let parsedInvoiceData;
@@ -4039,7 +4041,7 @@ const insertInvoiceHandler = async (req, res) => {
       company_name,
       bill_from,
       invoice_bill_from_id,
-      contract_type,
+      // contract_type,
       tax_type,
       tax_type_id,
       tax_code,
@@ -4056,7 +4058,9 @@ const insertInvoiceHandler = async (req, res) => {
       parsedInvoiceData,
       clientContact_name,
       clientBillTo_name,
-      clientShipAddress_name
+      clientShipAddress_name,
+      projectService,
+    projectService_names,
     );
 
     res.status(201).json({ statusCode: 201, message: "Invoice created successfully", invoice_name });
@@ -4071,32 +4075,14 @@ const insertInvoiceHandler = async (req, res) => {
 
 
 const updateInvoiceHandler = async (req, res) => {
-  const {
-    id,
-    client_name,
-    client_id,
-    contract_name,
-    contract_id,
-    po_number,
-    po_amount,
-    remain_po_amount,
-    invoice_date,
-    clientBillTo,
-    clientShipAddress,
-    clientContact,
-    company_name,
-    bill_from,
-    invoice_bill_from_id,
-    contract_type,
-    tax_type,
-    tax_type_id,
-    tax_code,
-    tax_code_id,
-    invoice_amount,
-    note_one,
-    note_two,
-    updated_by,
-    isActive
+  let {
+    id, client_name, client_id, invoice_name, contract_name, contract_id,
+    po_number, po_amount, remain_po_amount, invoice_date, clientBillTo,
+    clientShipAddress, clientContact, company_name, bill_from, invoice_bill_from_id,
+    tax_type, tax_type_id, tax_code, tax_code_id, invoice_amount, note_one,
+    note_two, updated_by, isActive, total_amount, gst_total, final_amount,
+    invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
+    projectService, projectService_names
   } = req.body;
 
   const filePath = req.files && req.files.file ? req.files.file[0].path.replace("\\", "/") : null;
@@ -4105,41 +4091,42 @@ const updateInvoiceHandler = async (req, res) => {
     return res.status(400).json({ statusCode: 400, message: "Invoice ID is required" });
   }
 
+  console.log("Received invoiceData:", invoiceData);
+
+  // Ensure invoiceData is parsed
+  if (typeof invoiceData === "string") {
+    try {
+      invoiceData = JSON.parse(invoiceData);
+    } catch (error) {
+      return res.status(400).json({ statusCode: 400, message: "Invalid invoiceData format", error: error.message });
+    }
+  }
+
+  console.log("Parsed invoiceData:", invoiceData);
+
+  if (!invoiceData || !Array.isArray(invoiceData.invoiceItems)) {
+    return res.status(400).json({ statusCode: 400, message: "'invoiceItems' must be an array." });
+  }
+
   try {
-    await updateInvoice(
-      id,
-      client_name,
-      client_id,
-      contract_name,
-      contract_id,
-      po_number,
-      po_amount,
-      remain_po_amount,
-      invoice_date,
-      clientBillTo,
-      clientShipAddress,
-      clientContact,
-      company_name,
-      bill_from,
-      invoice_bill_from_id,
-      contract_type,
-      tax_type,
-      tax_type_id,
-      tax_code,
-      tax_code_id,
-      invoice_amount,
-      note_one,
-      note_two,
-      updated_by,
-      isActive,
-      filePath
+    const result = await updateInvoice(
+      id, client_name, client_id, invoice_name, contract_name, contract_id, po_number,
+      po_amount, remain_po_amount, invoice_date, clientBillTo, clientShipAddress, clientContact,
+      company_name, bill_from, invoice_bill_from_id, tax_type, tax_type_id, tax_code, tax_code_id,
+      invoice_amount, note_one, note_two, updated_by, isActive, filePath, total_amount, gst_total,
+      final_amount, invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
+      projectService, projectService_names
     );
 
-    res.status(200).json({ statusCode: 200, message: "Invoice updated successfully" });
+    res.status(200).json({ statusCode: 200, message: "Invoice updated successfully", result });
   } catch (err) {
-    res.status(500).json({ statusCode: 500, message: "Server error while updating invoice", error: err });
+    console.error("Error updating invoice:", err);
+    res.status(500).json({ statusCode: 500, message: "Server error while updating invoice", error: err.message });
   }
 };
+
+
+
 
 const activateDeactivateInvoiceHandler = async (req, res) => {
   const { id, isActive } = req.body;

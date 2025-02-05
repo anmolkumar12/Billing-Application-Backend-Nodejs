@@ -611,3 +611,66 @@ MODIFY COLUMN `IndustrySubGroupId` VARCHAR(50) NULL DEFAULT NULL ;
 ALTER TABLE po_contract_info
 ADD COLUMN po_name VARCHAR(100) NULL DEFAULT NULL ;
 
+
+-- <<< ------------------- INVOICE SCRIPTS --------------------- >>>
+
+CREATE TABLE invoice_info (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    client_name VARCHAR(255) NOT NULL,
+    invoice_name VARCHAR(50) UNIQUE,
+    client_id INT NOT NULL,
+    contract_name VARCHAR(255),
+    po_number VARCHAR(100) NULL,
+    po_amount DECIMAL(15,2),
+    remain_po_amount DECIMAL(15,2),
+    invoice_date DATE NULL,
+    clientBillTo INT NULL,
+    clientShipAddress INT NULL,
+    clientContact INT NULL,
+    clientBillTo_name VARCHAR(255),
+    clientShipAddress_name VARCHAR(255),
+    clientContact_name VARCHAR(255),
+    company_name VARCHAR(255) NULL,
+    bill_from VARCHAR(255) NULL,
+    invoice_bill_from_id INT NULL,
+    contract_type VARCHAR(255),
+    tax_type VARCHAR(255),
+    tax_type_id INT,
+    tax_code VARCHAR(255),
+    tax_code_id VARCHAR(255),
+    invoice_amount DECIMAL(15,2) NOT NULL,
+    total_amount DECIMAL(15,2) NOT NULL,  -- Added total amount column
+    final_amount DECIMAL(15,2) NOT NULL,  -- Added final amount column
+    gst_total DECIMAL(15,2) NOT NULL,     -- Added GST total column
+    note_one TEXT,
+    note_two TEXT,
+    updated_by INT NOT NULL,
+    isActive TINYINT(1) DEFAULT 1,
+    filePath VARCHAR(500),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+ALTER TABLE invoice_info MODIFY COLUMN clientBillTo VARCHAR(250) NULL;
+ALTER TABLE invoice_info MODIFY COLUMN clientShipAddress VARCHAR(250) NULL;
+ALTER TABLE invoice_info MODIFY COLUMN clientContact VARCHAR(250) NULL;
+ALTER TABLE invoice_info ADD COLUMN contract_id VARCHAR(50) NULL;
+
+ALTER TABLE invoice_info ADD COLUMN projectService VARCHAR(250) NULL;
+ALTER TABLE invoice_info ADD COLUMN projectService_names VARCHAR(250) NULL;
+
+
+
+CREATE TABLE invoice_data (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    invoice_id INT NOT NULL,
+    description TEXT NULL,
+    sacCode VARCHAR(50) NULL,
+    amount DECIMAL(10,2) NULL,
+    totalAmount DECIMAL(10,2) NULL,
+    gstTotal DECIMAL(10,2) NULL,
+    finalAmount DECIMAL(10,2) NULL,
+    taxBreakdown  VARCHAR(500),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
