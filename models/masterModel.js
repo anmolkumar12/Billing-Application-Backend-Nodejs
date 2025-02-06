@@ -4634,6 +4634,15 @@ const insertInvoice = async (
       ]);
     }
 
+        // Step 4: Update dueAmount in po_contract_info
+        const updateDueAmountQuery = `
+        UPDATE po_contract_info
+        SET dueAmount = dueAmount - ?
+        WHERE poNumber = ? AND po_name = ?
+      `;
+  
+      await db.execute(updateDueAmountQuery, [invoice_amount, po_number, contract_name]);
+
     return { invoice: invoiceResult, invoice_name: finalInvoiceName };
 
   } catch (err) {
@@ -4756,6 +4765,276 @@ const getAllInvoices = async () => {
     return invoices;
   } catch (err) {
     console.error("Error retrieving invoices:", err);
+    throw err;
+  }
+};
+
+
+
+// ------------------- CREDIT NOTE ------------------------
+
+const insertCreditNote = async (
+  client_name,
+  client_id,
+  invoice_name,
+  contract_name,
+  contract_id,
+  po_number,
+  po_amount,
+  remain_po_amount,
+  invoice_date,
+  clientBillTo,
+  clientShipAddress,
+  clientContact,
+  company_name,
+  bill_from,
+  invoice_bill_from_id,
+  tax_type,
+  tax_type_id,
+  tax_code,
+  tax_code_id,
+  invoice_amount,
+  note_one,
+  note_two,
+  updated_by,
+  isActive,
+  filePath,
+  total_amount,
+  gst_total,
+  final_amount,
+  invoiceData,
+  clientContact_name,
+  clientBillTo_name,
+  clientShipAddress_name,
+  projectService,
+  projectService_names
+) => {
+  try {
+    console.log("Received values in insertInvoice:", {
+      invoice_name, client_name, client_id, contract_name, contract_id, po_number, po_amount,
+      remain_po_amount, invoice_date, clientBillTo, clientShipAddress, clientContact,
+      company_name, bill_from, invoice_bill_from_id, tax_type, tax_type_id,
+      tax_code, tax_code_id, invoice_amount, note_one, note_two, updated_by, isActive,
+      filePath, total_amount, gst_total, final_amount, clientContact_name, clientBillTo_name,
+      clientShipAddress_name, projectService, projectService_names, invoiceData
+    });
+
+    // Ensure client_id is a number
+    client_id = Number(client_id) || null;
+
+    // Step 1: Fetch the latest invoice number for the given invoice_name prefix
+    const getLastInvoiceQuery = `
+      SELECT invoice_name FROM credit_note_info 
+      WHERE invoice_name LIKE ? 
+      ORDER BY invoice_name DESC 
+      LIMIT 1
+    `;
+
+    const [lastInvoice] = await db.execute(getLastInvoiceQuery, [`${invoice_name}/%`]);
+    
+    let newInvoiceNumber = "0001";
+    if (lastInvoice.length > 0) {
+      const lastInvoiceName = lastInvoice[0].invoice_name;
+      const lastNumber = parseInt(lastInvoiceName.split("/").pop(), 10) || 0;
+      newInvoiceNumber = String(lastNumber + 1).padStart(4, "0");
+    }
+
+    const finalInvoiceName = `${invoice_name}/${newInvoiceNumber}`;
+
+    const safeValues = [
+      finalInvoiceName,
+      client_name || null,
+      client_id || null,
+      contract_name || null,
+      contract_id || null,
+      po_number || null,
+      po_amount || null,
+      remain_po_amount || null,
+      invoice_date || null,
+      clientBillTo || null,
+      clientShipAddress || null,
+      clientContact || null,
+      company_name || null,
+      bill_from || null,
+      invoice_bill_from_id || null,
+      tax_type || null,
+      tax_type_id || null,
+      tax_code || null,
+      tax_code_id || null,
+      invoice_amount || null,
+      note_one || null,
+      note_two || null,
+      updated_by || null,
+      isActive || null,
+      filePath || null,
+      total_amount || null,
+      gst_total || null,
+      final_amount || null,
+      clientContact_name || null,
+      clientBillTo_name || null,
+      clientShipAddress_name || null,
+      projectService || null,
+      projectService_names || null
+    ];
+
+    console.log("Final safeValues before query:", safeValues);
+
+    const insertQuery = `
+      INSERT INTO credit_note_info (
+        invoice_name, client_name, client_id, contract_name, contract_id, po_number, po_amount,
+        remain_po_amount, invoice_date, clientBillTo, clientShipAddress, clientContact,
+        company_name, bill_from, invoice_bill_from_id, tax_type, tax_type_id,
+        tax_code, tax_code_id, invoice_amount, note_one, note_two, updated_by, isActive,
+        filePath, total_amount, gst_total, final_amount, clientContact_name,
+        clientBillTo_name, clientShipAddress_name, projectService, projectService_names
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const [invoiceResult] = await db.execute(insertQuery, safeValues);
+    const invoice_id = invoiceResult.insertId;
+
+    // Step 3: Insert multiple invoice items
+    const invoiceDataQuery = `
+      INSERT INTO credit_note_data (
+        invoice_id, description, sacCode, amount, totalAmount, gstTotal, finalAmount, taxBreakdown
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    for (const item of invoiceData.invoiceItems) {
+      await db.execute(invoiceDataQuery, [
+        invoice_id,
+        item.description || null,
+        item.sacCode || null,
+        item.amount || 0,
+        invoiceData.totalAmount || 0,
+        invoiceData.gstTotal || 0,
+        invoiceData.finalAmount || 0,
+        JSON.stringify(invoiceData.taxBreakdown) || null
+      ]);
+    }
+
+    return { invoice: invoiceResult, invoice_name: finalInvoiceName };
+
+  } catch (err) {
+    console.error("Error inserting credit note:", err);
+    throw err;
+  }
+};
+
+
+
+
+// const sanitizeValue = (value) => (value === undefined ? null : value);
+
+const updateCreditNote = async (
+  id, client_name, client_id, invoice_name, contract_name, contract_id, po_number,
+  po_amount, remain_po_amount, invoice_date, clientBillTo, clientShipAddress, clientContact,
+  company_name, bill_from, invoice_bill_from_id, tax_type, tax_type_id, tax_code, tax_code_id,
+  invoice_amount, note_one, note_two, updated_by, isActive, filePath, total_amount, gst_total,
+  final_amount, invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
+  projectService, projectService_names
+) => {
+  try {
+    const query = `
+      UPDATE credit_note_info
+      SET
+        client_name = ?, client_id = ?, invoice_name = ?, contract_name = ?, contract_id = ?, 
+        po_number = ?, po_amount = ?, remain_po_amount = ?, invoice_date = ?, clientBillTo = ?, 
+        clientShipAddress = ?, clientContact = ?, company_name = ?, bill_from = ?, 
+        invoice_bill_from_id = ?, tax_type = ?, tax_type_id = ?, tax_code = ?, 
+        tax_code_id = ?, invoice_amount = ?, note_one = ?, note_two = ?, updated_by = ?, 
+        isActive = ?, filePath = ?, total_amount = ?, gst_total = ?, final_amount = ?, 
+        clientContact_name = ?, clientBillTo_name = ?, clientShipAddress_name = ?, 
+        projectService = ?, projectService_names = ? WHERE id = ?
+    `;
+
+    const values = [
+      sanitizeValue(client_name), sanitizeValue(client_id), sanitizeValue(invoice_name),
+      sanitizeValue(contract_name), sanitizeValue(contract_id), sanitizeValue(po_number),
+      sanitizeValue(po_amount), sanitizeValue(remain_po_amount), sanitizeValue(invoice_date),
+      sanitizeValue(clientBillTo), sanitizeValue(clientShipAddress), sanitizeValue(clientContact),
+      sanitizeValue(company_name), sanitizeValue(bill_from), sanitizeValue(invoice_bill_from_id),
+      sanitizeValue(tax_type), sanitizeValue(tax_type_id), sanitizeValue(tax_code),
+      sanitizeValue(tax_code_id), sanitizeValue(invoice_amount), sanitizeValue(note_one),
+      sanitizeValue(note_two), sanitizeValue(updated_by), sanitizeValue(isActive),
+      sanitizeValue(filePath), sanitizeValue(total_amount), sanitizeValue(gst_total),
+      sanitizeValue(final_amount), sanitizeValue(clientContact_name), sanitizeValue(clientBillTo_name),
+      sanitizeValue(clientShipAddress_name), sanitizeValue(projectService), sanitizeValue(projectService_names),
+      sanitizeValue(id)
+    ];
+
+    await db.execute(query, values);
+
+    // Delete existing invoice_data entries
+    const deleteInvoiceDataQuery = `DELETE FROM credit_note_data WHERE invoice_id = ?`;
+    await db.execute(deleteInvoiceDataQuery, [id]);
+
+    // Insert new invoiceData entries
+    const insertInvoiceDataQuery = `
+      INSERT INTO credit_note_data (
+        invoice_id, description, sacCode, amount, totalAmount, gstTotal, finalAmount, taxBreakdown
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    for (const item of invoiceData.invoiceItems) {
+      await db.execute(insertInvoiceDataQuery, [
+        id, sanitizeValue(item.description), sanitizeValue(item.sacCode),
+        sanitizeValue(item.amount), sanitizeValue(invoiceData.totalAmount),
+        sanitizeValue(invoiceData.gstTotal), sanitizeValue(invoiceData.finalAmount),
+        JSON.stringify(invoiceData.taxBreakdown)
+      ]);
+    }
+
+    return { message: "Credit note updated successfully" };
+  } catch (err) {
+    console.error("Error updating credit note:", err);
+    throw err;
+  }
+};
+
+
+
+const activateDeactivateCreditNote = async (id, isActive) => {
+  try {
+    const query = `UPDATE credit_note_info SET isActive = ? WHERE id = ?`;
+    const [result] = await db.execute(query, [isActive, id]);
+    return result;
+  } catch (err) {
+    console.error("Error updating credit note status:", err);
+    throw err;
+  }
+};
+
+const getAllCreditNote = async () => {
+  try {
+    const query = `
+      SELECT 
+        ii.*, 
+        COALESCE(
+          JSON_ARRAYAGG(
+            JSON_OBJECT(
+              'invoice_data_id', id.id,
+              'description', id.description,
+              'sacCode', id.sacCode,
+              'amount', id.amount,
+              'totalAmount', id.totalAmount,
+              'gstTotal', id.gstTotal,
+              'finalAmount', id.finalAmount,
+              'taxBreakdown', id.taxBreakdown,
+              'created_at', id.created_at,
+              'updated_at', id.updated_at
+            )
+          ), '[]'
+        ) AS invoiceInfo
+      FROM credit_note_info ii
+      LEFT JOIN credit_note_data id ON ii.id = id.invoice_id
+      GROUP BY ii.id
+    `;
+
+    const [invoices] = await db.execute(query);
+    return invoices;
+  } catch (err) {
+    console.error("Error retrieving credit notes:", err);
     throw err;
   }
 };
@@ -4931,5 +5210,9 @@ module.exports = {
   insertInvoice,
   updateInvoice,
   activateDeactivateInvoice,
-  getAllInvoices
+  getAllInvoices,
+  insertCreditNote,
+  updateCreditNote,
+  activateDeactivateCreditNote,
+  getAllCreditNote,
 };

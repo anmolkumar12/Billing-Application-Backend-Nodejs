@@ -157,7 +157,11 @@ const {
   insertInvoiceHandler,
   updateInvoiceHandler,
   activateDeactivateInvoiceHandler,
-  getInvoicesDataHandler
+  getInvoicesDataHandler,
+  insertCreditNoteHandler,
+  updateCreditNoteHandler,
+  activateDeactivateCreditNoteHandler,
+  getCreditNoteDataHandler
 
 } = require("../controllers/masterController");
 const multer = require("multer");
@@ -523,6 +527,16 @@ router.post('/updateInvoice', authMiddleware, upload.fields([
   { name: "file", maxCount: 1 }
 ]), updateInvoiceHandler);
 router.post('/activateDeactivateInvoice', authMiddleware, activateDeactivateInvoiceHandler);
+
+
+router.post('/getCreditNote', authMiddleware, getCreditNoteDataHandler);
+router.post('/insertCreditNote', authMiddleware, upload.fields([
+  { name: "file", maxCount: 1 }
+]), insertCreditNoteHandler);
+router.post('/updateCreditNote', authMiddleware, upload.fields([
+  { name: "file", maxCount: 1 }
+]), updateCreditNoteHandler);
+router.post('/activateDeactivateCreditNote', authMiddleware, activateDeactivateCreditNoteHandler);
 
 
 module.exports = router;
