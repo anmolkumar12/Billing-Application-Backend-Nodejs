@@ -735,3 +735,33 @@ CREATE TABLE credit_note_data (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+-- QUERY BY ARJUN ON 06-02-2025
+
+ALTER TABLE `ims_backend`.`industry_master_info` 
+CHANGE COLUMN `industryName` `industryName` VARCHAR(255) NULL ,
+CHANGE COLUMN `subIndustryCategory` `subIndustryCategory` VARCHAR(255) NULL ;
+
+ALTER TABLE `ims_backend`.`client_contact` 
+CHANGE COLUMN `client_name` `client_name` VARCHAR(255) NULL ,
+CHANGE COLUMN `salutation` `salutation` VARCHAR(10) NULL ,
+CHANGE COLUMN `last_name` `last_name` VARCHAR(255) NULL ,
+CHANGE COLUMN `email` `email` VARCHAR(255) NULL ,
+CHANGE COLUMN `phone_number` `phone_number` VARCHAR(15) NULL ;
+
+ALTER TABLE `ims_backend`.`client_bill_to_info` 
+ADD COLUMN `state_name` VARCHAR(45) NULL DEFAULT NULL AFTER `updated_at`,
+ADD COLUMN `placeOfSupply` TEXT NULL DEFAULT NULL AFTER `state_name`,
+ADD COLUMN `state_code` VARCHAR(45) NULL DEFAULT NULL AFTER `placeOfSupply`,
+ADD COLUMN `gstIn` VARCHAR(255) NULL DEFAULT NULL AFTER `state_code`;
+
+ALTER TABLE `ims_backend`.`client_ship_to_info` 
+ADD COLUMN `state_name` VARCHAR(45) NULL DEFAULT NULL AFTER `updated_at`,
+ADD COLUMN `placeOfSupply` TEXT NULL DEFAULT NULL AFTER `state_name`,
+ADD COLUMN `state_code` VARCHAR(45) NULL DEFAULT NULL AFTER `placeOfSupply`,
+ADD COLUMN `gstIn` VARCHAR(255) NULL DEFAULT NULL AFTER `state_code`;
+
+
+
+
+
+

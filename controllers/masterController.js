@@ -3337,6 +3337,10 @@ const createClientBillTo = async (req, res) => {
     address3,
     additionalAddressDetails,
     isDefaultAddress,
+    state_code,
+    gstIn,
+    placeOfSupply,
+    state_name,
     updated_by // Use `updated_by` to match the payload
   } = req.body;
 
@@ -3349,7 +3353,12 @@ const createClientBillTo = async (req, res) => {
       address3,
       additionalAddressDetails,
       isDefaultAddress,
-      updated_by // Pass `updated_by` as `updatedBy`
+      updated_by,
+      state_code,
+      gstIn,
+      placeOfSupply ,
+      state_name 
+       // Pass `updated_by` as `updatedBy`
     );
     res.status(201).json({ statusCode: 201, message: "Client Bill To created successfully" });
   } catch (err) {
@@ -3360,14 +3369,20 @@ const createClientBillTo = async (req, res) => {
 
 // Update Client Bill To
 const updateClientBillTo = async (req, res) => {
-  const { id, clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, updatedBy } = req.body;
+  const { id, clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, state_code,
+    gstIn,
+    placeOfSupply,
+    state_name, updatedBy } = req.body;
 
   if (!id) {
     return res.status(400).json({ statusCode: 400, message: "ID is required" });
   }
 
   try {
-    await updateClientBillToDetails(id, clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, updatedBy);
+    await updateClientBillToDetails(id, clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, state_code,
+      gstIn,
+      placeOfSupply,
+      state_name, updatedBy);
     res.status(200).json({ statusCode: 200, message: "Client Bill To updated successfully" });
   } catch (err) {
     res.status(500).json({ statusCode: 500, message: "Server error" });
@@ -3414,7 +3429,11 @@ const createClientShipTo = async (req, res) => {
     address3,
     additionalAddressDetails,
     isDefaultAddress,
-    updated_by // Corrected to match the payload
+    updated_by, // Corrected to match the payload
+    state_code,
+    gstIn,
+    placeOfSupply,
+    state_name
   } = req.body;
 
   try {
@@ -3426,7 +3445,11 @@ const createClientShipTo = async (req, res) => {
       address3,
       additionalAddressDetails,
       isDefaultAddress,
-      updated_by // Pass the correct field
+      updated_by, // Pass the correct field
+      state_code,
+      gstIn,
+      placeOfSupply,
+      state_name
     );
     res.status(201).json({ statusCode: 201, message: "Client Shipping info created successfully" });
   } catch (err) {
@@ -3437,14 +3460,20 @@ const createClientShipTo = async (req, res) => {
 
 // Update Client Ship To
 const updateClientShipTo = async (req, res) => {
-  const { id, clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, updatedBy } = req.body;
+  const { id, clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, updatedBy, state_code,
+    gstIn,
+    placeOfSupply,
+    state_name } = req.body;
 
   if (!id) {
     return res.status(400).json({ statusCode: 400, message: "ID is required" });
   }
 
   try {
-    await updateClientShipToDetails(id, clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, updatedBy);
+    await updateClientShipToDetails(id, clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, updatedBy, state_code,
+      gstIn,
+      placeOfSupply,
+      state_name);
     res.status(200).json({ statusCode: 200, message: "Client Shipping info updated successfully" });
   } catch (err) {
     res.status(500).json({ statusCode: 500, message: "Server error" });

@@ -3577,7 +3577,11 @@ const insertClientBillTo = async (
   address3,
   additionalAddressDetails,
   isDefaultAddress,
-  updatedBy
+  updatedBy,
+  state_code,
+  gstIn ,
+  placeOfSupply ,
+  state_name ,
 ) => {
   try {
     const sanitizedValues = [
@@ -3588,13 +3592,17 @@ const insertClientBillTo = async (
       address3 ?? null,
       JSON.stringify(additionalAddressDetails) ?? null,
       isDefaultAddress ?? null,
-      updatedBy ?? null // Explicitly handle `undefined` and convert to `null`
+      updatedBy ?? null, // Explicitly handle `undefined` and convert to `null`
+      state_code?? null,
+      gstIn ?? null,
+      placeOfSupply ?? null,
+      state_name ?? null,
     ];
 
     const query = `
       INSERT INTO client_bill_to_info 
-      (clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, updated_by, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      (clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, updated_by,state_code,gstIn,placeOfSupply,state_name, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     const [result] = await db.execute(query, sanitizedValues);
@@ -3616,6 +3624,10 @@ const updateClientBillToDetails = async (
   address3,
   additionalAddressDetails,
   isDefaultAddress,
+  state_code,
+  gstIn,
+  placeOfSupply,
+  state_name,
   updatedBy
 ) => {
   try {
@@ -3628,7 +3640,12 @@ const updateClientBillToDetails = async (
       JSON.stringify(additionalAddressDetails) ?? null,
       isDefaultAddress, // Explicitly pass isDefaultAddress without coalescing to null
       updatedBy ?? null,
-      id // Ensure 'id' is the last parameter
+      // Ensure 'id' is the last parameter
+      state_code,
+      gstIn,
+      placeOfSupply,
+      state_name,
+      id 
     ];
     const query = `
       UPDATE client_bill_to_info
@@ -3641,6 +3658,10 @@ const updateClientBillToDetails = async (
         additionalAddressDetails = ?, 
         isDefaultAddress = ?,
         updated_by = ?, 
+        state_code = ?,
+        gstIn = ?,
+        placeOfSupply = ?,
+        state_name = ?,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
@@ -3682,6 +3703,7 @@ const getClientBillToDetails = async (clientId = null) => {
         client_bill_to_info.*, 
         client_info.client_name,         
         country_info.name AS countryName
+
       FROM 
         client_bill_to_info
       LEFT JOIN 
@@ -3717,7 +3739,11 @@ const insertClientShipTo = async (
   address3,
   additionalAddressDetails,
   isDefaultAddress,
-  updatedBy
+  updatedBy,
+  state_code,
+  gstIn,
+  placeOfSupply,
+  state_name
 ) => {
   try {
     const sanitizedValues = [
@@ -3728,13 +3754,19 @@ const insertClientShipTo = async (
       address3 ?? null,
       JSON.stringify(additionalAddressDetails) ?? null,
       isDefaultAddress ?? null,
-      updatedBy ?? null // Ensure this is not undefined
+      updatedBy ?? null, // Ensure this is not undefined
+      state_code ?? null,
+      gstIn ?? null,
+      placeOfSupply ?? null,
+      state_name ?? null
+      
     ];
+    
 
     const query = `
       INSERT INTO client_ship_to_info 
-      (clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, updated_by, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      (clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, updated_by,state_code,gstIn,placeOfSupply,state_name, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?, CURRENT_TIMESTAMP)
     `;
 
     const [result] = await db.execute(query, sanitizedValues);
@@ -3756,7 +3788,11 @@ const updateClientShipToDetails = async (
   address3,
   additionalAddressDetails,
   isDefaultAddress,
-  updatedBy
+  updatedBy,
+  state_code,
+  gstIn,
+  placeOfSupply,
+  state_name
 ) => {
   try {
     const sanitizedValues = [
@@ -3768,6 +3804,10 @@ const updateClientShipToDetails = async (
       JSON.stringify(additionalAddressDetails) ?? null,
       isDefaultAddress, // Explicitly pass isDefaultAddress without coalescing to null
       updatedBy ?? null,
+      state_code ?? null,
+      gstIn ?? null,
+      placeOfSupply ?? null,
+      state_name ?? null,
       id // Ensure 'id' is the last parameter
     ];
 
@@ -3782,6 +3822,10 @@ const updateClientShipToDetails = async (
         additionalAddressDetails = ?, 
         isDefaultAddress = ?,
         updated_by = ?, 
+        state_code = ?,
+        gstIn = ?,
+        placeOfSupply = ?,
+        state_name = ?,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
