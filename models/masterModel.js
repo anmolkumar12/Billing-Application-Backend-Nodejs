@@ -4679,13 +4679,18 @@ const insertInvoice = async (
     }
 
         // Step 4: Update dueAmount in po_contract_info
+      //   const updateDueAmountQuery = `
+      //   UPDATE po_contract_info
+      //   SET dueAmount = dueAmount - ?
+      //   WHERE poNumber = ? AND po_name = ?
+      // `;
         const updateDueAmountQuery = `
         UPDATE po_contract_info
         SET dueAmount = dueAmount - ?
-        WHERE poNumber = ? AND po_name = ?
+        WHERE po_name = ?
       `;
   
-      await db.execute(updateDueAmountQuery, [invoice_amount, po_number, contract_name]);
+      await db.execute(updateDueAmountQuery, [invoice_amount, contract_name]);
 
     return { invoice: invoiceResult, invoice_name: finalInvoiceName };
 
