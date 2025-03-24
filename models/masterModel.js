@@ -2935,17 +2935,18 @@ const getCurrencyHistory = async (data) => {
 
 //  tax services
 
-const createTax = async (countryCode, taxType, taxFieldName, taxPercentage, updatedBy) => {
+const createTax = async (countryCode, taxType, taxFieldName, taxPercentage, isActive, updatedBy) => {
   try {
     const query = `
-      INSERT INTO tax_master (countryCode, taxType, taxFieldName, taxPercentage, updated_by, created_at)
-      VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      INSERT INTO tax_master (countryCode, taxType, taxFieldName, taxPercentage, isActive, updated_by, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
     const [result] = await db.execute(query, [
       countryCode,
       taxType,
       taxFieldName,
       taxPercentage,
+      isActive,
       updatedBy,
     ]);
     return result;
