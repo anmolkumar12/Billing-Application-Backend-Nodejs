@@ -763,5 +763,13 @@ ADD COLUMN `gstIn` VARCHAR(255) NULL DEFAULT NULL AFTER `state_code`;
 
 
 
+-- 25-03-2025--
 
+ALTER TABLE `ims_backend`.`company_location_info` 
+ADD COLUMN `deactivationDate` VARCHAR(100) NULL DEFAULT NULL ;
 
+ALTER TABLE region_head_info ADD CONSTRAINT unique_region_head_email UNIQUE (regionHeadEmail);
+ALTER TABLE industry_head_master ADD CONSTRAINT unique_industry_head_email UNIQUE (industry_head_email);
+
+ALTER TABLE `ims_backend`.`invoice_info` 
+ADD COLUMN `billed_hours` VARCHAR(45) NULL DEFAULT NULL;

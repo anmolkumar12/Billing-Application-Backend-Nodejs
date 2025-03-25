@@ -816,7 +816,7 @@ const getCompanyLocations = async (req, res) => {
 };
 
 const activateDeactivateCompanyLocation = async (req, res) => {
-  const { locationId, isActive, updatedBy } = req.body;
+  const { locationId, isActive, deactivationDate, updatedBy } = req.body;
 
   if (!locationId) {
     return res.status(400).json({
@@ -826,7 +826,7 @@ const activateDeactivateCompanyLocation = async (req, res) => {
   }
 
   try {
-    await activateDeactivateLocation(locationId, isActive, updatedBy);
+    await activateDeactivateLocation(locationId, isActive, deactivationDate, updatedBy);
 
     res.status(200).json({
       statusCode: 200,
@@ -1497,23 +1497,23 @@ const createIndustryHead = async (req, res) => {
 
     console.log('finalRes--->>>>', finalResult);
 
-    if (finalResult && finalResult.status == 'existing') {
-      res.status(400).json({
-        statusCode: 400,
-        // message: `This region already has a region head ${finalResult.existingRegionHead}`,
-        message: finalResult.conflictMessage
-      });
-    } else {
+    // if (finalResult && finalResult.status == 'existing') {
+    //   res.status(400).json({
+    //     statusCode: 400,
+    //     // message: `This region already has a region head ${finalResult.existingRegionHead}`,
+    //     message: finalResult.conflictMessage
+    //   });
+    // } else {
       res.status(201).json({
         statusCode: 201,
         message: "Industry Head created successfully",
       });
-    }
+    // }
   } catch (err) {
     console.error("Error creating industry head:", err);
     res.status(500).json({
       statusCode: 500,
-      message: "Server error while creating industry head",
+      message: "Duplicate entry for Email!",
     });
   }
 };
@@ -1561,13 +1561,13 @@ const updateIndustryHead = async (req, res) => {
       isActive
     );
 
-    if (finalResult && finalResult.status == 'existing') {
-      res.status(400).json({
-        statusCode: 400,
-        // message: `This region already has a region head ${finalResult.existingRegionHead}`,
-        message: finalResult.conflictMessage
-      });
-    } else {
+    // if (finalResult && finalResult.status == 'existing') {
+    //   res.status(400).json({
+    //     statusCode: 400,
+    //     // message: `This region already has a region head ${finalResult.existingRegionHead}`,
+    //     message: finalResult.conflictMessage
+    //   });
+    // } else {
       // res.status(201).json({
       //   statusCode: 201,
       //   message: "Industry Head created successfully",
@@ -1576,13 +1576,13 @@ const updateIndustryHead = async (req, res) => {
         statusCode: 200,
         message: "Industry Head updated successfully",
       });
-    }
+    // }
 
   } catch (err) {
     console.error("Error updating industry head:", err);
     res.status(500).json({
       statusCode: 500,
-      message: "Server error while updating industry head",
+      message: "Duplicate entry for Email!",
     });
   }
 };
@@ -1666,7 +1666,7 @@ const createSalesManager = async (req, res) => {
     console.error("Error creating sales manager:", err);
     res.status(500).json({
       statusCode: 500,
-      message: "Server error while creating sales manager",
+      message: "Email or E-Code already exists. Please enter a unique value.",
     });
   }
 };
@@ -1714,7 +1714,7 @@ const updateSalesManager = async (req, res) => {
     console.error("Error updating sales manager:", err);
     res.status(500).json({
       statusCode: 500,
-      message: "Server error while updating sales manager",
+      message: "Email or E-Code already exists. Please enter a unique value.",
     });
   }
 };
@@ -1798,7 +1798,7 @@ const createAccountManager = async (req, res) => {
     console.error("Error creating Account Manager:", err);
     res.status(500).json({
       statusCode: 500,
-      message: "Server error while creating Account Manager",
+      message: "Email or E-Code already exists. Please enter a unique value.",
     });
   }
 };
@@ -1846,7 +1846,7 @@ const updateAccountsManager = async (req, res) => {
     console.error("Error updating Account Manager:", err);
     res.status(500).json({
       statusCode: 500,
-      message: "Server error while updating Account Manager",
+      message: "Email or E-Code already exists. Please enter a unique value.",
     });
   }
 };
@@ -2613,23 +2613,23 @@ const addRegionHead = async (req, res) => {
     );
     console.log('rrrrrrrrrrrr', finalResult);
 
-    if (finalResult.status == 'existing') {
-      res.status(400).json({
-        statusCode: 400,
-        // message: `This region already has a region head ${finalResult.existingRegionHead}`,
-        message: finalResult.conflictMessage
-      });
-    } else {
+    // if (finalResult.status == 'existing') {
+    //   res.status(400).json({
+    //     statusCode: 400,
+    //     // message: `This region already has a region head ${finalResult.existingRegionHead}`,
+    //     message: finalResult.conflictMessage
+    //   });
+    // } else {
       res.status(201).json({
         statusCode: 201,
         message: "Region Head created successfully",
       });
-    }
+    // }
 
   } catch (err) {
     res.status(500).json({
       statusCode: 500,
-      message: "Server error",
+      message: "Duplicate entry for Email!",
     });
   }
 };
@@ -2668,22 +2668,22 @@ const updateRegionHead = async (req, res) => {
       isActive,
       updatedBy
     );
-    if (finalRes.status == 'existing') {
-      res.status(400).json({
-        statusCode: 400,
-        // message: `This region already has a region head: ${finalRes.existingRegionHead}`,
-        message: finalRes.conflictMessage
-      });
-    } else {
+    // if (finalRes.status == 'existing') {
+    //   res.status(400).json({
+    //     statusCode: 400,
+    //     // message: `This region already has a region head: ${finalRes.existingRegionHead}`,
+    //     message: finalRes.conflictMessage
+    //   });
+    // } else {
       res.status(200).json({
         statusCode: 200,
         message: "Region Head updated successfully",
       });
-    }
+    // }
   } catch (err) {
     res.status(500).json({
       statusCode: 500,
-      message: "Server error while updating region head details",
+      message: "Duplicate entry for Email!",
     });
   }
 };
@@ -4030,6 +4030,7 @@ const insertInvoiceHandler = async (req, res) => {
     clientShipAddress_name,
     projectService,
     projectService_names,
+    billed_hours
   } = req.body;
 
   let parsedInvoiceData;
@@ -4096,6 +4097,7 @@ const insertInvoiceHandler = async (req, res) => {
       clientShipAddress_name,
       projectService,
     projectService_names,
+    billed_hours
     );
 
     res.status(201).json({ statusCode: 201, message: "Invoice created successfully", invoice_name });
@@ -4117,7 +4119,7 @@ const updateInvoiceHandler = async (req, res) => {
     tax_type, tax_type_id, tax_code, tax_code_id, invoice_amount, note_one,
     note_two, updated_by, isActive, total_amount, gst_total, final_amount,
     invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
-    projectService, projectService_names
+    projectService, projectService_names, billed_hours
   } = req.body;
 
   const filePath = req.files && req.files.file ? req.files.file[0].path.replace("\\", "/") : null;
@@ -4150,7 +4152,7 @@ const updateInvoiceHandler = async (req, res) => {
       company_name, bill_from, invoice_bill_from_id, tax_type, tax_type_id, tax_code, tax_code_id,
       invoice_amount, note_one, note_two, updated_by, isActive, filePath, total_amount, gst_total,
       final_amount, invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
-      projectService, projectService_names
+      projectService, projectService_names, billed_hours
     );
 
     res.status(200).json({ statusCode: 200, message: "Invoice updated successfully", result });

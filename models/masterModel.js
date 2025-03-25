@@ -767,17 +767,18 @@ const getLocations = async (companyId = null) => {
   }
 };
 
-const activateDeactivateLocation = async (locationId, isActive, updatedBy) => {
+const activateDeactivateLocation = async (locationId, isActive, deactivationDate, updatedBy) => {
   try {
     const query = `
       UPDATE company_location_info
-      SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+      SET isActive = ?, updated_by = ?, deactivationDate = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
 
     const [result] = await db.execute(query, [
       isActive, // 1 for active, 0 for inactive
       updatedBy ?? null, // Updated by user, default to null if not provided
+      deactivationDate ?? null,
       locationId, // The location ID to update
     ]);
 
@@ -1397,90 +1398,90 @@ const insertIndustryHead = async (
 ) => {
   try {
 
-    // Convert regionIds and stateIds to arrays for comparison
-    const regionIdArray = regionIds ? String(regionIds).split(",").map(id => id.trim()) : [];
-    const stateIdArray = stateIds ? String(stateIds).split(",").map(id => id.trim()) : [];
-    console.log('regionIdArray', code);
+    // // Convert regionIds and stateIds to arrays for comparison
+    // const regionIdArray = regionIds ? String(regionIds).split(",").map(id => id.trim()) : [];
+    // const stateIdArray = stateIds ? String(stateIds).split(",").map(id => id.trim()) : [];
+    // console.log('regionIdArray', code);
 
-    // Check for existing regionIds
-    if (isRegionWise && regionIdArray.length > 0) {
-      const [existingRegions] = await db.execute(
-        `SELECT regionIds, industryHeadName, r.id AS regionId, r.regionName
-        FROM industry_head_master 
-        JOIN region_info r ON FIND_IN_SET(r.id, industry_head_master.regionIds)
-        WHERE isRegionWise = 1 
-        AND companyId = ?`,
-        [companyId]
-      );
-
-      console.log('overlapRegions111---->>>>>', [existingRegions]);
-      for (const record of existingRegions) {
-        const existingRegionIds = record.regionIds ? record.regionIds.split(",").map(id => id.trim()) : [];
-        const overlapRegions = regionIdArray.filter(id => existingRegionIds.includes(id));
-
-
-        if (overlapRegions.length > 0) {
-          return { status: 'existing', conflictMessage: `Region ${record.regionName} already allocated to ${record.industryHeadName}` }
-        }
-      }
-    }
-
-    // Check for existing stateIds
-    // if (!isRegionWise && stateIdArray.length > 0) {
-    //   const [existingStates] = await db.execute(
-    //     `SELECT stateIds, industryHeadName FROM industry_head_master WHERE isRegionWise = 0 AND companyId = ?`,
+    // // Check for existing regionIds
+    // if (isRegionWise && regionIdArray.length > 0) {
+    //   const [existingRegions] = await db.execute(
+    //     `SELECT regionIds, industryHeadName, r.id AS regionId, r.regionName
+    //     FROM industry_head_master 
+    //     JOIN region_info r ON FIND_IN_SET(r.id, industry_head_master.regionIds)
+    //     WHERE isRegionWise = 1 
+    //     AND companyId = ?`,
     //     [companyId]
     //   );
 
-    //   for (const record of existingStates) {
-    //     const existingStateIds = record.stateIds ? record.stateIds.split(",").map(id => id.trim()) : [];
-    //     const overlapStates = stateIdArray.filter(id => existingStateIds.includes(id));
-    //     console.log('overlapStates', overlapStates);
+    //   console.log('overlapRegions111---->>>>>', [existingRegions]);
+    //   for (const record of existingRegions) {
+    //     const existingRegionIds = record.regionIds ? record.regionIds.split(",").map(id => id.trim()) : [];
+    //     const overlapRegions = regionIdArray.filter(id => existingRegionIds.includes(id));
 
-    //     if (overlapStates.length > 0) {
-    //       return { status: 'existing', conflictMessage: `State ID(s) ${overlapStates.join(", ")} already allocated to ${record.industryHeadName}` }
+
+    //     if (overlapRegions.length > 0) {
+    //       return { status: 'existing', conflictMessage: `Region ${record.regionName} already allocated to ${record.industryHeadName}` }
     //     }
     //   }
     // }
 
-    if (!isRegionWise && stateIdArray.length > 0) {
-      const [existingStates] = await db.execute(
-        `SELECT 
-            ihm.stateIds, 
-            ihm.industryHeadName, 
-            s.id AS stateId, 
-            s.stateName 
-         FROM 
-            industry_head_master ihm 
-         JOIN 
-            state_info s 
-         ON 
-            FIND_IN_SET(s.id, ihm.stateIds) 
-         WHERE 
-            ihm.isRegionWise = 0 
-            AND ihm.companyId = ?`,
-        [companyId]
-      );
+    // // Check for existing stateIds
+    // // if (!isRegionWise && stateIdArray.length > 0) {
+    // //   const [existingStates] = await db.execute(
+    // //     `SELECT stateIds, industryHeadName FROM industry_head_master WHERE isRegionWise = 0 AND companyId = ?`,
+    // //     [companyId]
+    // //   );
 
-      for (const record of existingStates) {
-        const existingStateIds = record.stateIds
-          ? record.stateIds.split(",").map(id => id.trim())
-          : [];
-        const overlapStates = stateIdArray.filter(id => existingStateIds.includes(id));
+    // //   for (const record of existingStates) {
+    // //     const existingStateIds = record.stateIds ? record.stateIds.split(",").map(id => id.trim()) : [];
+    // //     const overlapStates = stateIdArray.filter(id => existingStateIds.includes(id));
+    // //     console.log('overlapStates', overlapStates);
 
-        if (overlapStates.length > 0) {
-          const overlappingStateNames = existingStates
-            .filter(r => overlapStates.includes(String(r.stateId))) // Match `stateId` with `overlapStates`
-            .map(r => r.stateName);
-          console.log('overlappingStateNames', overlapStates, existingStates);
+    // //     if (overlapStates.length > 0) {
+    // //       return { status: 'existing', conflictMessage: `State ID(s) ${overlapStates.join(", ")} already allocated to ${record.industryHeadName}` }
+    // //     }
+    // //   }
+    // // }
 
-          return {
-            status: 'existing',
-            conflictMessage: `State ${overlappingStateNames.join(", ")} already allocated to ${record.industryHeadName}`
-          };
-        }
-      }
-    }
+    // if (!isRegionWise && stateIdArray.length > 0) {
+    //   const [existingStates] = await db.execute(
+    //     `SELECT 
+    //         ihm.stateIds, 
+    //         ihm.industryHeadName, 
+    //         s.id AS stateId, 
+    //         s.stateName 
+    //      FROM 
+    //         industry_head_master ihm 
+    //      JOIN 
+    //         state_info s 
+    //      ON 
+    //         FIND_IN_SET(s.id, ihm.stateIds) 
+    //      WHERE 
+    //         ihm.isRegionWise = 0 
+    //         AND ihm.companyId = ?`,
+    //     [companyId]
+    //   );
+
+    //   for (const record of existingStates) {
+    //     const existingStateIds = record.stateIds
+    //       ? record.stateIds.split(",").map(id => id.trim())
+    //       : [];
+    //     const overlapStates = stateIdArray.filter(id => existingStateIds.includes(id));
+
+    //     if (overlapStates.length > 0) {
+    //       const overlappingStateNames = existingStates
+    //         .filter(r => overlapStates.includes(String(r.stateId))) // Match `stateId` with `overlapStates`
+    //         .map(r => r.stateName);
+    //       console.log('overlappingStateNames', overlapStates, existingStates);
+
+    //       return {
+    //         status: 'existing',
+    //         conflictMessage: `State ${overlappingStateNames.join(", ")} already allocated to ${record.industryHeadName}`
+    //       };
+    //     }
+    //   }
+    // }
 
 
     const query = `
@@ -1569,39 +1570,39 @@ const updateIndustryHeadDetails = async (
   isActive
 ) => {
   try {
-    const regionIdArray = regionIds ? String(regionIds).split(",").map(id => id.trim()) : [];
-    const stateIdArray = stateIds ? String(stateIds).split(",").map(id => id.trim()) : [];
+    // const regionIdArray = regionIds ? String(regionIds).split(",").map(id => id.trim()) : [];
+    // const stateIdArray = stateIds ? String(stateIds).split(",").map(id => id.trim()) : [];
 
-    // Check for overlapping states
-    if (!isRegionWise && stateIdArray.length > 0) {
-      const [existingStates] = await db.execute(
-        `SELECT industry_head_master.stateIds, industry_head_master.industryHeadName, 
-                industry_head_master.id AS industryHeadId, 
-                s.id AS stateId, s.stateName
-         FROM industry_head_master 
-         JOIN state_info s ON FIND_IN_SET(s.id, industry_head_master.stateIds)
-         WHERE industry_head_master.isRegionWise = 0 
-         AND industry_head_master.companyId = ?
-         AND industry_head_master.id != ?`, // Exclude the current record
-        [companyId, industryHeadId]
-      );
+    // // Check for overlapping states
+    // if (!isRegionWise && stateIdArray.length > 0) {
+    //   const [existingStates] = await db.execute(
+    //     `SELECT industry_head_master.stateIds, industry_head_master.industryHeadName, 
+    //             industry_head_master.id AS industryHeadId, 
+    //             s.id AS stateId, s.stateName
+    //      FROM industry_head_master 
+    //      JOIN state_info s ON FIND_IN_SET(s.id, industry_head_master.stateIds)
+    //      WHERE industry_head_master.isRegionWise = 0 
+    //      AND industry_head_master.companyId = ?
+    //      AND industry_head_master.id != ?`, // Exclude the current record
+    //     [companyId, industryHeadId]
+    //   );
 
-      for (const record of existingStates) {
-        const existingStateIds = record.stateIds ? record.stateIds.split(",").map(id => id.trim()) : [];
-        const overlapStates = stateIdArray.filter(id => existingStateIds.includes(id));
+    //   for (const record of existingStates) {
+    //     const existingStateIds = record.stateIds ? record.stateIds.split(",").map(id => id.trim()) : [];
+    //     const overlapStates = stateIdArray.filter(id => existingStateIds.includes(id));
 
-        if (overlapStates.length > 0) {
-          const overlappingStateNames = [...new Set(existingStates
-            .filter(r => overlapStates.includes(String(r.stateId)))
-            .map(r => r.stateName))];
+    //     if (overlapStates.length > 0) {
+    //       const overlappingStateNames = [...new Set(existingStates
+    //         .filter(r => overlapStates.includes(String(r.stateId)))
+    //         .map(r => r.stateName))];
 
-          return {
-            status: 'existing',
-            conflictMessage: `State ${overlappingStateNames.join(", ")} already allocated to ${record.industryHeadName}`
-          };
-        }
-      }
-    }
+    //       return {
+    //         status: 'existing',
+    //         conflictMessage: `State ${overlappingStateNames.join(", ")} already allocated to ${record.industryHeadName}`
+    //       };
+    //     }
+    //   }
+    // }
 
     // Proceed with updating the record
     const query = `
@@ -2652,16 +2653,16 @@ const createRegionHead = async (
 ) => {
   try {
 
-    const existingOverlaps = await checkRegionHeadOverlap(regionId, companyId);
-    console.log('ooooooooo', existingOverlaps);
+    // const existingOverlaps = await checkRegionHeadOverlap(regionId, companyId);
+    // console.log('ooooooooo', existingOverlaps);
 
-    if (existingOverlaps) {
-      const conflictMessage = existingOverlaps.map((conflict) => `Region ${conflict.regionName} is already assigned to ${conflict.regionHeadName}`).join(", ");
-      return {
-        status: "existing",
-        conflictMessage: conflictMessage,
-      };
-    }
+    // if (existingOverlaps) {
+    //   const conflictMessage = existingOverlaps.map((conflict) => `Region ${conflict.regionName} is already assigned to ${conflict.regionHeadName}`).join(", ");
+    //   return {
+    //     status: "existing",
+    //     conflictMessage: conflictMessage,
+    //   };
+    // }
 
     const query = `
       INSERT INTO region_head_info (
@@ -2713,32 +2714,32 @@ const updateRegionHeadDetails = async (
   try {
 
     // Check for region ID conflict
-    const conflictQuery = `
-        SELECT rhi.regionHeadName, r.regionName
-        FROM region_head_info rhi
-        JOIN region_info r ON FIND_IN_SET(r.id, rhi.regionId)
-        WHERE rhi.companyId = ? 
-          AND rhi.id != ? 
-          AND (
-            ${regionId.split(',').map(() => "FIND_IN_SET(?, rhi.regionId)").join(" OR ")}
-          )
-      `;
+    // const conflictQuery = `
+    //     SELECT rhi.regionHeadName, r.regionName
+    //     FROM region_head_info rhi
+    //     JOIN region_info r ON FIND_IN_SET(r.id, rhi.regionId)
+    //     WHERE rhi.companyId = ? 
+    //       AND rhi.id != ? 
+    //       AND (
+    //         ${regionId.split(',').map(() => "FIND_IN_SET(?, rhi.regionId)").join(" OR ")}
+    //       )
+    //   `;
 
-    const regionIdArray = regionId.split(',').map(id => id.trim());
-    const conflictValues = [companyId, regionHeadId, ...regionIdArray];
+    // const regionIdArray = regionId.split(',').map(id => id.trim());
+    // const conflictValues = [companyId, regionHeadId, ...regionIdArray];
 
-    const [conflictRows] = await db.execute(conflictQuery, conflictValues);
-    const conflictingRegions = conflictRows
-      .map(row => `Region ${row.regionName} is already assigned to ${row.regionHeadName}`)
-      .join(", ");
-    console.log('conflictRows', conflictingRegions);
-    if (conflictRows.length > 0) {
-      return { status: 'existing', conflictMessage: conflictingRegions }
-      // res.status(400).json({
-      //   statusCode: 400,
-      //   message: `Region already assigned to ${conflictRows[0].regionHeadName}`,
-      // });
-    }
+    // const [conflictRows] = await db.execute(conflictQuery, conflictValues);
+    // const conflictingRegions = conflictRows
+    //   .map(row => `Region ${row.regionName} is already assigned to ${row.regionHeadName}`)
+    //   .join(", ");
+    // console.log('conflictRows', conflictingRegions);
+    // if (conflictRows.length > 0) {
+    //   return { status: 'existing', conflictMessage: conflictingRegions }
+    //   // res.status(400).json({
+    //   //   statusCode: 400,
+    //   //   message: `Region already assigned to ${conflictRows[0].regionHeadName}`,
+    //   // });
+    // }
     const sanitizedValues = [
       regionId ?? null,
       countryId ?? null,
@@ -4573,7 +4574,8 @@ const insertInvoice = async (
   clientBillTo_name,
   clientShipAddress_name,
   projectService,
-  projectService_names
+  projectService_names,
+  billed_hours
 ) => {
   try {
     console.log("Received values in insertInvoice:", {
@@ -4582,7 +4584,7 @@ const insertInvoice = async (
       company_name, bill_from, invoice_bill_from_id, tax_type, tax_type_id,
       tax_code, tax_code_id, invoice_amount, note_one, note_two, updated_by, isActive,
       filePath, total_amount, gst_total, final_amount, clientContact_name, clientBillTo_name,
-      clientShipAddress_name, projectService, projectService_names, invoiceData
+      clientShipAddress_name, projectService, projectService_names, billed_hours, invoiceData
     });
 
     // Ensure client_id is a number
@@ -4640,7 +4642,8 @@ const insertInvoice = async (
       clientBillTo_name || null,
       clientShipAddress_name || null,
       projectService || null,
-      projectService_names || null
+      projectService_names || null,
+      billed_hours || null
     ];
 
     console.log("Final safeValues before query:", safeValues);
@@ -4652,8 +4655,8 @@ const insertInvoice = async (
         company_name, bill_from, invoice_bill_from_id, tax_type, tax_type_id,
         tax_code, tax_code_id, invoice_amount, note_one, note_two, updated_by, isActive,
         filePath, total_amount, gst_total, final_amount, clientContact_name,
-        clientBillTo_name, clientShipAddress_name, projectService, projectService_names
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        clientBillTo_name, clientShipAddress_name, projectService, projectService_names, billed_hours
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const [invoiceResult] = await db.execute(insertQuery, safeValues);
@@ -4712,7 +4715,7 @@ const updateInvoice = async (
   company_name, bill_from, invoice_bill_from_id, tax_type, tax_type_id, tax_code, tax_code_id,
   invoice_amount, note_one, note_two, updated_by, isActive, filePath, total_amount, gst_total,
   final_amount, invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
-  projectService, projectService_names
+  projectService, projectService_names, billed_hours
 ) => {
   try {
     const query = `
@@ -4725,7 +4728,7 @@ const updateInvoice = async (
         tax_code_id = ?, invoice_amount = ?, note_one = ?, note_two = ?, updated_by = ?, 
         isActive = ?, filePath = ?, total_amount = ?, gst_total = ?, final_amount = ?, 
         clientContact_name = ?, clientBillTo_name = ?, clientShipAddress_name = ?, 
-        projectService = ?, projectService_names = ? WHERE id = ?
+        projectService = ?, projectService_names = ?, billed_hours = ? WHERE id = ?
     `;
 
     const values = [
@@ -4739,7 +4742,7 @@ const updateInvoice = async (
       sanitizeValue(note_two), sanitizeValue(updated_by), sanitizeValue(isActive),
       sanitizeValue(filePath), sanitizeValue(total_amount), sanitizeValue(gst_total),
       sanitizeValue(final_amount), sanitizeValue(clientContact_name), sanitizeValue(clientBillTo_name),
-      sanitizeValue(clientShipAddress_name), sanitizeValue(projectService), sanitizeValue(projectService_names),
+      sanitizeValue(clientShipAddress_name), sanitizeValue(projectService), sanitizeValue(projectService_names), sanitizeValue(billed_hours),
       sanitizeValue(id)
     ];
 
