@@ -5,7 +5,7 @@ const updateClientStatus = async () => {
     try {
         const updateQuery = `
             UPDATE client_info
-            SET client_status = 1
+            SET client_status = 0
         `;
         
         await db.execute(updateQuery);
