@@ -1513,7 +1513,7 @@ const createIndustryHead = async (req, res) => {
     console.error("Error creating industry head:", err);
     res.status(500).json({
       statusCode: 500,
-      message: "Duplicate entry for Email!",
+      message: "Duplicate entry for E-Code !",
     });
   }
 };
@@ -1582,7 +1582,7 @@ const updateIndustryHead = async (req, res) => {
     console.error("Error updating industry head:", err);
     res.status(500).json({
       statusCode: 500,
-      message: "Duplicate entry for Email!",
+      message: "Duplicate entry for E-Code !",
     });
   }
 };
@@ -2629,7 +2629,7 @@ const addRegionHead = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       statusCode: 500,
-      message: "Duplicate entry for Email!",
+      message: "Duplicate entry for E-Code !",
     });
   }
 };
@@ -2683,7 +2683,7 @@ const updateRegionHead = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       statusCode: 500,
-      message: "Duplicate entry for Email!",
+      message: "Duplicate entry for E-Code !",
     });
   }
 };

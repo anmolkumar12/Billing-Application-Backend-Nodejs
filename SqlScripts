@@ -773,3 +773,22 @@ ALTER TABLE industry_head_master ADD CONSTRAINT unique_industry_head_email UNIQU
 
 ALTER TABLE `ims_backend`.`invoice_info` 
 ADD COLUMN `billed_hours` VARCHAR(45) NULL DEFAULT NULL;
+
+
+--26-03-2025--
+ALTER TABLE region_head_info DROP INDEX unique_region_head_email;
+ALTER TABLE region_head_info ADD CONSTRAINT unique_region_head_ecode UNIQUE (regionHeadEcode);
+
+ALTER TABLE industry_head_master DROP INDEX unique_industry_head_email;
+ALTER TABLE industry_head_master ADD CONSTRAINT unique__ecode UNIQUE (code);
+
+ALTER TABLE client_info 
+MODIFY COLUMN `msa_start_date` VARCHAR(50) NULL DEFAULT NULL ;
+ALTER TABLE client_info 
+MODIFY COLUMN `msa_end_date` VARCHAR(50) NULL DEFAULT NULL ;
+
+ALTER TABLE po_contract_info 
+MODIFY COLUMN `poAmount` INT NULL DEFAULT NULL;
+
+ALTER TABLE po_contract_info 
+MODIFY COLUMN `dueAmount` INT NULL DEFAULT NULL;
