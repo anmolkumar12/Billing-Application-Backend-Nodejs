@@ -3672,7 +3672,7 @@ const insertPoContractHandler = async (req, res) => {
     subIndustries,
     industryHead,
     salesManager,
-    accountManager, noOfResources, resourcesData, masterNames
+    accountManager, noOfResources, resourcesData, masterNames, po_creation_date
   } = req.body;
 
   // Retrieve the file path if a file is uploaded
@@ -3716,7 +3716,7 @@ const insertPoContractHandler = async (req, res) => {
       subIndustries,
       industryHead,
       salesManager,
-      accountManager, filePath, noOfResources, resourcesData, masterNames);
+      accountManager, filePath, noOfResources, resourcesData, masterNames, po_creation_date);
     // Respond with a success message
     res.status(201).json({
       statusCode: 201,
@@ -3764,7 +3764,7 @@ const updatePoContractHandler = async (req, res) => {
     industryHead,
     salesManager,
     accountManager,
-    noOfResources, resourcesData, masterNames
+    noOfResources, resourcesData, masterNames, po_creation_date
   } = req.body;
   const filePath = req.files && req.files.file ? req.files.file[0].path.replace("\\", "/") : null;
 
@@ -3803,7 +3803,7 @@ const updatePoContractHandler = async (req, res) => {
       subIndustries,
       industryHead,
       salesManager,
-      accountManager, filePath, noOfResources, resourcesData, masterNames);
+      accountManager, filePath, noOfResources, resourcesData, masterNames, po_creation_date);
     res.status(200).json({
       statusCode: 200,
       message: "PO contract updated successfully",

@@ -792,3 +792,12 @@ MODIFY COLUMN `poAmount` INT NULL DEFAULT NULL;
 
 ALTER TABLE po_contract_info 
 MODIFY COLUMN `dueAmount` INT NULL DEFAULT NULL;
+
+ALTER TABLE po_contract_info 
+ADD COLUMN `po_creation_date` VARCHAR(50) NULL DEFAULT NULL;
+
+ALTER TABLE sales_manager_master 
+MODIFY COLUMN `fromDate` date NULL DEFAULT NULL;
+
+ALTER TABLE account_manager_master 
+MODIFY COLUMN `fromDate` date NULL DEFAULT NULL;

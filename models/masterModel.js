@@ -4192,7 +4192,8 @@ const insertPoContract = async (
   filePath,
   noOfResources,
   resourcesData,
-  masterNames
+  masterNames,
+  po_creation_date
 ) => {
   try {
     const query = `
@@ -4202,8 +4203,8 @@ const insertPoContract = async (
         dueAmount, start_date, end_date, projectService, technolgyGroup,
         technolgySubGroup, technolgy, oem, product, docType, poNumber,
         srNumber, industryGroups, subIndustries, industryHead, salesManager,
-        accountManager, filePath,noOfResources,resourcesData,masterNames
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)
+        accountManager, filePath,noOfResources,resourcesData,masterNames, po_creation_date
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?, ?)
     `;
     const [result] = await db.execute(query, [
       clientId,
@@ -4237,7 +4238,8 @@ const insertPoContract = async (
       filePath || null,
       noOfResources || null,
       resourcesData || null,
-      masterNames || null
+      masterNames || null,
+      po_creation_date || null
     ]);
     return result;
   } catch (err) {
@@ -4278,7 +4280,8 @@ const updatePoContract = async (
   filePath,
   noOfResources,
   resourcesData,
-  masterNames
+  masterNames,
+  po_creation_date
 ) => {
   try {
     const query = `
@@ -4290,7 +4293,7 @@ const updatePoContract = async (
         technolgyGroup = ?, technolgySubGroup = ?, technolgy = ?, oem = ?, product = ?,
         docType = ?, poNumber = ?, srNumber = ?, industryGroups = ?, subIndustries = ?,
         industryHead = ?, salesManager = ?, accountManager = ?,filePath = ?, noOfResources = ?,
-      resourcesData = ?,masterNames = ?
+      resourcesData = ?,masterNames = ?, po_creation_date = ?
       WHERE id = ?
     `;
     const [result] = await db.execute(query, [
@@ -4325,6 +4328,7 @@ const updatePoContract = async (
       noOfResources || null,
       resourcesData || null,
       masterNames || null,
+      po_creation_date || null,
       id,
     ]);
     return result;
