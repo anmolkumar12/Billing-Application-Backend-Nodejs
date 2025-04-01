@@ -801,3 +801,9 @@ MODIFY COLUMN `fromDate` date NULL DEFAULT NULL;
 
 ALTER TABLE account_manager_master 
 MODIFY COLUMN `fromDate` date NULL DEFAULT NULL;
+
+
+-- 30.03.2025 --
+
+ALTER TABLE client_info 
+ADD COLUMN `isApplicableAM` VARCHAR(50) NULL DEFAULT NULL ;

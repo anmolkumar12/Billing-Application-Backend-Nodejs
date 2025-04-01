@@ -3174,6 +3174,7 @@ const createClient = async (
   IndustrySubGroupId,
   salesMangerId,
   accountManagerId,
+  isApplicableAM,
   msa_start_date,
   msa_end_date,
   msa_flag,
@@ -3215,10 +3216,10 @@ const createClient = async (
       INSERT INTO client_info (
         client_name, vega_client_name, client_type, credit_period, client_status, 
         countryId, companyId, accountId, industryId, IndustryHeadId, 
-        IndustryGroupId, IndustrySubGroupId, salesMangerId, accountManagerId, msa_start_date, 
+        IndustryGroupId, IndustrySubGroupId, salesMangerId, accountManagerId, isApplicableAM, msa_start_date, 
         msa_end_date, msa_flag, nda_flag, non_solicitation_clause_flag, 
         use_logo_permission_flag,isActive, msaFilePath, ndaFilePath, msa_document_id, updated_by, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     const sanitizedClientValues = [
@@ -3236,6 +3237,7 @@ const createClient = async (
       IndustrySubGroupId ?? null,
       salesMangerId ?? null,
       accountManagerId ?? null,
+      isApplicableAM ?? null,
       msa_start_date ?? null,
       msa_end_date ?? null,
       msa_flag ?? null,
@@ -3293,6 +3295,7 @@ const updateClientDetails = async (
   IndustrySubGroupId,
   salesMangerId,
   accountManagerId,
+  isApplicableAM,
   msa_start_date,
   msa_end_date,
   msa_flag,
@@ -3341,6 +3344,7 @@ const updateClientDetails = async (
         IndustrySubGroupId = ?, 
         salesMangerId = ?, 
         accountManagerId = ?, 
+        isApplicableAM = ?,
         msa_start_date = ?, 
         msa_end_date = ?, 
         msa_flag = ?, 
@@ -3370,6 +3374,7 @@ const updateClientDetails = async (
       IndustrySubGroupId ?? null,
       salesMangerId ?? null,
       accountManagerId ?? null,
+      isApplicableAM ?? null,
       msa_start_date ?? null,
       msa_end_date ?? null,
       msa_flag ?? null,
