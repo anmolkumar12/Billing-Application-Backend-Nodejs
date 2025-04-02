@@ -1,4 +1,10 @@
 const db = require("../config/db");
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
+const doc = new PDFDocument();
+const path = require('path');
+const puppeteer = require('puppeteer');
+const numberToWords = require("number-to-words");
 
 // Country
 const createCountry = async (
@@ -3586,9 +3592,9 @@ const insertClientBillTo = async (
   isDefaultAddress,
   updatedBy,
   state_code,
-  gstIn ,
-  placeOfSupply ,
-  state_name ,
+  gstIn,
+  placeOfSupply,
+  state_name,
 ) => {
   try {
     const sanitizedValues = [
@@ -3600,7 +3606,7 @@ const insertClientBillTo = async (
       JSON.stringify(additionalAddressDetails) ?? null,
       isDefaultAddress ?? null,
       updatedBy ?? null, // Explicitly handle `undefined` and convert to `null`
-      state_code?? null,
+      state_code ?? null,
       gstIn ?? null,
       placeOfSupply ?? null,
       state_name ?? null,
@@ -3652,7 +3658,7 @@ const updateClientBillToDetails = async (
       gstIn,
       placeOfSupply,
       state_name,
-      id 
+      id
     ];
     const query = `
       UPDATE client_bill_to_info
@@ -3766,9 +3772,9 @@ const insertClientShipTo = async (
       gstIn ?? null,
       placeOfSupply ?? null,
       state_name ?? null
-      
+
     ];
-    
+
 
     const query = `
       INSERT INTO client_ship_to_info 
@@ -4607,16 +4613,16 @@ const insertInvoice = async (
       LIMIT 1
     `;
 
-    const [lastInvoice] = await db.execute(getLastInvoiceQuery, [`${invoice_name}/%`]);
-    
+    const [lastInvoice] = await db.execute(getLastInvoiceQuery, [`${invoice_name}-%`]);
+
     let newInvoiceNumber = "0001";
     if (lastInvoice.length > 0) {
       const lastInvoiceName = lastInvoice[0].invoice_name;
-      const lastNumber = parseInt(lastInvoiceName.split("/").pop(), 10) || 0;
+      const lastNumber = parseInt(lastInvoiceName.split("-").pop(), 10) || 0;
       newInvoiceNumber = String(lastNumber + 1).padStart(4, "0");
     }
 
-    const finalInvoiceName = `${invoice_name}/${newInvoiceNumber}`;
+    const finalInvoiceName = `${invoice_name}-${newInvoiceNumber}`;
 
     const safeValues = [
       finalInvoiceName,
@@ -4691,19 +4697,19 @@ const insertInvoice = async (
       ]);
     }
 
-        // Step 4: Update dueAmount in po_contract_info
-      //   const updateDueAmountQuery = `
-      //   UPDATE po_contract_info
-      //   SET dueAmount = dueAmount - ?
-      //   WHERE poNumber = ? AND po_name = ?
-      // `;
-        const updateDueAmountQuery = `
+    // Step 4: Update dueAmount in po_contract_info
+    //   const updateDueAmountQuery = `
+    //   UPDATE po_contract_info
+    //   SET dueAmount = dueAmount - ?
+    //   WHERE poNumber = ? AND po_name = ?
+    // `;
+    const updateDueAmountQuery = `
         UPDATE po_contract_info
         SET dueAmount = dueAmount - ?
         WHERE po_name = ?
       `;
-  
-      await db.execute(updateDueAmountQuery, [invoice_amount, contract_name]);
+
+    await db.execute(updateDueAmountQuery, [invoice_amount, contract_name]);
 
     return { invoice: invoiceResult, invoice_name: finalInvoiceName };
 
@@ -4893,7 +4899,7 @@ const insertCreditNote = async (
     `;
 
     const [lastInvoice] = await db.execute(getLastInvoiceQuery, [`${invoice_name}/%`]);
-    
+
     let newInvoiceNumber = "0001";
     if (lastInvoice.length > 0) {
       const lastInvoiceName = lastInvoice[0].invoice_name;
@@ -4975,14 +4981,14 @@ const insertCreditNote = async (
       ]);
     }
 
-            // Step 4: Update dueAmount in po_contract_info
-            const updateDueAmountQuery = `
+    // Step 4: Update dueAmount in po_contract_info
+    const updateDueAmountQuery = `
             UPDATE po_contract_info
             SET dueAmount = dueAmount + ?
             WHERE poNumber = ? AND po_name = ?
           `;
-      
-          await db.execute(updateDueAmountQuery, [invoice_amount, po_number, contract_name]);
+
+    await db.execute(updateDueAmountQuery, [invoice_amount, po_number, contract_name]);
 
     return { invoice: invoiceResult, invoice_name: finalInvoiceName };
 
@@ -5110,7 +5116,354 @@ const getAllCreditNote = async () => {
   }
 };
 
+// const generateInvoicePDF = async (invoice_number) => {
+//   try {
+//     const query = "SELECT * FROM invoice_info WHERE invoice_name = ?";
+//     const [invoiceData] = await db.execute(query, [invoice_number]);
 
+//     if (!invoiceData.length) {
+//       throw new Error("Invoice not found");
+//     }
+
+//     const invoice = invoiceData[0];
+//     const logoQuery = "SELECT logopath FROM company_info WHERE companyName = ?";
+//     const [companyData] = await db.execute(logoQuery, [invoice.company_name]);
+//     const logoPath = companyData.length ? companyData[0].logopath : "default_logo.png";
+
+//     // Step 3: Ensure directory for the PDF exists
+//     const dirPath = path.join(__dirname, 'invoices');
+//     if (!fs.existsSync(dirPath)) {
+//       fs.mkdirSync(dirPath, { recursive: true });  // Ensure the directory exists
+//     }
+
+//     const pdfPath = path.join(dirPath, `${invoice_number}.pdf`);
+
+//        // Step 4: Create the PDF
+//     console.error("pdfPath:", invoice, logoPath,  companyData[0].logopath);
+
+//        await createPDF(invoice, logoPath, pdfPath);
+//     // await createPDF(invoice, logoPath, pdfPath);
+
+
+
+//     const insertPDFQuery = "UPDATE invoice_info SET pdf_path = ? WHERE invoice_name = ?";
+//     await db.execute(insertPDFQuery, [pdfPath, invoice_number]);
+
+//     return pdfPath;
+//   } catch (err) {
+//     console.error("Error generating PDF:", err);
+//     throw err;
+//   }
+// };
+
+const getInvoicePDFPath = async (invoice_number) => {
+  try {
+    const query = "SELECT pdf_path FROM invoice_info WHERE invoice_name = ?";
+    const [result] = await db.execute(query, [invoice_number]);
+    return result.length ? result[0].pdf_path : null;
+  } catch (err) {
+    console.error("Error fetching PDF path:", err);
+    throw err;
+  }
+};
+
+// const createPDF = async (invoice, logoPath, pdfPath) => {
+
+
+//   doc.pipe(fs.createWriteStream(pdfPath));
+
+//   // doc.image(logoPath, 50, 50, { width: 100 });
+//   doc.fontSize(20).text(`Invoice: ${invoice.invoice_name}`, 150, 50);
+//   doc.moveDown();
+
+//   doc.fontSize(12).text(`Client: ${invoice.client_name}`);
+//   doc.text(`Date: ${invoice.invoice_date}`);
+//   doc.text(`Amount: ${invoice.invoice_amount}`);
+//   doc.text(`Tax: ${invoice.gst_total}`);
+//   doc.text(`Total: ${invoice.final_amount}`);
+
+//   doc.end();
+// };
+
+
+const generateInvoicePDF = async (invoice_number) => {
+  try {
+    // Fetch invoice data from the database
+    const query = "SELECT * FROM invoice_info WHERE invoice_name = ?";
+    const [invoiceData] = await db.execute(query, [invoice_number]);
+
+    if (!invoiceData.length) {
+      throw new Error("Invoice not found");
+    }
+
+    const invoice = invoiceData[0];
+
+    // Fetch the company's information 
+    const companyQuery = "SELECT * FROM company_info WHERE companyName = ?";
+    const [companyData] = await db.execute(companyQuery, [invoice.company_name]);
+    invoice['companyInfo'] = companyData[0];
+
+
+    // Fetch the company's location 
+    const copanyLocationQuery = "SELECT * FROM company_location_info WHERE companyId = ? and isDefaultAddress = 1";
+    const [companyLocationData] = await db.execute(copanyLocationQuery, [companyData[0].id]);
+    const additionalDetails = JSON.parse(companyLocationData[0].additionalAddressDetails);
+
+    companyLocationData[0].additionalDetailsHtml = Object.entries(additionalDetails)
+      .map(([key, value]) => `<span>${key}: ${value}</span>, `)
+      .join("");
+
+    invoice['companyLocationInfo'] = companyLocationData[0];
+
+
+    // Fetch the company's account info 
+    const companyAccountQuery = "SELECT * FROM company_account_info WHERE companyId = ? and isDefaultAccount = 1";
+    const [companyAccountData] = await db.execute(companyAccountQuery, [companyData[0].id]);
+
+    companyAccountData[0].additionalDetailsHtml = Object.entries(companyAccountData[0].additionalFieldDetails)
+      .map(([key, value]) => `<span>${key}: ${value}</span> <br />`)
+      .join("");
+
+    invoice['companyAccountInfo'] = companyAccountData[0];
+
+
+    // Fetch the client's contact person info 
+    if (invoice.clientContact) {
+      const clientContactQuery = "SELECT * FROM client_contact WHERE id = ?";
+      const [clientContactData] = await db.execute(clientContactQuery, [invoice.clientContact]);
+
+      invoice['clientContactInfo'] = clientContactData[0];
+    } else {
+      invoice['clientContactInfo'] = {};
+
+    }
+
+
+    // Ensure the directory for saving PDFs exists
+    const dirPath = path.join(__dirname, 'invoices');
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+    }
+
+    // Define the PDF path
+    const pdfPath = path.join(dirPath, `${invoice_number}.pdf`);
+
+    // Generate the PDF using Puppeteer
+    await createPDF(invoice, pdfPath);
+
+    // Update the database with the generated PDF path
+    const insertPDFQuery = "UPDATE invoice_info SET pdf_path = ? WHERE invoice_name = ?";
+    await db.execute(insertPDFQuery, [pdfPath, invoice_number]);
+
+    return pdfPath;
+  } catch (err) {
+    console.error("Error generating PDF:", err);
+    throw err;
+  }
+};
+
+const formatDate = (dateString) => {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  // return `${year}/${month}/${day}`;
+  return `${day}/${month}/${year}`;
+};
+
+const convertAmountToWords = (amount, currency = "INR") => {
+  let [whole, decimal] = amount.toString().split(".");
+
+  let currencyWord = currency === "USD" ? "Dollars" : "Rupees";
+  let subCurrencyWord = currency === "USD" ? "Cents" : "Paise";
+
+  let words = numberToWords.toWords(parseInt(whole)) + ` ${currencyWord}`;
+
+  if (decimal && parseInt(decimal) > 0) {
+    if (decimal.length === 1) decimal += "0"; // Ensure two decimal places
+    words += ` and ${numberToWords.toWords(parseInt(decimal))} ${subCurrencyWord}`;
+  }
+
+  return `In Words: ${currency} ${words} Only`;
+};
+
+
+// Function to generate PDF using Puppeteer
+const createPDF = async (invoice, pdfPath) => {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  console.error("companyDataaaa", invoice);
+
+  // Define the HTML content with the invoice details
+  const htmlContent = `    
+  <html>
+      <head></head>
+      <body>
+        <div style="position: absolute; top: 0; left: 0; background: #00000099; height: 100vh; width: 100vw; z-index: 1; display: flex; justify-content: center; align-items: center; overflow: hidden;" onclick="props?.setDownloadExportPDF(false)">
+          <div style="width: 90%; max-width: 750px; height: 90vh; background-color: white; padding: 2rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); overflow-y: auto;" onclick="event.stopPropagation()">
+            
+            <img src="http://localhost:5000/${invoice.companyInfo.logopath}" alt="Polestar" style="height: 35px; width: 80px; margin-bottom: 0px; margin-left: 10px;" />
+            <h1 style="text-align: center; font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Export Invoice</h1>
+            <div style="border: 1px solid black;">
+              <div style="display: flex;">
+                <div style="border: 1px solid black; width: 60%; padding: 4px;">
+                  <div style="font-size: 0.875rem;">
+                    <span style="font-weight: 600;">${process.env.PORT || 5000}/${invoice.companyInfo.logopath}</span><br />
+                    <span style="font-weight: 600;">${invoice.company_name}</span><br />
+                    <span>${invoice.companyLocationInfo.address1}</span><br />
+                    <span>${invoice.companyLocationInfo.address2}</span><br />
+                    <span>${invoice.companyLocationInfo.address3}</span><br />
+                    <span>${invoice.companyLocationInfo.additionalDetailsHtml}</span><br />
+                    
+                    <span>Website - <a href=${invoice.companyInfo.Website} target="_blank" rel="noopener noreferrer">${invoice.companyInfo.Website}</a></span><br />
+                    <span>Email - ${invoice.companyInfo.Email}</span><br />
+                    <span>CIN No. - U72900UP2017PTC092242</span>
+                  </div>
+                </div>
+              </div>
+              <div style="display: grid; width: 100%; grid-template-columns: repeat(4, 1fr);">
+                <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
+                  <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">Invoice No:</span>
+                  <span>${invoice.invoice_name}</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
+                  <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">Invoice Date:</span>
+                  <span>${formatDate(invoice.invoice_date)}</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
+                  <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">Due Date:</span>
+                  <span>2024-05-30</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
+                  <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">Terms of Payment:</span>
+                  <span>30 Days</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
+                  <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">PO Number:</span>
+                  <span>${invoice.po_number}</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
+                  <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">PAN:</span>
+                  <span>AAJCP1487E</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
+                  <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">GSTN:</span>
+                  <span>09AAJCP1487E1Z7</span>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
+                  <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">IEC:</span>
+                  <span>AAJCP1487E</span>
+                </div>
+              </div>
+              <div style="display: flex;">
+                <span style="font-weight: 600; padding: 4px; width: 20%; border: 1px solid black;">Client's Details</span>
+                <div style="width: 80%; display: grid; grid-template-columns: 1fr 1fr; font-size: 0.875rem;">
+                  <div style="border: 1px solid black; padding: 4px;">
+                    <span style="font-weight: 600; text-decoration: underline;">Delivery Address:</span><br />
+                    <span>${invoice.clientShipAddress_name}</span><br />
+                  </div>
+                  <div style="border: 1px solid black; padding: 4px;">
+                    <span style="font-weight: 600; text-decoration: underline;">Billing Address:</span><br />
+                    <span>${invoice.clientBillTo_name}</span><br />
+                  </div>
+                  
+                </div>
+              </div>
+              <div>
+              <div style={{ fontSize: '14px', padding: '4px', display: 'flex', justifyContent: 'center', border: '1px solid black' }}>
+
+              ${invoice.clientContactInfo ?
+      `<div style="font-weight: 800; text-align: center;">
+                  Kind Attention : ${invoice.clientContactInfo.salutation} 
+                  ${invoice.clientContactInfo.first_name} 
+                  ${invoice.clientContactInfo.last_name}
+                </div>`
+      : ''
+    }
+
+
+              <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <thead>
+                  <tr>
+                    <th style="border: 1px solid black; padding: 4px; text-align: left;">Description</th>
+                    <th style="border: 1px solid black; padding: 4px; text-align: right;">Amount (INR)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="border: 1px solid black; padding: 4px; vertical-align: top; height: 200px;">
+                      <span style="font-weight: 600;">${invoice.companyInfo.description}</span><br />
+                      
+        <span style="font-weight: 600;">Total Amount Payable</span>
+                    </td>
+                    <td style="border: 1px solid black; padding: 4px; text-align: right; font-weight: 600;">
+                      <span>${invoice.final_amount}</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              </div
+              <div style="border: 1px solid black; padding: 4px; font-size: 12px;">
+                <span style="font-weight: 600;">${convertAmountToWords(invoice.final_amount)}</span>
+              </div>
+              <div style="display: flex; justify-content: flex-end; border: 1px solid black; padding: 4px;">
+                <div style="text-align: center;">
+                  <div style="margin-bottom: 3rem;"></div>
+                  <img src="http://localhost:5000/${invoice.companyInfo.digitalSignPath}" alt="Polestar" style="height: 30px; width: 100px; margin-bottom: 0px; margin-left: 10px;" />
+                  <div style="font-weight: 600; font-size: 14px;">Authorised Signatory</div>
+                </div>
+              </div>
+
+              <div style={{ border: "1px solid black", fontSize: "0.875rem", padding: "4px" }}>
+                <div style={{ fontWeight: "600" }}>Terms & Conditions:</div>
+                <ol style={{ marginBottom: "0px", paddingLeft: "16px" }}>
+                  <li style={{ marginBottom: "0.25rem" }}>
+                    This bill is payable on receipt by Cheque/Wire transfer in favor of Polestar Solutions & Services India Pvt. Ltd. In case payment is made by electronic fund transfer, please send details to <a href="ajay@polestarllp.com" target="_blank" rel="noopener noreferrer">ajay@polestarllp.com</a>.
+                  </li>
+                  <li style={{ marginBottom: "0.25rem" }}>TDS certificate, if applicable is to be sent to the above address.</li>
+                  <li style={{ marginBottom: "0.25rem" }}>Whether GST is payable on Reverse Charge basis? - No</li>
+                </ol>
+              </div>
+
+              <div className="bank-details" style={{ fontSize: "14px" }}>
+                <div className="bank-title" style={{ fontWeight: "600", display: "flex", justifyContent: "space-around", border: "1px solid black", padding: "4px" }}>Bank Details :</div>
+                <div className="bank-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+                  <div className="bank-column" style={{ display: "flex", flexDirection: "column", border: "1px solid black", padding: "4px" }}>
+                    <div className="bank-row"><span className="bank-label" style={{ fontWeight: "bold", flex: "1" }}>Beneficiary Name : </span><span>${invoice.company_name}</span></div>
+                    <div className="bank-row"><span className="bank-label" style={{ fontWeight: "bold", flex: "1" }}>Bank Name : </span><span>${invoice.companyAccountInfo.bankName}</span></div>
+                    <div className="bank-row"><span className="bank-label" style={{ fontWeight: "bold", flex: "1" }}>Bank Address : </span><span>${invoice.companyAccountInfo.bankAddress}</span></div>
+                    <div className="bank-row"><span className="bank-label" style={{ fontWeight: "bold", flex: "1" }}>Account No. : </span><span>${invoice.companyAccountInfo.accountNumber}</span></div>
+                  </div>
+                  <div className="bank-column" style={{ display: "flex", flexDirection: "column", border: "1px solid black", padding: "4px" }}>
+                    <div className="bank-row"><span className="bank-label" style={{ fontWeight: "bold", flex: "1" }}>${invoice.companyAccountInfo.additionalDetailsHtml}</span></div>
+                 
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </body>
+    </html>
+  `
+    ;
+
+  // Set the content to the page
+  await page.setContent(htmlContent);
+
+  // Generate PDF from HTML content
+  await page.pdf({
+    path: pdfPath,
+    format: 'A4',
+    printBackground: true,
+  });
+
+  console.log('PDF generated at:', pdfPath);
+
+  await browser.close();
+};
 
 
 module.exports = {
@@ -5286,4 +5639,6 @@ module.exports = {
   updateCreditNote,
   activateDeactivateCreditNote,
   getAllCreditNote,
+  generateInvoicePDF,
+  getInvoicePDFPath
 };
