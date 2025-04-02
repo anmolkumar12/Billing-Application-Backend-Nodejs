@@ -5466,7 +5466,7 @@ const generateCreditNotePDF = async (invoice_number) => {
 
 
     // Ensure the directory for saving PDFs exists
-    const dirPath = path.join(__dirname, 'invoices');
+    const dirPath = path.join(__dirname, 'creditnotes');
     if (!fs.existsSync(dirPath)) {
       fs.mkdirSync(dirPath, { recursive: true });
     }
