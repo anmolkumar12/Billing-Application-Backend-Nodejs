@@ -176,7 +176,8 @@ const {
   activateDeactivateCreditNote,
   getAllCreditNote,
   generateInvoicePDF,
-  getInvoicePDFPath
+  getInvoicePDFPath,
+  generateCreditNotePDF
 
 } = require("../models/masterModel");
 
@@ -4261,7 +4262,7 @@ const insertCreditNoteHandler = async (req, res) => {
   }
 
   // Generate invoice_name prefix
-  const invoiceNamePrefix = `${client_name.split(" ").map(word => word[0]).join("").toUpperCase()}/${invoice_date.slice(2, 4)}-${(parseInt(invoice_date.slice(2, 4)) + 1)}`;
+  const invoiceNamePrefix = `${client_name.split(" ").map(word => word[0]).join("").toUpperCase()}-${invoice_date.slice(2, 4)}-${(parseInt(invoice_date.slice(2, 4)) + 1)}`;
 
   try {
     const { invoice_name } = await insertCreditNote(
@@ -4404,6 +4405,25 @@ const generateInvoicePDFHandler = async (req, res) => {
 
   try {
     const pdfPath = await generateInvoicePDF(invoice_number);
+
+    res.status(201).json({ statusCode: 201, message: "Invoice PDF generated successfully", pdfPath });
+  } catch (err) {
+    console.error("Error generating invoice PDF:", err);
+    res.status(500).json({ statusCode: 500, message: "Server error while generating invoice PDF", error: err });
+  }
+};
+
+const generateCreditNotePDFHandler = async (req, res) => {
+  const { invoice_number } = req.body;
+  // const invoice_number = "DIPL-2526-0005";
+  console.error("generating invoice PDF:", invoice_number);
+
+  if (!invoice_number) {
+    return res.status(400).json({ statusCode: 400, message: "Invoice number is required" });
+  }
+
+  try {
+    const pdfPath = await generateCreditNotePDF(invoice_number);
 
     res.status(201).json({ statusCode: 201, message: "Invoice PDF generated successfully", pdfPath });
   } catch (err) {
@@ -4607,5 +4627,6 @@ module.exports = {
   activateDeactivateCreditNoteHandler,
   getCreditNoteDataHandler,
   generateInvoicePDFHandler,
-  downloadInvoicePDFHandler
+  downloadInvoicePDFHandler,
+  generateCreditNotePDFHandler
 };

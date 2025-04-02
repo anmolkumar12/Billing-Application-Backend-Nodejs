@@ -819,3 +819,12 @@ modify COLUMN `remain_po_amount` INT NULL DEFAULT NULL ;
 
 ALTER TABLE msa_documents 
 modify COLUMN `end_date` VARCHAR(50) NULL DEFAULT NULL ;
+
+ALTER TABLE credit_note_info 
+ADD COLUMN `pdf_path` VARCHAR(500) NULL DEFAULT NULL ;
+
+ALTER TABLE credit_note_info 
+modify COLUMN `po_amount` INT NULL DEFAULT NULL ;
+
+ALTER TABLE credit_note_info 
+modify COLUMN `remain_po_amount` INT NULL DEFAULT NULL ;
