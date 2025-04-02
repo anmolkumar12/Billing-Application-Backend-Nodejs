@@ -5236,7 +5236,7 @@ const generateInvoicePDF = async (invoice_number) => {
 const createPDF = async (invoice, pdfPath) => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
-  console.error("companyDataaaa", invoice);
+  console.error("companyDataaaa", invoice, pdfPath);
 
   // Define the HTML content with the invoice details
   const htmlContent = ` 
@@ -5247,7 +5247,7 @@ const createPDF = async (invoice, pdfPath) => {
           <div style="width: 90%; max-width: 750px; height: 90vh; background-color: white; padding: 2rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); overflow-y: auto;" onclick="event.stopPropagation()">
 
             <img src="http://localhost:5000/${invoice.companyInfo.logopath}" alt="Polestar" style="height: 35px; width: 80px; margin-bottom: 0px; margin-left: 10px;" />
-            <h1 style="text-align: center; font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Export Invoice</h1>
+            <h1 style="text-align: center; font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Export ${pdfPath.includes("invoices") ? 'Invoice' : 'Credit Note' }</h1>
             <div style="border: 1px solid black;">
               <div style="display: flex;">
                 <div style="display: flex; width: 40%; ">
