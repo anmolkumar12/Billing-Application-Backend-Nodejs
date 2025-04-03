@@ -177,8 +177,8 @@ const {
   getAllCreditNote,
   generateInvoicePDF,
   getInvoicePDFPath,
-  generateCreditNotePDF
-
+  generateCreditNotePDF,
+  generateTaxInvoicePDF
 } = require("../models/masterModel");
 
 // Country
@@ -564,6 +564,7 @@ const addCompany = async (req, res) => {
     updatedBy,
     independent, // 0 or 1 to define whether the company is independent
     parentCompanyId,
+    pan_number
   } = req.body;
 
   // Access the files from req.files
@@ -585,6 +586,7 @@ const addCompany = async (req, res) => {
       logoPath,
       independent,
       parentCompanyId,
+      pan_number,
       digitalSignPath
     );
     res.status(201).json({
@@ -615,6 +617,7 @@ const updateCompany = async (req, res) => {
     updatedBy,
     independent, // 0 or 1 to define whether the company is independent
     parentCompanyId,
+    pan_number
   } = req.body;
 
   // Access the files from req.files
@@ -650,6 +653,7 @@ const updateCompany = async (req, res) => {
       updatedBy,
       independent,
       parentCompanyId,
+      pan_number,
       updatedDigitalSignPath
     );
 
@@ -715,6 +719,7 @@ const createCompanyLocation = async (req, res) => {
     address3,
     additionalAddressDetails,
     isDefaultAddress,
+    gst_number,
     isActive,
     updatedBy,
   } = req.body;
@@ -729,6 +734,7 @@ const createCompanyLocation = async (req, res) => {
       address3,
       additionalAddressDetails,
       isDefaultAddress,
+      gst_number,
       isActive,
       updatedBy
     );
@@ -757,6 +763,7 @@ const updateCompanyLocation = async (req, res) => {
     address3,
     additionalAddressDetails,
     isDefaultAddress,
+    gst_number,
     isActive,
     updatedBy,
   } = req.body;
@@ -779,6 +786,7 @@ const updateCompanyLocation = async (req, res) => {
       address3,
       additionalAddressDetails,
       isDefaultAddress,
+      gst_number,
       isActive,
       updatedBy
     );
@@ -3347,6 +3355,7 @@ const createClientBillTo = async (req, res) => {
     gstIn,
     placeOfSupply,
     state_name,
+    iec_code,
     updated_by // Use `updated_by` to match the payload
   } = req.body;
 
@@ -3363,7 +3372,8 @@ const createClientBillTo = async (req, res) => {
       state_code,
       gstIn,
       placeOfSupply ,
-      state_name 
+      state_name ,
+      iec_code
        // Pass `updated_by` as `updatedBy`
     );
     res.status(201).json({ statusCode: 201, message: "Client Bill To created successfully" });
@@ -3378,7 +3388,7 @@ const updateClientBillTo = async (req, res) => {
   const { id, clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, state_code,
     gstIn,
     placeOfSupply,
-    state_name, updatedBy } = req.body;
+    state_name, iec_code, updatedBy } = req.body;
 
   if (!id) {
     return res.status(400).json({ statusCode: 400, message: "ID is required" });
@@ -3388,7 +3398,7 @@ const updateClientBillTo = async (req, res) => {
     await updateClientBillToDetails(id, clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, state_code,
       gstIn,
       placeOfSupply,
-      state_name, updatedBy);
+      state_name, iec_code, updatedBy);
     res.status(200).json({ statusCode: 200, message: "Client Bill To updated successfully" });
   } catch (err) {
     res.status(500).json({ statusCode: 500, message: "Server error" });
@@ -4432,6 +4442,26 @@ const generateCreditNotePDFHandler = async (req, res) => {
   }
 };
 
+
+const generateTaxInvoicePDFHandler = async (req, res) => {
+  const { invoice_number } = req.body;
+  // const invoice_number = "DIPL-2526-0005";
+  console.error("generating invoice PDF:", invoice_number);
+
+  if (!invoice_number) {
+    return res.status(400).json({ statusCode: 400, message: "Invoice number is required" });
+  }
+
+  try {
+    const pdfPath = await generateTaxInvoicePDF(invoice_number);
+
+    res.status(201).json({ statusCode: 201, message: "Invoice PDF generated successfully", pdfPath });
+  } catch (err) {
+    console.error("Error generating invoice PDF:", err);
+    res.status(500).json({ statusCode: 500, message: "Server error while generating invoice PDF", error: err });
+  }
+};
+
 const downloadInvoicePDFHandler = async (req, res) => {
   const { invoice_number } = req.params;
 
@@ -4628,5 +4658,6 @@ module.exports = {
   getCreditNoteDataHandler,
   generateInvoicePDFHandler,
   downloadInvoicePDFHandler,
-  generateCreditNotePDFHandler
+  generateCreditNotePDFHandler,
+  generateTaxInvoicePDFHandler
 };

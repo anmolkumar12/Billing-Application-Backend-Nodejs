@@ -468,15 +468,16 @@ const createCompany = async (
   logopath,
   independent, // 0 or 1 to define whether the company is independent
   parentCompanyId,
+  pan_number,
   digitalSignPath
 ) => {
   try {
     const query = `
       INSERT INTO company_info (
         countryId, companyName, companyCode, Website, Email, logopath, description, companyAddtionalFields, isactive, 
-        updated_by, independent, parentCompanyId, digitalSignPath, updated_at
+        updated_by, independent, parentCompanyId, pan_number, digitalSignPath, updated_at
       ) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     const [result] = await db.execute(query, [
@@ -492,6 +493,7 @@ const createCompany = async (
       updatedBy,
       independent,
       parentCompanyId,
+      pan_number,
       digitalSignPath,
     ]);
 
@@ -516,6 +518,7 @@ const updateCompanyDetails = async (
   updatedBy,
   independent, // 0 or 1 to define whether the company is independent
   parentCompanyId,
+  pan_number,
   digitalSignPath
 ) => {
   try {
@@ -532,6 +535,7 @@ const updateCompanyDetails = async (
       isActive ?? null,
       independent ?? null,
       parentCompanyId ?? null,
+      pan_number ?? null,
       digitalSignPath ?? null, // Updated digital signature path (if new)
       companyId,
     ];
@@ -551,6 +555,7 @@ const updateCompanyDetails = async (
         isactive = ?, 
         independent = ?, 
         parentCompanyId = ?, 
+        pan_number = ?,
         digitalSignPath = ?, 
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
@@ -649,14 +654,15 @@ const insertCompanyLocation = async (
   address3,
   additionalAddressDetails,
   isDefaultAddress,
+  gst_number,
   isActive,
   updatedBy
 ) => {
   try {
     const query = `
       INSERT INTO company_location_info 
-      (companyId, countryId, stateId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, isActive, updated_by, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      (companyId, countryId, stateId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, gst_number, isActive, updated_by, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     const sanitizedValues = [
@@ -668,6 +674,7 @@ const insertCompanyLocation = async (
       address3 ?? null,
       JSON.stringify(additionalAddressDetails) ?? null,
       isDefaultAddress ?? null,
+      gst_number ?? null,
       isActive ?? null,
       updatedBy ?? null,
     ];
@@ -691,6 +698,7 @@ const updateLocationDetails = async (
   address3,
   additionalAddressDetails,
   isDefaultAddress,
+  gst_number,
   isActive,
   updatedBy
 ) => {
@@ -706,6 +714,7 @@ const updateLocationDetails = async (
         address3 = ?, 
         additionalAddressDetails = ?, 
         isDefaultAddress = ?, 
+        gst_number = ?,
         isActive = ?, 
         updated_by = ?, 
         updated_at = CURRENT_TIMESTAMP
@@ -721,6 +730,7 @@ const updateLocationDetails = async (
       address3 ?? null,
       JSON.stringify(additionalAddressDetails) ?? null,
       isDefaultAddress ?? null,
+      gst_number ?? null,
       isActive ?? null,
       updatedBy ?? null,
       locationId,
@@ -3595,6 +3605,7 @@ const insertClientBillTo = async (
   gstIn,
   placeOfSupply,
   state_name,
+  iec_code
 ) => {
   try {
     const sanitizedValues = [
@@ -3610,12 +3621,13 @@ const insertClientBillTo = async (
       gstIn ?? null,
       placeOfSupply ?? null,
       state_name ?? null,
+      iec_code ?? null
     ];
 
     const query = `
       INSERT INTO client_bill_to_info 
-      (clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, updated_by,state_code,gstIn,placeOfSupply,state_name, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      (clientId, countryId, address1, address2, address3, additionalAddressDetails, isDefaultAddress, updated_by,state_code,gstIn,placeOfSupply,state_name, iec_code, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     const [result] = await db.execute(query, sanitizedValues);
@@ -3641,6 +3653,7 @@ const updateClientBillToDetails = async (
   gstIn,
   placeOfSupply,
   state_name,
+  iec_code,
   updatedBy
 ) => {
   try {
@@ -3658,6 +3671,7 @@ const updateClientBillToDetails = async (
       gstIn,
       placeOfSupply,
       state_name,
+      iec_code,
       id
     ];
     const query = `
@@ -3675,6 +3689,7 @@ const updateClientBillToDetails = async (
         gstIn = ?,
         placeOfSupply = ?,
         state_name = ?,
+        iec_code = ?
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
@@ -4009,6 +4024,7 @@ const getPoContractConfigurationModel = async () => {
                 'id', b.id,
                 'countryId', b.countryId,
                 'stateId', b.stateId,
+                'iec_code', b.iec_code,
                 'address1', b.address1,
                 'address2', b.address2,
                 'address3', b.address3,
@@ -5247,7 +5263,7 @@ const createPDF = async (invoice, pdfPath) => {
           <div style="width: 90%; max-width: 750px; height: 90vh; background-color: white; padding: 2rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); overflow-y: auto;" onclick="event.stopPropagation()">
 
             <img src="http://localhost:5000/${invoice.companyInfo.logopath}" alt="Polestar" style="height: 35px; width: 80px; margin-bottom: 0px; margin-left: 10px;" />
-            <h1 style="text-align: center; font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Export ${pdfPath.includes("invoices") ? 'Invoice' : 'Credit Note' }</h1>
+            <h1 style="text-align: center; font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Export ${pdfPath.includes("invoices") ? 'Invoice' : 'Credit Note'}</h1>
             <div style="border: 1px solid black;">
               <div style="display: flex;">
                 <div style="display: flex; width: 40%; ">
@@ -5288,15 +5304,11 @@ const createPDF = async (invoice, pdfPath) => {
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">PAN:</span>
-                    <span>AAJCP1487E</span>
+                    <span>${invoice.companyInfo.pan_number}</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">GSTN:</span>
-                    <span>09AAJCP1487E1Z7</span>
-                  </div>
-                  <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
-                    <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">IEC:</span>
-                    <span>AAJCP1487E</span>
+                    <span>${invoice.companyLocationInfo.gst_number}</span>
                   </div>
                 </div>
               </div>
@@ -5317,14 +5329,14 @@ const createPDF = async (invoice, pdfPath) => {
               <div>
                 <div style="fontSize: 14px, padding: 4px, display: flex, justifyContent: center, border: 1px solid black">
 
-                  ${invoice.clientContactInfo ?
-                    `<div style="font-weight: 800; text-align: center;">
-                  Kind Attention : ${invoice.clientContactInfo.salutation} 
-                  ${invoice.clientContactInfo.first_name} 
-                  ${invoice.clientContactInfo.last_name}
+                  ${Object.keys(invoice.clientContactInfo).length > 0 ?
+      `<div style="font-weight: 800; text-align: center;">
+                  Kind Attention : ${invoice.clientContactInfo.salutation || ''} 
+                  ${invoice.clientContactInfo.first_name || ''} 
+                  ${invoice.clientContactInfo.last_name || ''}
                 </div>`
-                    : ''
-                  }
+      : ''
+    }
 
 
                   <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
@@ -5476,6 +5488,308 @@ const generateCreditNotePDF = async (invoice_number) => {
 
     // Generate the PDF using Puppeteer
     await createPDF(invoice, pdfPath);
+
+    // Update the database with the generated PDF path
+    const insertPDFQuery = "UPDATE invoice_info SET pdf_path = ? WHERE invoice_name = ?";
+    await db.execute(insertPDFQuery, [pdfPath, invoice_number]);
+
+    return pdfPath;
+  } catch (err) {
+    console.error("Error generating PDF:", err);
+    throw err;
+  }
+};
+
+
+// Function to generate PDF using Puppeteer
+const createTaxInvoicePDF = async (invoice, pdfPath) => {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  console.error("companyDataaaa", invoice, pdfPath);
+
+  // Define the HTML content with the invoice details
+  const htmlContent =
+`    <html>
+      <head></head>
+      <body>
+        <div style="position: absolute; top: 0; left: 0; background: #00000099; height: 100vh; width: 100vw; z-index: 1; display: flex; justify-content: center; align-items: center; overflow: hidden;" onclick="props?.setDownloadExportPDF(false)">
+          <div style="width: 90%; max-width: 750px; height: 90vh; background-color: white; padding: 2rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); overflow-y: auto;" onclick="event.stopPropagation()">
+
+            <img src="http://localhost:5000/${invoice.companyInfo.logopath}" alt="Polestar" style="height: 35px; width: 80px; margin-bottom: 0px; margin-left: 10px;" />
+            <h1 style="text-align: center; font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Tax Invoice</h1>
+            <div style="border: 1px solid black;">
+              <div style="display: flex;">
+                <div style="display: flex; width: 40%; ">
+                  <div style="border: 1px solid black; width: 100%; padding: 4px;">
+                    <div style="font-size: 0.875rem;">
+                      <span style="font-weight: 600;">${invoice.company_name}</span><br />
+                      <span>${invoice.companyLocationInfo.address1}</span><br />
+                      <span>${invoice.companyLocationInfo.address2}</span><br />
+                      <span>${invoice.companyLocationInfo.address3}</span><br />
+                      <span>${invoice.companyLocationInfo.additionalDetailsHtml}</span><br />
+
+                      <span>Website - <a href=${invoice.companyInfo.Website} target="_blank" rel="noopener noreferrer">${invoice.companyInfo.Website}</a></span><br />
+                      <span>Email - ${invoice.companyInfo.Email}</span><br />
+                      <span>CIN No. - U72900UP2017PTC092242</span>
+                    </div>
+                  </div>
+                </div>
+                <div style="display: grid; width: 60%; grid-template-columns: repeat(4, 1fr);">
+                  <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
+                    <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">Invoice No:</span>
+                    <span>${invoice.invoice_name}</span>
+                  </div>
+                  <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
+                    <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">Invoice Date:</span>
+                    <span>${formatDate(invoice.invoice_date)}</span>
+                  </div>
+                  <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
+                    <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">Due Date:</span>
+                    <span>2024-05-30</span>
+                  </div>
+                  <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
+                    <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">Terms of Payment:</span>
+                    <span>30 Days</span>
+                  </div>
+                  <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
+                    <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">PO Number:</span>
+                    <span>${invoice.po_number}</span>
+                  </div>
+                  <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
+                    <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">PAN:</span>
+                    <span>${invoice.companyInfo.pan_number}</span>
+                  </div>
+                  <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
+                    <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">GSTN:</span>
+                    <span>${invoice.companyLocationInfo.gst_number}</span>
+                  </div>
+                  <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
+                    <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">IEC:</span>
+                    <span>AAJCP1487E</span>
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex;">
+                <span style="font-weight: 600; padding: 4px; width: 20%; border: 1px solid black;">Client's Details</span>
+                <div style="width: 80%; display: grid; grid-template-columns: 1fr 1fr; font-size: 0.875rem;">
+                  <div style="border: 1px solid black; padding: 4px;">
+                    <span style="font-weight: 600; text-decoration: underline;">Delivery Address:</span><br />
+                    <span>${invoice.clientShipAddress_name}</span><br />
+                  </div>
+                  <div style="border: 1px solid black; padding: 4px;">
+                    <span style="font-weight: 600; text-decoration: underline;">Billing Address:</span><br />
+                    <span>${invoice.clientBillTo_name}</span><br />
+                  </div>
+
+                </div>
+              </div>
+              <div>
+                <div style="fontSize: 14px, padding: 4px, display: flex, justifyContent: center, border: 1px solid black">
+
+                  ${Object.keys(invoice.clientContactInfo).length < 0 ?
+                    `<div style="font-weight: 800; text-align: center;">
+                  Kind Attention ${invoice.clientContactInfo.salutation || ''} 
+                  ${invoice.clientContactInfo.first_name || ''} 
+                  ${invoice.clientContactInfo.last_name || ''}
+                  </div>`
+                    : ''
+                  }
+                  <div style="font-family: Arial, sans-serif;">
+                    <div style="font-size: 14px; padding: 4px; display: flex; justify-content: center; border: 1px solid black;">
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                      <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                        <thead>
+                          <tr>
+                            <th style="border: 1px solid black; padding: 4px; text-align: left;">Description</th>
+                            <th style="border: 1px solid black; padding: 4px; text-align: left;">SAC Code</th>
+                            <th style="border: 1px solid black; padding: 4px; text-align: right;">Amount (INR)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td style="border: 1px solid black; padding: 4px; text-align: left;">
+                              ${invoice.invoiceTaxInfo.description || "N/A"}
+                            </td>
+                            <td style="border: 1px solid black; padding: 4px; text-align: left;">
+                              ${invoice.invoiceTaxInfo.sacCode || "N/A"}
+                            </td>
+                            <td style="border: 1px solid black; padding: 4px; text-align: right;">
+                              ${invoice.invoiceTaxInfo.amount}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td colspan="2" style="border: 1px solid black; padding: 4px; text-align: right; font-weight: bold; padding-right: 10px;">
+                              Total
+                            </td>
+                            <td style="border: 1px solid black; padding: 4px; text-align: right;">
+                              ${invoice.invoiceTaxInfo.totalAmount}
+                            </td>
+                          </tr>
+                          ${JSON.parse(invoice.invoiceTaxInfo.taxDetails)
+                            .map(
+                              (tax) => `
+                                <tr>
+                                  <td colspan="2" style="border: 1px solid black; padding: 4px; text-align: right; font-weight: bold; padding-right: 10px;">
+                                    ${tax.taxFieldName} @ ${tax.taxPercentage}%
+                                  </td>
+                                  <td style="border: 1px solid black; padding: 4px; text-align: right;">
+                                    ${tax.calculatedAmount}
+                                  </td>
+                                </tr>
+                                `
+                              )
+                            .join("")}
+                          <tr>
+                            <td colspan="2" style="border: 1px solid black; padding: 4px; text-align: right; font-weight: bold; padding-right: 10px;">
+                              Total Amount After Tax
+                            </td>
+                            <td style="border: 1px solid black; padding: 4px; text-align: right; font-weight: 600;">
+                              ${invoice.invoiceTaxInfo.finalAmount}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div style="border: 1px solid black; padding: 4px; font-size: 12px;">
+                      <span style="font-weight: 600;">${convertAmountToWords(invoice.invoiceTaxInfo.finalAmount)}</span>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; border: 1px solid black; padding: 4px;">
+                  <div style="text-align: center;">
+                    <div style="margin-bottom: 3rem;"></div>
+                    <img src="http://localhost:5000/${invoice.companyInfo.digitalSignPath}" alt="Polestar" style="height: 30px; width: 100px; margin-bottom: 0px; margin-left: 10px;" />
+                    <div style="font-weight: 600; font-size: 14px;">Authorised Signatory</div>
+                  </div>
+                </div>
+
+                <div style="border: 1px solid black, fontSize: 0.875rem, padding: 4px">
+                  <div style="fontWeight: 600 ">Terms & Conditions:</div>
+                  <ol style="marginBottom: 0px, paddingLeft: 16px">
+                    <li style="marginBottom: 0.25rem">
+                      This bill is payable on receipt by Cheque/Wire transfer in favor of Polestar Solutions & Services India Pvt. Ltd. In case payment is made by electronic fund transfer, please send details to <a href="ajay@polestarllp.com" target="_blank" rel="noopener noreferrer">ajay@polestarllp.com</a>.
+                    </li>
+                    <li style="marginBottom: 0.25rem">TDS certificate, if applicable is to be sent to the above address.</li>
+                    <li style="marginBottom: 0.25rem">Whether GST is payable on Reverse Charge basis? - No</li>
+                  </ol>
+                </div>
+
+                <div style="fontSize: 14px , border: 1px solid black, padding: 10px">
+                  <div style="fontWeight: 600, display: flex, justifyContent: space-around, border: 1px solid black, padding: 4px ">Bank Details :</div>
+                  <div style="display: grid, gridTemplateColumns: 1fr 1fr ">
+                    <div style="display: flex, flexDirection: column, border: 1px solid black, padding: 4px ">
+                      <div><span style="fontWeight: bold, flex: 1 ">Beneficiary Name : </span><span>${invoice.company_name}</span></div>
+                      <div><span style="fontWeight: bold, flex: 1 ">Bank Name : </span><span>${invoice.companyAccountInfo.bankName}</span></div>
+                      <div><span style="fontWeight: bold, flex: 1 ">Bank Address : </span><span>${invoice.companyAccountInfo.bankAddress}</span></div>
+                      <div><span style="fontWeight: bold, flex: 1 ">Account No. : </span><span>${invoice.companyAccountInfo.accountNumber}</span></div>
+                    </div>
+                    <div style="display: flex, flexDirection: column, border: 1px solid black, padding: 4px ">
+                      <div><span style="fontWeight: bold, flex: 1 ">${invoice.companyAccountInfo.additionalDetailsHtml}</span></div>
+
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </body>
+    </html>`
+
+
+    ;
+
+  // Set the content to the page
+  await page.setContent(htmlContent);
+
+  // Generate PDF from HTML content
+  await page.pdf({
+    path: pdfPath,
+    format: 'A4',
+    printBackground: true,
+  });
+
+  console.log('PDF generated at:', pdfPath);
+
+  await browser.close();
+};
+
+
+const generateTaxInvoicePDF = async (invoice_number) => {
+  try {
+    // Fetch invoice data from the database
+    const query = "SELECT * FROM invoice_info WHERE invoice_name = ?";
+    const [invoiceData] = await db.execute(query, [invoice_number]);
+
+    if (!invoiceData.length) {
+      throw new Error("Invoice not found");
+    }
+
+    const invoice = invoiceData[0];
+
+    // Fetch the company's information 
+    const companyQuery = "SELECT * FROM company_info WHERE companyName = ?";
+    const [companyData] = await db.execute(companyQuery, [invoice.company_name]);
+    invoice['companyInfo'] = companyData[0];
+
+
+    // Fetch the company's location 
+    const copanyLocationQuery = "SELECT * FROM company_location_info WHERE companyId = ? and isDefaultAddress = 1";
+    const [companyLocationData] = await db.execute(copanyLocationQuery, [companyData[0].id]);
+    const additionalDetails = JSON.parse(companyLocationData[0].additionalAddressDetails);
+
+    companyLocationData[0].additionalDetailsHtml = Object.entries(additionalDetails)
+      .map(([key, value]) => `<span>${key}: ${value}</span>, `)
+      .join("");
+
+    invoice['companyLocationInfo'] = companyLocationData[0];
+
+
+    // Fetch the company's account info 
+    const companyAccountQuery = "SELECT * FROM company_account_info WHERE companyId = ? and isDefaultAccount = 1";
+    const [companyAccountData] = await db.execute(companyAccountQuery, [companyData[0].id]);
+
+    companyAccountData[0].additionalDetailsHtml = Object.entries(companyAccountData[0].additionalFieldDetails)
+      .map(([key, value]) => `<span>${key}: ${value}</span> <br />`)
+      .join("");
+
+    invoice['companyAccountInfo'] = companyAccountData[0];
+
+
+    // Fetch the client's contact person info 
+    if (invoice.clientContact) {
+      const clientContactQuery = "SELECT * FROM client_contact WHERE id = ?";
+      const [clientContactData] = await db.execute(clientContactQuery, [invoice.clientContact]);
+
+      invoice['clientContactInfo'] = clientContactData[0];
+    } else {
+      invoice['clientContactInfo'] = {};
+    }
+
+    // Fetch the company's invoice tax info 
+    const invoiceTaxQuery = "SELECT * FROM invoice_data WHERE invoice_id = ?";
+    const [invoiceTaxData] = await db.execute(invoiceTaxQuery, [invoice.id]);
+    invoiceTaxData[0].taxDetails = invoiceTaxData[0].taxBreakdown;
+    invoice['invoiceTaxInfo'] = invoiceTaxData[0];
+
+
+    // Ensure the directory for saving PDFs exists
+    const dirPath = path.join(__dirname, 'invoices');
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+    }
+
+    // Define the PDF path
+    const pdfPath = path.join(dirPath, `${invoice_number}.pdf`);
+
+    // Generate the PDF using Puppeteer
+    await createTaxInvoicePDF(invoice, pdfPath);
 
     // Update the database with the generated PDF path
     const insertPDFQuery = "UPDATE invoice_info SET pdf_path = ? WHERE invoice_name = ?";
@@ -5664,5 +5978,6 @@ module.exports = {
   getAllCreditNote,
   generateInvoicePDF,
   getInvoicePDFPath,
-  generateCreditNotePDF
+  generateCreditNotePDF,
+  generateTaxInvoicePDF
 };

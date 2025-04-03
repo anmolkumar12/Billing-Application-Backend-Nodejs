@@ -803,7 +803,7 @@ ALTER TABLE account_manager_master
 MODIFY COLUMN `fromDate` date NULL DEFAULT NULL;
 
 
--- 30.03.2025 --
+-- 02.04.2025 --
 
 ALTER TABLE client_info 
 ADD COLUMN `isApplicableAM` VARCHAR(50) NULL DEFAULT NULL ;
@@ -828,3 +828,12 @@ modify COLUMN `po_amount` INT NULL DEFAULT NULL ;
 
 ALTER TABLE credit_note_info 
 modify COLUMN `remain_po_amount` INT NULL DEFAULT NULL ;
+
+ALTER TABLE company_info 
+add COLUMN `pan_number` VARCHAR(10) NULL DEFAULT NULL ;
+
+ALTER TABLE company_location_info 
+add COLUMN `gst_number` VARCHAR(50) NULL DEFAULT NULL ;
+
+ALTER TABLE client_bill_to_info 
+add COLUMN `iec_code` VARCHAR(50) NULL DEFAULT NULL ;

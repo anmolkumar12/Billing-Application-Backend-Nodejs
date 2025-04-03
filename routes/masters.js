@@ -165,6 +165,7 @@ const {
   generateInvoicePDFHandler,
   downloadInvoicePDFHandler,
   generateCreditNotePDFHandler,
+  generateTaxInvoicePDFHandler
 
 } = require("../controllers/masterController");
 const multer = require("multer");
@@ -543,6 +544,8 @@ router.post('/activateDeactivateCreditNote', authMiddleware, activateDeactivateC
 // router.post('/updateInvoice', authMiddleware, generateInvoicePDFHandler);
 router.post('/generateInvoicePDFHandler', authMiddleware, generateInvoicePDFHandler);
 router.get('/downloadInvoicePDF/:invoice_number', authMiddleware, downloadInvoicePDFHandler);
+// router.post('/generateTaxInvoicePDF', authMiddleware, generateTaxInvoicePDFHandler);
+router.post('/generateTaxInvoicePDF', authMiddleware, generateTaxInvoicePDFHandler);
 router.post('/generateCreditNotePDF', authMiddleware, generateCreditNotePDFHandler);
 
 module.exports = router;
