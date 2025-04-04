@@ -837,3 +837,11 @@ add COLUMN `gst_number` VARCHAR(50) NULL DEFAULT NULL ;
 
 ALTER TABLE client_bill_to_info 
 add COLUMN `iec_code` VARCHAR(50) NULL DEFAULT NULL ;
+
+
+-- 04.04.2024 --
+ALTER TABLE credit_note_info 
+ADD COLUMN `invoice_number` varchar(50) NULL DEFAULT NULL;
+
+ALTER TABLE credit_note_info 
+ADD COLUMN `invoice_number_id` varchar(10) NULL DEFAULT NULL;

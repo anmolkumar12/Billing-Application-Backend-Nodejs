@@ -4891,7 +4891,9 @@ const insertCreditNote = async (
   clientBillTo_name,
   clientShipAddress_name,
   projectService,
-  projectService_names
+  projectService_names,
+  invoice_number,
+  invoice_number_id,
 ) => {
   try {
     console.log("Received values in insertInvoice:", {
@@ -4900,7 +4902,8 @@ const insertCreditNote = async (
       company_name, bill_from, invoice_bill_from_id, tax_type, tax_type_id,
       tax_code, tax_code_id, invoice_amount, note_one, note_two, updated_by, isActive,
       filePath, total_amount, gst_total, final_amount, clientContact_name, clientBillTo_name,
-      clientShipAddress_name, projectService, projectService_names, invoiceData
+      clientShipAddress_name, projectService, projectService_names,   invoice_number,
+      invoice_number_id, invoiceData
     });
 
     // Ensure client_id is a number
@@ -4958,7 +4961,9 @@ const insertCreditNote = async (
       clientBillTo_name || null,
       clientShipAddress_name || null,
       projectService || null,
-      projectService_names || null
+      projectService_names || null,
+      invoice_number || null,
+      invoice_number_id || null
     ];
 
     console.log("Final safeValues before query:", safeValues);
@@ -4970,8 +4975,8 @@ const insertCreditNote = async (
         company_name, bill_from, invoice_bill_from_id, tax_type, tax_type_id,
         tax_code, tax_code_id, invoice_amount, note_one, note_two, updated_by, isActive,
         filePath, total_amount, gst_total, final_amount, clientContact_name,
-        clientBillTo_name, clientShipAddress_name, projectService, projectService_names
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        clientBillTo_name, clientShipAddress_name, projectService, projectService_names,   invoice_number, invoice_number_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const [invoiceResult] = await db.execute(insertQuery, safeValues);
@@ -5025,7 +5030,7 @@ const updateCreditNote = async (
   company_name, bill_from, invoice_bill_from_id, tax_type, tax_type_id, tax_code, tax_code_id,
   invoice_amount, note_one, note_two, updated_by, isActive, filePath, total_amount, gst_total,
   final_amount, invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
-  projectService, projectService_names
+  projectService, projectService_names, invoice_number, invoice_number_id
 ) => {
   try {
     const query = `
@@ -5038,7 +5043,7 @@ const updateCreditNote = async (
         tax_code_id = ?, invoice_amount = ?, note_one = ?, note_two = ?, updated_by = ?, 
         isActive = ?, filePath = ?, total_amount = ?, gst_total = ?, final_amount = ?, 
         clientContact_name = ?, clientBillTo_name = ?, clientShipAddress_name = ?, 
-        projectService = ?, projectService_names = ? WHERE id = ?
+        projectService = ?, projectService_names = ?, invoice_number = ?, invoice_number_id = ? WHERE id = ?
     `;
 
     const values = [
@@ -5052,7 +5057,7 @@ const updateCreditNote = async (
       sanitizeValue(note_two), sanitizeValue(updated_by), sanitizeValue(isActive),
       sanitizeValue(filePath), sanitizeValue(total_amount), sanitizeValue(gst_total),
       sanitizeValue(final_amount), sanitizeValue(clientContact_name), sanitizeValue(clientBillTo_name),
-      sanitizeValue(clientShipAddress_name), sanitizeValue(projectService), sanitizeValue(projectService_names),
+      sanitizeValue(clientShipAddress_name), sanitizeValue(projectService), sanitizeValue(projectService_names), sanitizeValue(invoice_number), sanitizeValue(invoice_number_id),
       sanitizeValue(id)
     ];
 
@@ -5184,69 +5189,73 @@ const generateInvoicePDF = async (invoice_number) => {
 
     const invoice = invoiceData[0];
 
-    // Fetch the company's information 
+    // Company Info
     const companyQuery = "SELECT * FROM company_info WHERE companyName = ?";
     const [companyData] = await db.execute(companyQuery, [invoice.company_name]);
     invoice['companyInfo'] = companyData[0];
 
-
-    // Fetch the company's location 
-    const copanyLocationQuery = "SELECT * FROM company_location_info WHERE companyId = ? and isDefaultAddress = 1";
-    const [companyLocationData] = await db.execute(copanyLocationQuery, [companyData[0].id]);
-    const additionalDetails = JSON.parse(companyLocationData[0].additionalAddressDetails);
+    // Company Location Info
+    const companyLocationQuery = "SELECT * FROM company_location_info WHERE companyId = ? AND isDefaultAddress = 1";
+    const [companyLocationData] = await db.execute(companyLocationQuery, [companyData[0].id]);
+    const additionalDetails = JSON.parse(companyLocationData[0].additionalAddressDetails || "{}");
 
     companyLocationData[0].additionalDetailsHtml = Object.entries(additionalDetails)
-      .map(([key, value]) => `<span>${key}: ${value}</span>, `)
-      .join("");
-
+      .map(([key, value]) => `<span>${key}: ${value}</span>`)
+      .join(", ");
+    
     invoice['companyLocationInfo'] = companyLocationData[0];
 
-
-    // Fetch the company's account info 
-    const companyAccountQuery = "SELECT * FROM company_account_info WHERE companyId = ? and isDefaultAccount = 1";
+    // Company Account Info
+    const companyAccountQuery = "SELECT * FROM company_account_info WHERE companyId = ? AND isDefaultAccount = 1";
     const [companyAccountData] = await db.execute(companyAccountQuery, [companyData[0].id]);
 
-    companyAccountData[0].additionalDetailsHtml = Object.entries(companyAccountData[0].additionalFieldDetails)
-      .map(([key, value]) => `<span>${key}: ${value}</span> <br />`)
+    const accountDetails = companyAccountData[0]?.additionalFieldDetails || {};
+    companyAccountData[0].additionalDetailsHtml = Object.entries(accountDetails)
+      .map(([key, value]) => `<span>${key}: ${value}</span><br />`)
       .join("");
 
     invoice['companyAccountInfo'] = companyAccountData[0];
 
-
-    // Fetch the client's contact person info 
+    // Client Contact Info
     if (invoice.clientContact) {
       const clientContactQuery = "SELECT * FROM client_contact WHERE id = ?";
       const [clientContactData] = await db.execute(clientContactQuery, [invoice.clientContact]);
-
       invoice['clientContactInfo'] = clientContactData[0];
     } else {
       invoice['clientContactInfo'] = {};
-
     }
 
-
-    // Ensure the directory for saving PDFs exists
-    const dirPath = path.join(__dirname, 'invoices');
+    // Ensure directory exists
+    const dirPath = path.join(__dirname, '..', 'models', 'invoices');
     if (!fs.existsSync(dirPath)) {
       fs.mkdirSync(dirPath, { recursive: true });
     }
 
-    // Define the PDF path
-    const pdfPath = path.join(dirPath, `${invoice_number}.pdf`);
+    // Define PDF path and URL
+    const fileName = `${invoice_number}.pdf`;
+    const pdfPath = path.join(dirPath, fileName);
+    const relativePDFUrl = `/invoices/${fileName}`;
 
     // Generate the PDF using Puppeteer
     await createPDF(invoice, pdfPath);
 
-    // Update the database with the generated PDF path
-    const insertPDFQuery = "UPDATE invoice_info SET pdf_path = ? WHERE invoice_name = ?";
-    await db.execute(insertPDFQuery, [pdfPath, invoice_number]);
+    // Update DB with relative path
+    const updatePDFQuery = "UPDATE invoice_info SET pdf_path = ? WHERE invoice_name = ?";
+    await db.execute(updatePDFQuery, [relativePDFUrl, invoice_number]);
 
-    return pdfPath;
+    // ✅ Return relative path for frontend
+    return {
+      statusCode: 201,
+      message: "PDF generated successfully",
+      pdfPath: relativePDFUrl
+    };
+
   } catch (err) {
     console.error("Error generating PDF:", err);
     throw err;
   }
 };
+
 
 // Function to generate PDF using Puppeteer
 const createPDF = async (invoice, pdfPath) => {
@@ -5423,10 +5432,9 @@ const createPDF = async (invoice, pdfPath) => {
   await browser.close();
 };
 
-
 const generateCreditNotePDF = async (invoice_number) => {
   try {
-    // Fetch invoice data from the database
+    // Fetch invoice data
     const query = "SELECT * FROM credit_note_info WHERE invoice_name = ?";
     const [invoiceData] = await db.execute(query, [invoice_number]);
 
@@ -5436,69 +5444,73 @@ const generateCreditNotePDF = async (invoice_number) => {
 
     const invoice = invoiceData[0];
 
-    // Fetch the company's information 
+    // Company info
     const companyQuery = "SELECT * FROM company_info WHERE companyName = ?";
     const [companyData] = await db.execute(companyQuery, [invoice.company_name]);
     invoice['companyInfo'] = companyData[0];
 
-
-    // Fetch the company's location 
-    const copanyLocationQuery = "SELECT * FROM company_location_info WHERE companyId = ? and isDefaultAddress = 1";
-    const [companyLocationData] = await db.execute(copanyLocationQuery, [companyData[0].id]);
-    const additionalDetails = JSON.parse(companyLocationData[0].additionalAddressDetails);
+    // Company location
+    const companyLocationQuery = "SELECT * FROM company_location_info WHERE companyId = ? and isDefaultAddress = 1";
+    const [companyLocationData] = await db.execute(companyLocationQuery, [companyData[0].id]);
+    const additionalDetails = JSON.parse(companyLocationData[0].additionalAddressDetails || "{}");
 
     companyLocationData[0].additionalDetailsHtml = Object.entries(additionalDetails)
-      .map(([key, value]) => `<span>${key}: ${value}</span>, `)
+      .map(([key, value]) => `<span>${key}: ${value}</span>`)
       .join("");
 
     invoice['companyLocationInfo'] = companyLocationData[0];
 
-
-    // Fetch the company's account info 
+    // Company account info
     const companyAccountQuery = "SELECT * FROM company_account_info WHERE companyId = ? and isDefaultAccount = 1";
     const [companyAccountData] = await db.execute(companyAccountQuery, [companyData[0].id]);
 
-    companyAccountData[0].additionalDetailsHtml = Object.entries(companyAccountData[0].additionalFieldDetails)
-      .map(([key, value]) => `<span>${key}: ${value}</span> <br />`)
+    const accountDetails = companyAccountData[0]?.additionalFieldDetails || {};
+    companyAccountData[0].additionalDetailsHtml = Object.entries(accountDetails)
+      .map(([key, value]) => `<span>${key}: ${value}</span><br />`)
       .join("");
 
     invoice['companyAccountInfo'] = companyAccountData[0];
 
-
-    // Fetch the client's contact person info 
+    // Client contact info
     if (invoice.clientContact) {
       const clientContactQuery = "SELECT * FROM client_contact WHERE id = ?";
       const [clientContactData] = await db.execute(clientContactQuery, [invoice.clientContact]);
-
       invoice['clientContactInfo'] = clientContactData[0];
     } else {
       invoice['clientContactInfo'] = {};
-
     }
 
-
-    // Ensure the directory for saving PDFs exists
-    const dirPath = path.join(__dirname, 'creditnotes');
+    // Directory setup
+    const dirPath = path.join(__dirname, '..', 'models', 'creditnotes');
     if (!fs.existsSync(dirPath)) {
       fs.mkdirSync(dirPath, { recursive: true });
     }
 
-    // Define the PDF path
-    const pdfPath = path.join(dirPath, `${invoice_number}.pdf`);
+    // File path and name
+    const fileName = `${invoice_number}.pdf`;
+    const pdfPath = path.join(dirPath, fileName);
+    const relativePDFUrl = `/creditnotes/${fileName}`; // this is the public URL
 
-    // Generate the PDF using Puppeteer
+    // Generate PDF
     await createPDF(invoice, pdfPath);
 
-    // Update the database with the generated PDF path
-    const insertPDFQuery = "UPDATE invoice_info SET pdf_path = ? WHERE invoice_name = ?";
-    await db.execute(insertPDFQuery, [pdfPath, invoice_number]);
+    // Optional: Update PDF path in DB
+    const updatePDFQuery = "UPDATE invoice_info SET pdf_path = ? WHERE invoice_name = ?";
+    await db.execute(updatePDFQuery, [relativePDFUrl, invoice_number]);
 
-    return pdfPath;
+    // ✅ Return relative URL for frontend to use
+    return {
+      statusCode: 201,
+      message: "PDF generated successfully",
+      pdfPath: relativePDFUrl
+    };
+
   } catch (err) {
     console.error("Error generating PDF:", err);
     throw err;
   }
 };
+
 
 
 // Function to generate PDF using Puppeteer
@@ -5723,7 +5735,7 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
 
 const generateTaxInvoicePDF = async (invoice_number) => {
   try {
-    // Fetch invoice data from the database
+    // Fetch invoice data
     const query = "SELECT * FROM invoice_info WHERE invoice_name = ?";
     const [invoiceData] = await db.execute(query, [invoice_number]);
 
@@ -5733,74 +5745,79 @@ const generateTaxInvoicePDF = async (invoice_number) => {
 
     const invoice = invoiceData[0];
 
-    // Fetch the company's information 
+    // Company Info
     const companyQuery = "SELECT * FROM company_info WHERE companyName = ?";
     const [companyData] = await db.execute(companyQuery, [invoice.company_name]);
     invoice['companyInfo'] = companyData[0];
 
-
-    // Fetch the company's location 
-    const copanyLocationQuery = "SELECT * FROM company_location_info WHERE companyId = ? and isDefaultAddress = 1";
-    const [companyLocationData] = await db.execute(copanyLocationQuery, [companyData[0].id]);
-    const additionalDetails = JSON.parse(companyLocationData[0].additionalAddressDetails);
+    // Company Location Info
+    const companyLocationQuery = "SELECT * FROM company_location_info WHERE companyId = ? AND isDefaultAddress = 1";
+    const [companyLocationData] = await db.execute(companyLocationQuery, [companyData[0].id]);
+    const additionalDetails = JSON.parse(companyLocationData[0].additionalAddressDetails || "{}");
 
     companyLocationData[0].additionalDetailsHtml = Object.entries(additionalDetails)
-      .map(([key, value]) => `<span>${key}: ${value}</span>, `)
-      .join("");
+      .map(([key, value]) => `<span>${key}: ${value}</span>`)
+      .join(", ");
 
     invoice['companyLocationInfo'] = companyLocationData[0];
 
-
-    // Fetch the company's account info 
-    const companyAccountQuery = "SELECT * FROM company_account_info WHERE companyId = ? and isDefaultAccount = 1";
+    // Company Account Info
+    const companyAccountQuery = "SELECT * FROM company_account_info WHERE companyId = ? AND isDefaultAccount = 1";
     const [companyAccountData] = await db.execute(companyAccountQuery, [companyData[0].id]);
 
-    companyAccountData[0].additionalDetailsHtml = Object.entries(companyAccountData[0].additionalFieldDetails)
-      .map(([key, value]) => `<span>${key}: ${value}</span> <br />`)
+    const accountDetails = companyAccountData[0]?.additionalFieldDetails || {};
+    companyAccountData[0].additionalDetailsHtml = Object.entries(accountDetails)
+      .map(([key, value]) => `<span>${key}: ${value}</span><br />`)
       .join("");
 
     invoice['companyAccountInfo'] = companyAccountData[0];
 
-
-    // Fetch the client's contact person info 
+    // Client Contact Info
     if (invoice.clientContact) {
       const clientContactQuery = "SELECT * FROM client_contact WHERE id = ?";
       const [clientContactData] = await db.execute(clientContactQuery, [invoice.clientContact]);
-
       invoice['clientContactInfo'] = clientContactData[0];
     } else {
       invoice['clientContactInfo'] = {};
     }
 
-    // Fetch the company's invoice tax info 
+    // Tax Details Info
     const invoiceTaxQuery = "SELECT * FROM invoice_data WHERE invoice_id = ?";
     const [invoiceTaxData] = await db.execute(invoiceTaxQuery, [invoice.id]);
     invoiceTaxData[0].taxDetails = invoiceTaxData[0].taxBreakdown;
     invoice['invoiceTaxInfo'] = invoiceTaxData[0];
 
-
-    // Ensure the directory for saving PDFs exists
-    const dirPath = path.join(__dirname, 'invoices');
+    // Create Directory
+    const dirPath = path.join(__dirname, '..', 'models', 'taxinvoices');
     if (!fs.existsSync(dirPath)) {
       fs.mkdirSync(dirPath, { recursive: true });
     }
 
-    // Define the PDF path
-    const pdfPath = path.join(dirPath, `${invoice_number}.pdf`);
+    // Define file path and public URL
+    const fileName = `${invoice_number}.pdf`;
+    const pdfPath = path.join(dirPath, fileName);
+    const relativePDFUrl = `/taxinvoices/${fileName}`;
 
-    // Generate the PDF using Puppeteer
+    // Generate PDF
     await createTaxInvoicePDF(invoice, pdfPath);
 
-    // Update the database with the generated PDF path
-    const insertPDFQuery = "UPDATE invoice_info SET pdf_path = ? WHERE invoice_name = ?";
-    await db.execute(insertPDFQuery, [pdfPath, invoice_number]);
+    // Update DB with PDF path
+    const updatePDFQuery = "UPDATE invoice_info SET pdf_path = ? WHERE invoice_name = ?";
+    await db.execute(updatePDFQuery, [relativePDFUrl, invoice_number]);
 
-    return pdfPath;
+    // ✅ Return response
+    return {
+      statusCode: 201,
+      message: "Tax Invoice PDF generated successfully",
+      pdfPath: relativePDFUrl
+    };
+
   } catch (err) {
-    console.error("Error generating PDF:", err);
+    console.error("Error generating Tax Invoice PDF:", err);
     throw err;
   }
 };
+
 
 
 module.exports = {

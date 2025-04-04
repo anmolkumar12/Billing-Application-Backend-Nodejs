@@ -4245,6 +4245,8 @@ const insertCreditNoteHandler = async (req, res) => {
     clientShipAddress_name,
     projectService,
     projectService_names,
+    invoice_number,
+    invoice_number_id,
   } = req.body;
 
   let parsedInvoiceData;
@@ -4311,6 +4313,8 @@ const insertCreditNoteHandler = async (req, res) => {
       clientShipAddress_name,
       projectService,
     projectService_names,
+    invoice_number,
+    invoice_number_id,
     );
 
     res.status(201).json({ statusCode: 201, message: "Credit note created successfully", invoice_name });
@@ -4332,7 +4336,8 @@ const updateCreditNoteHandler = async (req, res) => {
     tax_type, tax_type_id, tax_code, tax_code_id, invoice_amount, note_one,
     note_two, updated_by, isActive, total_amount, gst_total, final_amount,
     invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
-    projectService, projectService_names
+    projectService, projectService_names, invoice_number,
+    invoice_number_id,
   } = req.body;
 
   const filePath = req.files && req.files.file ? req.files.file[0].path.replace("\\", "/") : null;
@@ -4365,7 +4370,8 @@ const updateCreditNoteHandler = async (req, res) => {
       company_name, bill_from, invoice_bill_from_id, tax_type, tax_type_id, tax_code, tax_code_id,
       invoice_amount, note_one, note_two, updated_by, isActive, filePath, total_amount, gst_total,
       final_amount, invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
-      projectService, projectService_names
+      projectService, projectService_names,   invoice_number,
+      invoice_number_id,
     );
 
     res.status(200).json({ statusCode: 200, message: "Credit note updated successfully", result });

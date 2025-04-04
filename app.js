@@ -22,6 +22,13 @@ app.use("/api/auth", authRoutes);
 app.use("/api/masters", masterRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// ✅ Serve generated credit notes PDFs
+app.use('/creditnotes', express.static(path.join(__dirname, 'models', 'creditnotes')));
+
+app.use('/invoices', express.static(path.join(__dirname, 'models', 'invoices')));
+
+app.use('/taxinvoices', express.static(path.join(__dirname, 'models', 'taxinvoices')));
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
