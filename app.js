@@ -7,6 +7,7 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const { runAllCronJobs } = require("./cron/currencyCron");
 const { runClientStatusCronJob } = require("./cron/clientStatusCron");
+// const { runSalesManagerStatusCronJob } = require("./cron/saleManagerDeactivationCron");
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ limit: "100mb", extended: true }));
 app.use(express.json({ limit: "100mb" }));
 runAllCronJobs();
 runClientStatusCronJob();
+// runSalesManagerStatusCronJob();
 app.use("/api/auth", authRoutes);
 app.use("/api/masters", masterRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

@@ -1729,32 +1729,66 @@ const updateSalesManager = async (req, res) => {
   }
 };
 
-const activateOrDeactivateSalesManager = async (req, res) => {
-  const { salesManagerId, isActive, updatedBy, deactivationDate } = req.body;
+// const activateOrDeactivateSalesManager = async (req, res) => {
+//   const { salesManagerId, isActive, updatedBy, deactivationDate } = req.body;
 
-  if (!salesManagerId || isActive === undefined) {
+//   if (!salesManagerId || isActive === undefined) {
+//     return res.status(400).json({
+//       statusCode: 400,
+//       message: "Deactivation date is required",
+//     });
+//   }
+
+//   try {
+//     await updateSalesManagerStatus(salesManagerId, isActive, updatedBy, deactivationDate);
+
+//     res.status(200).json({
+//       statusCode: 200,
+//       message: `Sales Manager ${isActive ? "activated" : "deactivated"
+//         } successfully`,
+//     });
+//   } catch (err) {
+//     console.error("Error updating Sales Manager status:", err);
+//     res.status(500).json({
+//       statusCode: 500,
+//       message: "Server error while updating Sales Manager status",
+//     });
+//   }
+// };
+
+const activateOrDeactivateSalesManager = async (req, res) => {
+  const { salesManagerId, isActive, industryHeadIds, updatedBy, deactivationDate } = req.body;
+
+  if (!salesManagerId || !industryHeadIds?.length || isActive === undefined) {
     return res.status(400).json({
       statusCode: 400,
-      message: "Deactivation date is required",
+      message: "Missing required fields",
     });
   }
 
   try {
-    await updateSalesManagerStatus(salesManagerId, isActive, updatedBy, deactivationDate);
+    await updateSalesManagerStatus(
+      salesManagerId,
+      isActive,
+      industryHeadIds,
+      updatedBy,
+      deactivationDate
+    );
 
     res.status(200).json({
       statusCode: 200,
-      message: `Sales Manager ${isActive ? "activated" : "deactivated"
-        } successfully`,
+      message: `Industries ${isActive ? "activated" : "deactivated"} successfully.`,
     });
   } catch (err) {
-    console.error("Error updating Sales Manager status:", err);
+    console.error("Error:", err);
     res.status(500).json({
       statusCode: 500,
-      message: "Server error while updating Sales Manager status",
+      message: "Server error while updating sales manager",
     });
   }
 };
+
+
 
 const getSalesManagers = async (req, res) => {
   try {
