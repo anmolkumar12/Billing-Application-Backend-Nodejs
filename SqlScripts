@@ -850,3 +850,16 @@ ADD COLUMN `invoice_number_id` varchar(10) NULL DEFAULT NULL;
 
 ALTER TABLE account_manager_master ADD COLUMN deactivatedIndustryIds TEXT DEFAULT NULL;
 ALTER TABLE sales_manager_master ADD COLUMN deactivatedIndustryIds TEXT DEFAULT NULL;
+
+ALTER TABLE invoice_info ADD COLUMN client_country varchar(50) DEFAULT NULL;
+
+ALTER TABLE group_industry_info modify COLUMN industryIds varchar(50) DEFAULT NULL;
+
+ALTER TABLE invoice_info 
+ADD COLUMN `due_date` DATE NULL DEFAULT NULL;
+
+ALTER TABLE invoice_info 
+ADD COLUMN `terms_of_payment` VARCHAR(500) NULL DEFAULT NULL;
+
+ALTER TABLE invoice_info 
+ADD COLUMN `iec_code` VARCHAR(50) NULL DEFAULT NULL;

@@ -4744,7 +4744,10 @@ const insertInvoice = async (
   clientShipAddress_name,
   projectService,
   projectService_names,
-  billed_hours
+  billed_hours,
+  currency, due_date,
+  terms_of_payment,
+  iec_code 
 ) => {
   try {
     console.log("Received values in insertInvoice:", {
@@ -4753,7 +4756,9 @@ const insertInvoice = async (
       company_name, bill_from, invoice_bill_from_id, tax_type, tax_type_id,
       tax_code, tax_code_id, invoice_amount, note_one, note_two, updated_by, isActive,
       filePath, total_amount, gst_total, final_amount, clientContact_name, clientBillTo_name,
-      clientShipAddress_name, projectService, projectService_names, billed_hours, invoiceData
+      clientShipAddress_name, projectService, projectService_names, billed_hours, currency, due_date,
+      terms_of_payment,
+      iec_code, invoiceData
     });
 
     // Ensure client_id is a number
@@ -4812,7 +4817,11 @@ const insertInvoice = async (
       clientShipAddress_name || null,
       projectService || null,
       projectService_names || null,
-      billed_hours || null
+      billed_hours || null, 
+      currency || null,
+      due_date || null,
+      terms_of_payment || null,
+      iec_code || null
     ];
 
     console.log("Final safeValues before query:", safeValues);
@@ -4824,8 +4833,10 @@ const insertInvoice = async (
         company_name, bill_from, invoice_bill_from_id, tax_type, tax_type_id,
         tax_code, tax_code_id, invoice_amount, note_one, note_two, updated_by, isActive,
         filePath, total_amount, gst_total, final_amount, clientContact_name,
-        clientBillTo_name, clientShipAddress_name, projectService, projectService_names, billed_hours
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        clientBillTo_name, clientShipAddress_name, projectService, projectService_names, billed_hours, currency, due_date,
+    terms_of_payment,
+    iec_code 
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const [invoiceResult] = await db.execute(insertQuery, safeValues);
@@ -4884,7 +4895,9 @@ const updateInvoice = async (
   company_name, bill_from, invoice_bill_from_id, tax_type, tax_type_id, tax_code, tax_code_id,
   invoice_amount, note_one, note_two, updated_by, isActive, filePath, total_amount, gst_total,
   final_amount, invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
-  projectService, projectService_names, billed_hours
+  projectService, projectService_names, billed_hours, due_date,
+  terms_of_payment,
+  iec_code 
 ) => {
   try {
     const query = `
@@ -4897,7 +4910,9 @@ const updateInvoice = async (
         tax_code_id = ?, invoice_amount = ?, note_one = ?, note_two = ?, updated_by = ?, 
         isActive = ?, filePath = ?, total_amount = ?, gst_total = ?, final_amount = ?, 
         clientContact_name = ?, clientBillTo_name = ?, clientShipAddress_name = ?, 
-        projectService = ?, projectService_names = ?, billed_hours = ? WHERE id = ?
+        projectService = ?, projectService_names = ?, billed_hours = ?,due_date = ?,
+    terms_of_payment = ?,
+    iec_code = ? WHERE id = ?
     `;
 
     const values = [
@@ -4911,7 +4926,9 @@ const updateInvoice = async (
       sanitizeValue(note_two), sanitizeValue(updated_by), sanitizeValue(isActive),
       sanitizeValue(filePath), sanitizeValue(total_amount), sanitizeValue(gst_total),
       sanitizeValue(final_amount), sanitizeValue(clientContact_name), sanitizeValue(clientBillTo_name),
-      sanitizeValue(clientShipAddress_name), sanitizeValue(projectService), sanitizeValue(projectService_names), sanitizeValue(billed_hours),
+      sanitizeValue(clientShipAddress_name), sanitizeValue(projectService), sanitizeValue(projectService_names), sanitizeValue(billed_hours), sanitizeValue(due_date),
+      sanitizeValue(terms_of_payment),
+      sanitizeValue(iec_code), 
       sanitizeValue(id)
     ];
 
@@ -5298,7 +5315,7 @@ const formatDate = (dateString) => {
   return `${day}/${month}/${year}`;
 };
 
-const convertAmountToWords = (amount, currency = "INR") => {
+const convertAmountToWords = (amount, currency) => {
   let [whole, decimal] = amount.toString().split(".");
 
   let currencyWord = currency === "USD" ? "Dollars" : "Rupees";
@@ -5439,24 +5456,31 @@ const createPDF = async (invoice, pdfPath) => {
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">Due Date:</span>
-                    <span>2024-05-30</span>
+                    <span>${formatDate(invoice.due_date)  || ''}</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">Terms of Payment:</span>
-                    <span>30 Days</span>
+                    <span>${invoice.terms_of_payment  || 0} Days</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">PO Number:</span>
-                    <span>${invoice.po_number}</span>
+                    <span>${invoice.po_number  || ''}</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">PAN:</span>
-                    <span>${invoice.companyInfo.pan_number}</span>
+                    <span>${invoice.companyInfo.pan_number  || ''}</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">GSTN:</span>
-                    <span>${invoice.companyLocationInfo.gst_number}</span>
+                    <span>${invoice.companyLocationInfo.gst_number || ''}</span>
                   </div>
+                  ${pdfPath.includes("invoices") ? `
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
+                      <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">IEC:</span>
+                      <span>${invoice.iec_code || ''}</span>
+                    </div>
+                  ` : ''}
+                  
                 </div>
               </div>
               <div style="display: flex;">
@@ -5508,7 +5532,7 @@ const createPDF = async (invoice, pdfPath) => {
                   </table>
                 </div>
                 <div style="border: 1px solid black; padding: 4px; font-size: 12px;">
-                  <span style="font-weight: 600;">${convertAmountToWords(invoice.final_amount)}</span>
+                  <span style="font-weight: 600;">${convertAmountToWords(invoice.final_amount, invoice.currency)}</span>
                 </div>
                 <div style="display: flex; justify-content: flex-end; border: 1px solid black; padding: 4px;">
                   <div style="text-align: center;">
@@ -5518,32 +5542,34 @@ const createPDF = async (invoice, pdfPath) => {
                   </div>
                 </div>
 
-                <div style="border: 1px solid black, fontSize: 0.875rem, padding: 4px">
-                  <div style="fontWeight: 600 ">Terms & Conditions:</div>
-                  <ol style="marginBottom: 0px, paddingLeft: 16px">
-                    <li style="marginBottom: 0.25rem">
-                      This bill is payable on receipt by Cheque/Wire transfer in favor of Polestar Solutions & Services India Pvt. Ltd. In case payment is made by electronic fund transfer, please send details to <a href="ajay@polestarllp.com" target="_blank" rel="noopener noreferrer">ajay@polestarllp.com</a>.
-                    </li>
-                    <li style="marginBottom: 0.25rem">TDS certificate, if applicable is to be sent to the above address.</li>
-                    <li style="marginBottom: 0.25rem">Whether GST is payable on Reverse Charge basis? - No</li>
-                  </ol>
-                </div>
+<div style="border: 1px solid black; font-size: 0.875rem; padding: 4px;">
+  <div style="font-weight: 600;">Terms & Conditions:</div>
+  <ol style="margin-bottom: 0px; padding-left: 16px;">
+    <li style="margin-bottom: 0.25rem;">
+      This bill is payable on receipt by Cheque/Wire transfer in favor of Polestar Solutions & Services India Pvt. Ltd. In case payment is made by electronic fund transfer, please send details to 
+      <a href="mailto:ajay@polestarllp.com" target="_blank" rel="noopener noreferrer">ajay@polestarllp.com</a>.
+    </li>
+    <li style="margin-bottom: 0.25rem;">TDS certificate, if applicable is to be sent to the above address.</li>
+    <li style="margin-bottom: 0.25rem;">Whether GST is payable on Reverse Charge basis? - No</li>
+  </ol>
+</div>
 
-                <div style="fontSize: 14px , border: 1px solid black, padding: 10px">
-                  <div style="fontWeight: 600, display: flex, justifyContent: space-around, border: 1px solid black, padding: 4px ">Bank Details :</div>
-                  <div style="display: grid, gridTemplateColumns: 1fr 1fr ">
-                    <div style="display: flex, flexDirection: column, border: 1px solid black, padding: 4px ">
-                      <div><span style="fontWeight: bold, flex: 1 ">Beneficiary Name : </span><span>${invoice.company_name}</span></div>
-                      <div><span style="fontWeight: bold, flex: 1 ">Bank Name : </span><span>${invoice.companyAccountInfo.bankName}</span></div>
-                      <div><span style="fontWeight: bold, flex: 1 ">Bank Address : </span><span>${invoice.companyAccountInfo.bankAddress}</span></div>
-                      <div><span style="fontWeight: bold, flex: 1 ">Account No. : </span><span>${invoice.companyAccountInfo.accountNumber}</span></div>
-                    </div>
-                    <div style="display: flex, flexDirection: column, border: 1px solid black, padding: 4px ">
-                      <div><span style="fontWeight: bold, flex: 1 ">${invoice.companyAccountInfo.additionalDetailsHtml}</span></div>
 
-                    </div>
-                  </div>
-                </div>
+<div>
+  <div style="font-weight: 600; display: flex; justify-content: space-around; border: 1px solid black; padding: 4px;">Bank Details :</div>
+  <div style="display: grid; grid-template-columns: 1fr 1fr;">
+    <div style="display: flex; flex-direction: column; border: 1px solid black; padding: 4px;">
+      <div><span style="font-weight: bold; flex: 1;">Beneficiary Name : </span><span>${invoice.company_name}</span></div>
+      <div><span style="font-weight: bold; flex: 1;">Bank Name : </span><span>${invoice.companyAccountInfo.bankName}</span></div>
+      <div><span style="font-weight: bold; flex: 1;">Bank Address : </span><span>${invoice.companyAccountInfo.bankAddress}</span></div>
+      <div><span style="font-weight: bold; flex: 1;">Account No. : </span><span>${invoice.companyAccountInfo.accountNumber}</span></div>
+    </div>
+    <div style="display: flex; flex-direction: column; border: 1px solid black; padding: 4px;">
+      <div><span style="font-weight: bold; flex: 1;">${invoice.companyAccountInfo.additionalDetailsHtml}</span></div>
+    </div>
+  </div>
+</div>
+
 
               </div>
             </div>
@@ -5695,28 +5721,25 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">Due Date:</span>
-                    <span>2024-05-30</span>
+                    <span>${formatDate(invoice.due_date ) || ''}</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">Terms of Payment:</span>
-                    <span>30 Days</span>
+                    <span>${invoice.terms_of_payment  || 0} Days</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">PO Number:</span>
-                    <span>${invoice.po_number}</span>
+                    <span>${invoice.po_number  || ''}</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">PAN:</span>
-                    <span>${invoice.companyInfo.pan_number}</span>
+                    <span>${invoice.companyInfo.pan_number  || ''}</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">GSTN:</span>
-                    <span>${invoice.companyLocationInfo.gst_number}</span>
+                    <span>${invoice.companyLocationInfo.gst_number || ''}</span>
                   </div>
-                  <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
-                    <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">IEC:</span>
-                    <span>AAJCP1487E</span>
-                  </div>
+                  
                 </div>
               </div>
               <div style="display: flex;">
@@ -5804,7 +5827,7 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
                     </div>
 
                     <div style="border: 1px solid black; padding: 4px; font-size: 12px;">
-                      <span style="font-weight: 600;">${convertAmountToWords(invoice.invoiceTaxInfo.finalAmount)}</span>
+                      <span style="font-weight: 600;">${convertAmountToWords(invoice.invoiceTaxInfo.finalAmount, invoice.currency)}</span>
                     </div>
                   </div>
 
@@ -5818,32 +5841,33 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
                   </div>
                 </div>
 
-                <div style="border: 1px solid black, fontSize: 0.875rem, padding: 4px">
-                  <div style="fontWeight: 600 ">Terms & Conditions:</div>
-                  <ol style="marginBottom: 0px, paddingLeft: 16px">
-                    <li style="marginBottom: 0.25rem">
-                      This bill is payable on receipt by Cheque/Wire transfer in favor of Polestar Solutions & Services India Pvt. Ltd. In case payment is made by electronic fund transfer, please send details to <a href="ajay@polestarllp.com" target="_blank" rel="noopener noreferrer">ajay@polestarllp.com</a>.
-                    </li>
-                    <li style="marginBottom: 0.25rem">TDS certificate, if applicable is to be sent to the above address.</li>
-                    <li style="marginBottom: 0.25rem">Whether GST is payable on Reverse Charge basis? - No</li>
-                  </ol>
-                </div>
+<div style="border: 1px solid black; font-size: 0.875rem; padding: 4px;">
+  <div style="font-weight: 600;">Terms & Conditions:</div>
+  <ol style="margin-bottom: 0px; padding-left: 16px;">
+    <li style="margin-bottom: 0.25rem;">
+      This bill is payable on receipt by Cheque/Wire transfer in favor of Polestar Solutions & Services India Pvt. Ltd. In case payment is made by electronic fund transfer, please send details to 
+      <a href="mailto:ajay@polestarllp.com" target="_blank" rel="noopener noreferrer">ajay@polestarllp.com</a>.
+    </li>
+    <li style="margin-bottom: 0.25rem;">TDS certificate, if applicable is to be sent to the above address.</li>
+    <li style="margin-bottom: 0.25rem;">Whether GST is payable on Reverse Charge basis? - No</li>
+  </ol>
+</div>
 
-                <div style="fontSize: 14px , border: 1px solid black, padding: 10px">
-                  <div style="fontWeight: 600, display: flex, justifyContent: space-around, border: 1px solid black, padding: 4px ">Bank Details :</div>
-                  <div style="display: grid, gridTemplateColumns: 1fr 1fr ">
-                    <div style="display: flex, flexDirection: column, border: 1px solid black, padding: 4px ">
-                      <div><span style="fontWeight: bold, flex: 1 ">Beneficiary Name : </span><span>${invoice.company_name}</span></div>
-                      <div><span style="fontWeight: bold, flex: 1 ">Bank Name : </span><span>${invoice.companyAccountInfo.bankName}</span></div>
-                      <div><span style="fontWeight: bold, flex: 1 ">Bank Address : </span><span>${invoice.companyAccountInfo.bankAddress}</span></div>
-                      <div><span style="fontWeight: bold, flex: 1 ">Account No. : </span><span>${invoice.companyAccountInfo.accountNumber}</span></div>
-                    </div>
-                    <div style="display: flex, flexDirection: column, border: 1px solid black, padding: 4px ">
-                      <div><span style="fontWeight: bold, flex: 1 ">${invoice.companyAccountInfo.additionalDetailsHtml}</span></div>
 
-                    </div>
-                  </div>
-                </div>
+<div>
+  <div style="font-weight: 600; display: flex; justify-content: space-around; border: 1px solid black; padding: 4px;">Bank Details :</div>
+  <div style="display: grid; grid-template-columns: 1fr 1fr;">
+    <div style="display: flex; flex-direction: column; border: 1px solid black; padding: 4px;">
+      <div><span style="font-weight: bold; flex: 1;">Beneficiary Name : </span><span>${invoice.company_name}</span></div>
+      <div><span style="font-weight: bold; flex: 1;">Bank Name : </span><span>${invoice.companyAccountInfo.bankName}</span></div>
+      <div><span style="font-weight: bold; flex: 1;">Bank Address : </span><span>${invoice.companyAccountInfo.bankAddress}</span></div>
+      <div><span style="font-weight: bold; flex: 1;">Account No. : </span><span>${invoice.companyAccountInfo.accountNumber}</span></div>
+    </div>
+    <div style="display: flex; flex-direction: column; border: 1px solid black; padding: 4px;">
+      <div><span style="font-weight: bold; flex: 1;">${invoice.companyAccountInfo.additionalDetailsHtml}</span></div>
+    </div>
+  </div>
+</div>
 
               </div>
             </div>
