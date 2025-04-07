@@ -1824,29 +1824,28 @@ const updateSalesManagerStatus = async (
     const currentIndustryIds = rows[0].industryHeadIds?.split(',').map(id => id.trim()).filter(Boolean) || [];
     const currentDeactivatedIds = rows[0].deactivatedIndustryIds?.split(',').map(id => id.trim()).filter(Boolean) || [];
 
-    const updateDate = deactivationDate || null;
-
     let updatedIndustryIds = [...currentIndustryIds];
     let updatedDeactivatedIds = [...currentDeactivatedIds];
 
     if (isActive) {
-      // 🟢 Activating industries
-      updatedIndustryIds = Array.from(new Set([...updatedIndustryIds, ...industryHeadIds.map(String)]));
-      updatedDeactivatedIds = updatedDeactivatedIds.filter(id => !industryHeadIds.includes(parseInt(id)));
-
+      // 🟢 Activation
+      const reactivatingIds = industryHeadIds.map(String);
+      // Add to industryHeadIds if not already present
+      updatedIndustryIds = Array.from(new Set([...updatedIndustryIds, ...reactivatingIds]));
+      // Remove from deactivated list
+      updatedDeactivatedIds = updatedDeactivatedIds.filter(id => !reactivatingIds.includes(id));
     } else {
-      // 🔴 Deactivating industries
-      updatedIndustryIds = updatedIndustryIds.filter(id => !industryHeadIds.includes(parseInt(id)));
-      updatedDeactivatedIds = Array.from(new Set([...updatedDeactivatedIds, ...industryHeadIds.map(String)]));
+      // 🔴 Deactivation request - Schedule for cron
+      const toDeactivate = industryHeadIds.map(String);
+      updatedDeactivatedIds = Array.from(new Set([...updatedDeactivatedIds, ...toDeactivate]));
     }
 
-    const newIndustryStr = updatedIndustryIds.join(',') || null;
+    const newIndustryHeadStr = updatedIndustryIds.length ? updatedIndustryIds.join(',') : null;
     const newDeactivatedStr = updatedDeactivatedIds.length ? updatedDeactivatedIds.join(',') : null;
 
-    // If all industries are activated back, clear deactivationDate
-    const finalDeactivationDate = newDeactivatedStr ? updateDate : null;
+    const isActiveFinal = updatedIndustryIds.length > 0 ? 1 : 0;
 
-    const query = `
+    const updateQuery = `
       UPDATE sales_manager_master
       SET 
         industryHeadIds = ?,
@@ -1858,19 +1857,23 @@ const updateSalesManagerStatus = async (
       WHERE id = ?
     `;
 
-    await db.execute(query, [
-      newIndustryStr,
+    await db.execute(updateQuery, [
+      newIndustryHeadStr,
       newDeactivatedStr,
-      updatedIndustryIds.length > 0 ? 1 : 0,
+      isActiveFinal,
       updatedBy,
-      finalDeactivationDate,
-      salesManagerId,
+      newDeactivatedStr ? deactivationDate : null,
+      salesManagerId
     ]);
+
   } catch (err) {
-    console.error("Error updating status:", err);
+    console.error("Error updating Sales Manager status:", err);
     throw err;
   }
 };
+
+
+
 
 
 
@@ -1969,19 +1972,85 @@ const updateAccountManager = async (
   }
 };
 
-const activateOrDeactivateAccountManager = async (id, isActive, updatedBy, deactivationDate) => {
+// const activateOrDeactivateAccountManager = async (id, isActive, updatedBy, deactivationDate) => {
+//   try {
+//     const query = `
+//             UPDATE account_manager_master
+//             SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP,deactivationDate = ?
+//             WHERE id = ?
+//         `;
+//     await db.execute(query, [isActive, updatedBy, deactivationDate, id]);
+//   } catch (err) {
+//     console.error("Error updating Account Manager status:", err);
+//     throw err;
+//   }
+// };
+
+
+const activateOrDeactivateAccountManager = async (
+  accountManagerId,
+  isActive,
+  industryHeadIds,
+  updatedBy,
+  deactivationDate
+) => {
   try {
-    const query = `
-            UPDATE account_manager_master
-            SET isActive = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP,deactivationDate = ?
-            WHERE id = ?
-        `;
-    await db.execute(query, [isActive, updatedBy, deactivationDate, id]);
+    const [rows] = await db.execute(
+      `SELECT industryHeadIds, deactivatedIndustryIds FROM account_manager_master WHERE id = ?`,
+      [accountManagerId]
+    );
+
+    if (!rows.length) throw new Error("Account Manager not found");
+
+    const currentIndustryIds = rows[0].industryHeadIds?.split(',').map(id => id.trim()).filter(Boolean) || [];
+    const currentDeactivatedIds = rows[0].deactivatedIndustryIds?.split(',').map(id => id.trim()).filter(Boolean) || [];
+
+    let updatedIndustryIds = [...currentIndustryIds];
+    let updatedDeactivatedIds = [...currentDeactivatedIds];
+
+    if (isActive) {
+      // 🟢 Activation
+      const reactivatingIds = industryHeadIds.map(String);
+      updatedIndustryIds = Array.from(new Set([...updatedIndustryIds, ...reactivatingIds]));
+      updatedDeactivatedIds = updatedDeactivatedIds.filter(id => !reactivatingIds.includes(id));
+    } else {
+      // 🔴 Deactivation
+      const toDeactivate = industryHeadIds.map(String);
+      updatedDeactivatedIds = Array.from(new Set([...updatedDeactivatedIds, ...toDeactivate]));
+    }
+
+    const newIndustryHeadStr = updatedIndustryIds.length ? updatedIndustryIds.join(',') : null;
+    const newDeactivatedStr = updatedDeactivatedIds.length ? updatedDeactivatedIds.join(',') : null;
+
+    const isActiveFinal = updatedIndustryIds.length > 0 ? 1 : 0;
+
+    const updateQuery = `
+      UPDATE account_manager_master
+      SET 
+        industryHeadIds = ?,
+        deactivatedIndustryIds = ?,
+        isActive = ?,
+        updated_by = ?,
+        updated_at = CURRENT_TIMESTAMP,
+        deactivationDate = ?
+      WHERE id = ?
+    `;
+
+    await db.execute(updateQuery, [
+      newIndustryHeadStr,
+      newDeactivatedStr,
+      isActiveFinal,
+      updatedBy,
+      newDeactivatedStr ? deactivationDate : null,
+      accountManagerId
+    ]);
+
   } catch (err) {
     console.error("Error updating Account Manager status:", err);
     throw err;
   }
 };
+
 
 const getAccountManagersList = async () => {
   try {

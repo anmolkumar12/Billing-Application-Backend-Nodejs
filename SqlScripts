@@ -845,3 +845,8 @@ ADD COLUMN `invoice_number` varchar(50) NULL DEFAULT NULL;
 
 ALTER TABLE credit_note_info 
 ADD COLUMN `invoice_number_id` varchar(10) NULL DEFAULT NULL;
+
+--------------------- 07.04.2025 ---------------------
+
+ALTER TABLE account_manager_master ADD COLUMN deactivatedIndustryIds TEXT DEFAULT NULL;
+ALTER TABLE sales_manager_master ADD COLUMN deactivatedIndustryIds TEXT DEFAULT NULL;

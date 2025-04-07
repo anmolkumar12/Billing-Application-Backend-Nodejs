@@ -1767,6 +1767,8 @@ const activateOrDeactivateSalesManager = async (req, res) => {
   }
 
   try {
+    console.log('lllllllllllllllllllll', industryHeadIds);
+
     await updateSalesManagerStatus(
       salesManagerId,
       isActive,
@@ -1895,37 +1897,82 @@ const updateAccountsManager = async (req, res) => {
   }
 };
 
-const activateOrDeactivateAccountsManager = async (req, res) => {
-  const { salesManagerId, isActive, updatedBy, deactivationDate } = req.body;
+// const activateOrDeactivateAccountsManager = async (req, res) => {
+//   const { salesManagerId, isActive, updatedBy, deactivationDate } = req.body;
 
-  if (!salesManagerId || isActive === undefined) {
+//   if (!salesManagerId || isActive === undefined) {
+//     return res.status(400).json({
+//       statusCode: 400,
+//       message: "Deactivation date is required",
+//     });
+//   }
+
+//   try {
+//     await activateOrDeactivateAccountManager(
+//       salesManagerId,
+//       isActive,
+//       updatedBy,
+//       deactivationDate
+//     );
+
+//     res.status(200).json({
+//       statusCode: 200,
+//       message: `Account Manager ${isActive ? "activated" : "deactivated"
+//         } successfully`,
+//     });
+//   } catch (err) {
+//     console.error("Error updating Sales Manager status:", err);
+//     res.status(500).json({
+//       statusCode: 500,
+//       message: "Server error while updating Sales Manager status",
+//     });
+//   }
+// };
+
+
+const activateOrDeactivateAccountsManager = async (req, res) => {
+  const {
+    accountManagerId,
+    isActive,
+    updatedBy,
+    deactivationDate,
+    industryHeadIds,
+  } = req.body;
+
+  if (!accountManagerId || !industryHeadIds?.length || isActive === undefined) {
     return res.status(400).json({
       statusCode: 400,
-      message: "Deactivation date is required",
+      message: "Required fields are missing.",
     });
   }
 
   try {
+    console.log('lllllllllllllllllllll', industryHeadIds);
+
     await activateOrDeactivateAccountManager(
-      salesManagerId,
+      accountManagerId,
       isActive,
+      industryHeadIds,
       updatedBy,
       deactivationDate
     );
 
     res.status(200).json({
       statusCode: 200,
-      message: `Account Manager ${isActive ? "activated" : "deactivated"
-        } successfully`,
+      message: `Account Manager ${
+        isActive ? "activated" : "scheduled for deactivation"
+      } successfully`,
     });
   } catch (err) {
-    console.error("Error updating Sales Manager status:", err);
+    console.error("Error updating Account Manager status:", err);
     res.status(500).json({
       statusCode: 500,
-      message: "Server error while updating Sales Manager status",
+      message: "Server error while updating Account Manager status",
     });
   }
 };
+
+
 
 const getAccountManagers = async (req, res) => {
   try {
