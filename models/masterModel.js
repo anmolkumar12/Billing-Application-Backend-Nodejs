@@ -1867,11 +1867,11 @@ const updateSalesManagerStatus = async (
       salesManagerId
     ]);
 
-        // ✅ Immediately run cron logic if deactivationDate is today and it's a deactivation
-        if (!isActive && deactivationDate === new Date().toISOString().split("T")[0]) {
-          console.log("⏱️ Immediate deactivation triggered inside updateSalesManagerStatus");
-          await updateSalesManagerStatusOnDeactivationDate();
-        }
+    // ✅ Immediately run cron logic if deactivationDate is today and it's a deactivation
+    if (!isActive && deactivationDate === new Date().toISOString().split("T")[0]) {
+      console.log("⏱️ Immediate deactivation triggered inside updateSalesManagerStatus");
+      await updateSalesManagerStatusOnDeactivationDate();
+    }
 
   } catch (err) {
     console.error("Error updating Sales Manager status:", err);
@@ -2051,6 +2051,12 @@ const activateOrDeactivateAccountManager = async (
       newDeactivatedStr ? deactivationDate : null,
       accountManagerId
     ]);
+
+    // ✅ Immediately run cron logic if deactivationDate is today and it's a deactivation
+    if (!isActive && deactivationDate === new Date().toISOString().split("T")[0]) {
+      console.log("⏱️ Immediate deactivation triggered inside updateSalesManagerStatus");
+      await updateAccountManagerStatusOnDeactivationDate();
+    }
 
   } catch (err) {
     console.error("Error updating Account Manager status:", err);
@@ -5508,13 +5514,13 @@ const createPDF = async (invoice, pdfPath) => {
                 <div style="fontSize: 14px, padding: 4px, display: flex, justifyContent: center, border: 1px solid black">
 
                   ${Object.keys(invoice.clientContactInfo).length > 0 ?
-                    `<div style="font-weight: 800; text-align: center;">
+      `<div style="font-weight: 800; text-align: center;">
                   Kind Attention : ${invoice.clientContactInfo.salutation || ''} 
                   ${invoice.clientContactInfo.first_name || ''} 
                   ${invoice.clientContactInfo.last_name || ''}
                 </div>`
-                    : ''
-                  }
+      : ''
+    }
 
 
                   <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
@@ -5625,13 +5631,21 @@ const generateCreditNotePDF = async (invoice_number) => {
     // Company location
     const companyLocationQuery = "SELECT * FROM company_location_info WHERE companyId = ? and isDefaultAddress = 1";
     const [companyLocationData] = await db.execute(companyLocationQuery, [companyData[0].id]);
-    const additionalDetails = JSON.parse(companyLocationData[0].additionalAddressDetails || "{}");
+    console.log('ccccccccccccc', companyLocationData[0], companyData[0]);
 
-    companyLocationData[0].additionalDetailsHtml = Object.entries(additionalDetails)
-      .map(([key, value]) => `<span>${key}: ${value}</span>`)
-      .join("");
+    if (companyLocationData[0]) {
+      const additionalDetails = JSON.parse(companyLocationData[0].additionalAddressDetails || "{}");
 
-    invoice['companyLocationInfo'] = companyLocationData[0];
+      companyLocationData[0].additionalDetailsHtml = Object.entries(additionalDetails)
+        .map(([key, value]) => `<span>${key}: ${value}</span>`)
+        .join("");
+
+      invoice['companyLocationInfo'] = companyLocationData[0];
+    } else {
+      invoice['companyLocationInfo'] = {};
+
+    }
+
 
     // Company account info
     const companyAccountQuery = "SELECT * FROM company_account_info WHERE companyId = ? and isDefaultAccount = 1";
@@ -5708,10 +5722,10 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
                   <div style="border: 1px solid black; width: 100%; padding: 4px;">
                     <div style="font-size: 0.875rem;">
                       <span style="font-weight: 600;">${invoice.company_name}</span><br />
-                      <span>${invoice.companyLocationInfo.address1}</span><br />
-                      <span>${invoice.companyLocationInfo.address2}</span><br />
-                      <span>${invoice.companyLocationInfo.address3}</span><br />
-                      <span>${invoice.companyLocationInfo.additionalDetailsHtml}</span><br />
+                      <span>${invoice.companyLocationInfo.address1 || ''}</span><br />
+                      <span>${invoice.companyLocationInfo.address2 || ''}</span><br />
+                      <span>${invoice.companyLocationInfo.address3 || ''}</span><br />
+                      <span>${invoice.companyLocationInfo.additionalDetailsHtml || ''}</span><br />
 
                       <span>Website - <a href=${invoice.companyInfo.Website} target="_blank" rel="noopener noreferrer">${invoice.companyInfo.Website}</a></span><br />
                       <span>Email - ${invoice.companyInfo.Email}</span><br />
