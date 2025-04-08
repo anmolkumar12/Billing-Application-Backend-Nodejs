@@ -5454,10 +5454,10 @@ const createPDF = async (invoice, pdfPath) => {
                   <div style="border: 1px solid black; width: 100%; padding: 4px;">
                     <div style="font-size: 0.875rem;">
                       <span style="font-weight: 600;">${invoice.company_name}</span><br />
-                      <span>${invoice.companyLocationInfo.address1}</span><br />
-                      <span>${invoice.companyLocationInfo.address2}</span><br />
-                      <span>${invoice.companyLocationInfo.address3}</span><br />
-                      <span>${invoice.companyLocationInfo.additionalDetailsHtml}</span><br />
+                      <span>${invoice.companyLocationInfo.address1 || ''}</span><br />
+                      <span>${invoice.companyLocationInfo.address2 || ''}</span><br />
+                      <span>${invoice.companyLocationInfo.address3 || ''}</span><br />
+                      <span>${invoice.companyLocationInfo.additionalDetailsHtml || ''}</span><br />
 
                       <span>Website - <a href=${invoice.companyInfo.Website} target="_blank" rel="noopener noreferrer">${invoice.companyInfo.Website}</a></span><br />
                       <span>Email - ${invoice.companyInfo.Email}</span><br />
@@ -5947,13 +5947,26 @@ const generateTaxInvoicePDF = async (invoice_number) => {
     // Company Location Info
     const companyLocationQuery = "SELECT * FROM company_location_info WHERE companyId = ? AND isDefaultAddress = 1";
     const [companyLocationData] = await db.execute(companyLocationQuery, [companyData[0].id]);
-    const additionalDetails = JSON.parse(companyLocationData[0].additionalAddressDetails || "{}");
 
-    companyLocationData[0].additionalDetailsHtml = Object.entries(additionalDetails)
-      .map(([key, value]) => `<span>${key}: ${value}</span>`)
-      .join(", ");
+    if (companyLocationData[0]) {
+      const additionalDetails = JSON.parse(companyLocationData[0].additionalAddressDetails || "{}");
 
-    invoice['companyLocationInfo'] = companyLocationData[0];
+      companyLocationData[0].additionalDetailsHtml = Object.entries(additionalDetails)
+        .map(([key, value]) => `<span>${key}: ${value}</span>`)
+        .join("");
+
+      invoice['companyLocationInfo'] = companyLocationData[0];
+    } else {
+      invoice['companyLocationInfo'] = {};
+
+    }
+    // const additionalDetails = JSON.parse(companyLocationData[0].additionalAddressDetails || "{}");
+
+    // companyLocationData[0].additionalDetailsHtml = Object.entries(additionalDetails)
+    //   .map(([key, value]) => `<span>${key}: ${value}</span>`)
+    //   .join(", ");
+
+    // invoice['companyLocationInfo'] = companyLocationData[0];
 
     // Company Account Info
     const companyAccountQuery = "SELECT * FROM company_account_info WHERE companyId = ? AND isDefaultAccount = 1";
