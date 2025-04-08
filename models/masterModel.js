@@ -5366,13 +5366,19 @@ const generateInvoicePDF = async (invoice_number) => {
     // Company Location Info
     const companyLocationQuery = "SELECT * FROM company_location_info WHERE companyId = ? AND isDefaultAddress = 1";
     const [companyLocationData] = await db.execute(companyLocationQuery, [companyData[0].id]);
-    const additionalDetails = JSON.parse(companyLocationData[0].additionalAddressDetails || "{}");
 
-    companyLocationData[0].additionalDetailsHtml = Object.entries(additionalDetails)
-      .map(([key, value]) => `<span>${key}: ${value}</span>`)
-      .join(", ");
+    if (companyLocationData[0]) {
+      const additionalDetails = JSON.parse(companyLocationData[0].additionalAddressDetails || "{}");
 
-    invoice['companyLocationInfo'] = companyLocationData[0];
+      companyLocationData[0].additionalDetailsHtml = Object.entries(additionalDetails)
+        .map(([key, value]) => `<span>${key}: ${value}</span>`)
+        .join("");
+
+      invoice['companyLocationInfo'] = companyLocationData[0];
+    } else {
+      invoice['companyLocationInfo'] = {};
+
+    }
 
     // Company Account Info
     const companyAccountQuery = "SELECT * FROM company_account_info WHERE companyId = ? AND isDefaultAccount = 1";
