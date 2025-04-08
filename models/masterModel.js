@@ -4747,7 +4747,7 @@ const insertInvoice = async (
   billed_hours,
   currency, due_date,
   terms_of_payment,
-  iec_code 
+  iec_code
 ) => {
   try {
     console.log("Received values in insertInvoice:", {
@@ -4817,7 +4817,7 @@ const insertInvoice = async (
       clientShipAddress_name || null,
       projectService || null,
       projectService_names || null,
-      billed_hours || null, 
+      billed_hours || null,
       currency || null,
       due_date || null,
       terms_of_payment || null,
@@ -4897,7 +4897,7 @@ const updateInvoice = async (
   final_amount, invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
   projectService, projectService_names, billed_hours, due_date,
   terms_of_payment,
-  iec_code 
+  iec_code
 ) => {
   try {
     const query = `
@@ -4928,7 +4928,7 @@ const updateInvoice = async (
       sanitizeValue(final_amount), sanitizeValue(clientContact_name), sanitizeValue(clientBillTo_name),
       sanitizeValue(clientShipAddress_name), sanitizeValue(projectService), sanitizeValue(projectService_names), sanitizeValue(billed_hours), sanitizeValue(due_date),
       sanitizeValue(terms_of_payment),
-      sanitizeValue(iec_code), 
+      sanitizeValue(iec_code),
       sanitizeValue(id)
     ];
 
@@ -5057,7 +5057,7 @@ const insertCreditNote = async (
       company_name, bill_from, invoice_bill_from_id, tax_type, tax_type_id,
       tax_code, tax_code_id, invoice_amount, note_one, note_two, updated_by, isActive,
       filePath, total_amount, gst_total, final_amount, clientContact_name, clientBillTo_name,
-      clientShipAddress_name, projectService, projectService_names,   invoice_number,
+      clientShipAddress_name, projectService, projectService_names, invoice_number,
       invoice_number_id, invoiceData
     });
 
@@ -5357,7 +5357,7 @@ const generateInvoicePDF = async (invoice_number) => {
     companyLocationData[0].additionalDetailsHtml = Object.entries(additionalDetails)
       .map(([key, value]) => `<span>${key}: ${value}</span>`)
       .join(", ");
-    
+
     invoice['companyLocationInfo'] = companyLocationData[0];
 
     // Company Account Info
@@ -5456,19 +5456,19 @@ const createPDF = async (invoice, pdfPath) => {
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">Due Date:</span>
-                    <span>${formatDate(invoice.due_date)  || ''}</span>
+                    <span>${formatDate(invoice.due_date) || ''}</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">Terms of Payment:</span>
-                    <span>${invoice.terms_of_payment  || 0} Days</span>
+                    <span>${invoice.terms_of_payment || 0} Days</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">PO Number:</span>
-                    <span>${invoice.po_number  || ''}</span>
+                    <span>${invoice.po_number || ''}</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">PAN:</span>
-                    <span>${invoice.companyInfo.pan_number  || ''}</span>
+                    <span>${invoice.companyInfo.pan_number || ''}</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">GSTN:</span>
@@ -5480,7 +5480,7 @@ const createPDF = async (invoice, pdfPath) => {
                       <span>${invoice.iec_code || ''}</span>
                     </div>
                   ` : ''}
-                  
+
                 </div>
               </div>
               <div style="display: flex;">
@@ -5501,13 +5501,13 @@ const createPDF = async (invoice, pdfPath) => {
                 <div style="fontSize: 14px, padding: 4px, display: flex, justifyContent: center, border: 1px solid black">
 
                   ${Object.keys(invoice.clientContactInfo).length > 0 ?
-      `<div style="font-weight: 800; text-align: center;">
+                    `<div style="font-weight: 800; text-align: center;">
                   Kind Attention : ${invoice.clientContactInfo.salutation || ''} 
                   ${invoice.clientContactInfo.first_name || ''} 
                   ${invoice.clientContactInfo.last_name || ''}
                 </div>`
-      : ''
-    }
+                    : ''
+                  }
 
 
                   <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
@@ -5537,38 +5537,40 @@ const createPDF = async (invoice, pdfPath) => {
                 <div style="display: flex; justify-content: flex-end; border: 1px solid black; padding: 4px;">
                   <div style="text-align: center;">
                     <div style="margin-bottom: 3rem;"></div>
-                    <img src="http://localhost:5000/${invoice.companyInfo.digitalSignPath}" alt="Polestar" style="height: 30px; width: 100px; margin-bottom: 0px; margin-left: 10px;" />
+                    ${invoice.companyInfo.digitalSignPath ? `
+                      <img src="http://localhost:5000/${invoice.companyInfo.digitalSignPath}" alt="Polestar" style="height: 30px; width: 100px; margin-bottom: 0px; margin-left: 10px;" />
+                    ` : ''}
                     <div style="font-weight: 600; font-size: 14px;">Authorised Signatory</div>
                   </div>
                 </div>
 
-<div style="border: 1px solid black; font-size: 0.875rem; padding: 4px;">
-  <div style="font-weight: 600;">Terms & Conditions:</div>
-  <ol style="margin-bottom: 0px; padding-left: 16px;">
-    <li style="margin-bottom: 0.25rem;">
-      This bill is payable on receipt by Cheque/Wire transfer in favor of Polestar Solutions & Services India Pvt. Ltd. In case payment is made by electronic fund transfer, please send details to 
-      <a href="mailto:ajay@polestarllp.com" target="_blank" rel="noopener noreferrer">ajay@polestarllp.com</a>.
-    </li>
-    <li style="margin-bottom: 0.25rem;">TDS certificate, if applicable is to be sent to the above address.</li>
-    <li style="margin-bottom: 0.25rem;">Whether GST is payable on Reverse Charge basis? - No</li>
-  </ol>
-</div>
+                <div style="border: 1px solid black; font-size: 0.875rem; padding: 4px;">
+                  <div style="font-weight: 600;">Terms & Conditions:</div>
+                  <ol style="margin-bottom: 0px; padding-left: 16px;">
+                    <li style="margin-bottom: 0.25rem;">
+                      This bill is payable on receipt by Cheque/Wire transfer in favor of Polestar Solutions & Services India Pvt. Ltd. In case payment is made by electronic fund transfer, please send details to
+                      <a href="mailto:ajay@polestarllp.com" target="_blank" rel="noopener noreferrer">ajay@polestarllp.com</a>.
+                    </li>
+                    <li style="margin-bottom: 0.25rem;">TDS certificate, if applicable is to be sent to the above address.</li>
+                    <li style="margin-bottom: 0.25rem;">Whether GST is payable on Reverse Charge basis? - No</li>
+                  </ol>
+                </div>
 
 
-<div>
-  <div style="font-weight: 600; display: flex; justify-content: space-around; border: 1px solid black; padding: 4px;">Bank Details :</div>
-  <div style="display: grid; grid-template-columns: 1fr 1fr;">
-    <div style="display: flex; flex-direction: column; border: 1px solid black; padding: 4px;">
-      <div><span style="font-weight: bold; flex: 1;">Beneficiary Name : </span><span>${invoice.company_name}</span></div>
-      <div><span style="font-weight: bold; flex: 1;">Bank Name : </span><span>${invoice.companyAccountInfo.bankName}</span></div>
-      <div><span style="font-weight: bold; flex: 1;">Bank Address : </span><span>${invoice.companyAccountInfo.bankAddress}</span></div>
-      <div><span style="font-weight: bold; flex: 1;">Account No. : </span><span>${invoice.companyAccountInfo.accountNumber}</span></div>
-    </div>
-    <div style="display: flex; flex-direction: column; border: 1px solid black; padding: 4px;">
-      <div><span style="font-weight: bold; flex: 1;">${invoice.companyAccountInfo.additionalDetailsHtml}</span></div>
-    </div>
-  </div>
-</div>
+                <div>
+                  <div style="font-weight: 600; display: flex; justify-content: space-around; border: 1px solid black; padding: 4px;">Bank Details :</div>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr;">
+                    <div style="display: flex; flex-direction: column; border: 1px solid black; padding: 4px;">
+                      <div><span style="font-weight: bold; flex: 1;">Beneficiary Name : </span><span>${invoice.company_name}</span></div>
+                      <div><span style="font-weight: bold; flex: 1;">Bank Name : </span><span>${invoice.companyAccountInfo.bankName}</span></div>
+                      <div><span style="font-weight: bold; flex: 1;">Bank Address : </span><span>${invoice.companyAccountInfo.bankAddress}</span></div>
+                      <div><span style="font-weight: bold; flex: 1;">Account No. : </span><span>${invoice.companyAccountInfo.accountNumber}</span></div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; border: 1px solid black; padding: 4px;">
+                      <div><span style="font-weight: bold; flex: 1;">${invoice.companyAccountInfo.additionalDetailsHtml}</span></div>
+                    </div>
+                  </div>
+                </div>
 
 
               </div>
@@ -5685,7 +5687,7 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
 
   // Define the HTML content with the invoice details
   const htmlContent =
-`    <html>
+    `    <html>
       <head></head>
       <body>
         <div style="position: absolute; top: 0; left: 0; background: #00000099; height: 100vh; width: 100vw; z-index: 1; display: flex; justify-content: center; align-items: center; overflow: hidden;" onclick="props?.setDownloadExportPDF(false)">
@@ -5721,19 +5723,19 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">Due Date:</span>
-                    <span>${formatDate(invoice.due_date ) || ''}</span>
+                    <span>${formatDate(invoice.due_date) || ''}</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">Terms of Payment:</span>
-                    <span>${invoice.terms_of_payment  || 0} Days</span>
+                    <span>${invoice.terms_of_payment || 0} Days</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">PO Number:</span>
-                    <span>${invoice.po_number  || ''}</span>
+                    <span>${invoice.po_number || ''}</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">PAN:</span>
-                    <span>${invoice.companyInfo.pan_number  || ''}</span>
+                    <span>${invoice.companyInfo.pan_number || ''}</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">GSTN:</span>
@@ -5760,13 +5762,13 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
                 <div style="fontSize: 14px, padding: 4px, display: flex, justifyContent: center, border: 1px solid black">
 
                   ${Object.keys(invoice.clientContactInfo).length < 0 ?
-                    `<div style="font-weight: 800; text-align: center;">
+      `<div style="font-weight: 800; text-align: center;">
                   Kind Attention ${invoice.clientContactInfo.salutation || ''} 
                   ${invoice.clientContactInfo.first_name || ''} 
                   ${invoice.clientContactInfo.last_name || ''}
                   </div>`
-                    : ''
-                  }
+      : ''
+    }
                   <div style="font-family: Arial, sans-serif;">
                     <div style="font-size: 14px; padding: 4px; display: flex; justify-content: center; border: 1px solid black;">
                     </div>
@@ -5801,8 +5803,8 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
                             </td>
                           </tr>
                           ${JSON.parse(invoice.invoiceTaxInfo.taxDetails)
-                            .map(
-                              (tax) => `
+      .map(
+        (tax) => `
                                 <tr>
                                   <td colspan="2" style="border: 1px solid black; padding: 4px; text-align: right; font-weight: bold; padding-right: 10px;">
                                     ${tax.taxFieldName} @ ${tax.taxPercentage}%
@@ -5812,8 +5814,8 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
                                   </td>
                                 </tr>
                                 `
-                              )
-                            .join("")}
+      )
+      .join("")}
                           <tr>
                             <td colspan="2" style="border: 1px solid black; padding: 4px; text-align: right; font-weight: bold; padding-right: 10px;">
                               Total Amount After Tax
@@ -5836,7 +5838,9 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
                 <div style="display: flex; justify-content: flex-end; border: 1px solid black; padding: 4px;">
                   <div style="text-align: center;">
                     <div style="margin-bottom: 3rem;"></div>
-                    <img src="http://localhost:5000/${invoice.companyInfo.digitalSignPath}" alt="Polestar" style="height: 30px; width: 100px; margin-bottom: 0px; margin-left: 10px;" />
+                    ${invoice.companyInfo.digitalSignPath ? `
+                      <img src="http://localhost:5000/${invoice.companyInfo.digitalSignPath}" alt="Polestar" style="height: 30px; width: 100px; margin-bottom: 0px; margin-left: 10px;" />
+                    ` : ''}                    
                     <div style="font-weight: 600; font-size: 14px;">Authorised Signatory</div>
                   </div>
                 </div>
