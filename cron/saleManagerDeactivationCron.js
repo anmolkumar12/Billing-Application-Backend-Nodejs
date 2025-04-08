@@ -88,7 +88,7 @@ const updateAccountManagerStatusOnDeactivationDate = async () => {
 
 
 function runSalesManagerStatusCronJob() {
-    // For real run: "0 0 * * *" (every midnight)
+    // For real run: "*/2 * * * *" (every 2 minutes)
     cron.schedule("0 0 * * *", async () => {
         console.log("🔁 Running Sales Manager Deactivation Cron Job...");
         await updateSalesManagerStatusOnDeactivationDate();
@@ -97,5 +97,7 @@ function runSalesManagerStatusCronJob() {
 }
 
 module.exports = {
-    runSalesManagerStatusCronJob
+    runSalesManagerStatusCronJob,
+    updateSalesManagerStatusOnDeactivationDate, 
+    updateAccountManagerStatusOnDeactivationDate
 };

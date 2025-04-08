@@ -5,6 +5,7 @@ const doc = new PDFDocument();
 const path = require('path');
 const puppeteer = require('puppeteer');
 const numberToWords = require("number-to-words");
+const { updateSalesManagerStatusOnDeactivationDate } = require("../cron/saleManagerDeactivationCron");
 
 // Country
 const createCountry = async (
@@ -1865,6 +1866,12 @@ const updateSalesManagerStatus = async (
       newDeactivatedStr ? deactivationDate : null,
       salesManagerId
     ]);
+
+        // ✅ Immediately run cron logic if deactivationDate is today and it's a deactivation
+        if (!isActive && deactivationDate === new Date().toISOString().split("T")[0]) {
+          console.log("⏱️ Immediate deactivation triggered inside updateSalesManagerStatus");
+          await updateSalesManagerStatusOnDeactivationDate();
+        }
 
   } catch (err) {
     console.error("Error updating Sales Manager status:", err);
@@ -5468,7 +5475,7 @@ const createPDF = async (invoice, pdfPath) => {
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">PAN:</span>
-                    <span>${invoice.companyInfo.pan_number || ''}</span>
+                    <span>${(!invoice.companyInfo.pan_number || invoice.companyInfo.pan_number == 'null') ? '' : invoice.companyInfo.pan_number}</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">GSTN:</span>
@@ -5735,7 +5742,7 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">PAN:</span>
-                    <span>${invoice.companyInfo.pan_number || ''}</span>
+                    <span>${(!invoice.companyInfo.pan_number || invoice.companyInfo.pan_number == 'null') ? '' : invoice.companyInfo.pan_number}</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px;">GSTN:</span>
