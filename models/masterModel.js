@@ -6,6 +6,7 @@ const path = require('path');
 const puppeteer = require('puppeteer');
 const numberToWords = require("number-to-words");
 const { updateSalesManagerStatusOnDeactivationDate } = require("../cron/saleManagerDeactivationCron");
+const { updateAccountManagerStatusOnDeactivationDate } = require("../cron/saleManagerDeactivationCron");
 
 // Country
 const createCountry = async (
