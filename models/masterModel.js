@@ -3841,7 +3841,7 @@ const updateClientBillToDetails = async (
         gstIn = ?,
         placeOfSupply = ?,
         state_name = ?,
-        iec_code = ?
+        iec_code = ?,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `;
