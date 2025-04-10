@@ -1869,7 +1869,7 @@ const updateSalesManagerStatus = async (
     ]);
 
     // ✅ Immediately run cron logic if deactivationDate is today and it's a deactivation
-    if (!isActive && deactivationDate === new Date().toISOString().split("T")[0]) {
+    if (!isActive && deactivationDate <= new Date().toISOString().split("T")[0]) {
       console.log("⏱️ Immediate deactivation triggered inside updateSalesManagerStatus");
       await updateSalesManagerStatusOnDeactivationDate();
     }
@@ -1881,24 +1881,31 @@ const updateSalesManagerStatus = async (
 };
 
 
-
-
-
-
 const getSalesManagersList = async () => {
   try {
     const query = `
-      SELECT sales_manager_master.*, 
-      users.username as updated_by,
-             (SELECT GROUP_CONCAT(industry_head_master.industryHeadName)
-              FROM industry_head_master 
-              WHERE FIND_IN_SET(industry_head_master.id, sales_manager_master.industryHeadIds)) AS industryHeadNames, company_info.companyName
+      SELECT 
+        sales_manager_master.*, 
+        users.username AS updated_by,
+        company_info.companyName,
+
+        -- Active industry head names
+        (SELECT GROUP_CONCAT(ih.industryHeadName)
+         FROM industry_head_master ih
+         WHERE FIND_IN_SET(ih.id, sales_manager_master.industryHeadIds)
+        ) AS industryHeadNames,
+
+        -- Deactivated industry head names
+        (SELECT GROUP_CONCAT(ih.industryHeadName)
+         FROM industry_head_master ih
+         WHERE FIND_IN_SET(ih.id, sales_manager_master.deactivatedIndustryIds)
+        ) AS deactivatedIndustryHeadNames
+
       FROM sales_manager_master
-      LEFT JOIN 
-        company_info ON sales_manager_master.companyId = company_info.id
-    LEFT JOIN
-        users 
-        on users.id = sales_manager_master.updated_by
+      LEFT JOIN company_info 
+        ON sales_manager_master.companyId = company_info.id
+      LEFT JOIN users 
+        ON users.id = sales_manager_master.updated_by
     `;
 
     const [salesManagers] = await db.execute(query);
@@ -1908,6 +1915,36 @@ const getSalesManagersList = async () => {
     throw err;
   }
 };
+
+
+
+
+// const getSalesManagersList = async () => {
+//   try {
+//     const query = `
+//       SELECT sales_manager_master.*, 
+//       users.username as updated_by,
+//              (SELECT GROUP_CONCAT(industry_head_master.industryHeadName)
+//               FROM industry_head_master 
+//               WHERE FIND_IN_SET(industry_head_master.id, sales_manager_master.industryHeadIds)) AS industryHeadNames, company_info.companyName
+//       FROM sales_manager_master
+//       LEFT JOIN 
+//         company_info ON sales_manager_master.companyId = company_info.id
+//     LEFT JOIN
+//         users 
+//         on users.id = sales_manager_master.updated_by
+//     `;
+
+//     const [salesManagers] = await db.execute(query);
+
+//     console.log('salesManagers', salesManagers);
+    
+//     return salesManagers;
+//   } catch (err) {
+//     console.error("Error retrieving Sales Managers:", err);
+//     throw err;
+//   }
+// };
 
 // Account Manager Master
 const insertAccountManager = async (
@@ -2054,7 +2091,7 @@ const activateOrDeactivateAccountManager = async (
     ]);
 
     // ✅ Immediately run cron logic if deactivationDate is today and it's a deactivation
-    if (!isActive && deactivationDate === new Date().toISOString().split("T")[0]) {
+    if (!isActive && deactivationDate <= new Date().toISOString().split("T")[0]) {
       console.log("⏱️ Immediate deactivation triggered inside updateSalesManagerStatus");
       await updateAccountManagerStatusOnDeactivationDate();
     }
@@ -2066,22 +2103,58 @@ const activateOrDeactivateAccountManager = async (
 };
 
 
+// const getAccountManagersList = async () => {
+//   try {
+//     const query = `
+//             SELECT account_manager_master.*, 
+//             users.username as updated_by,
+//                    (SELECT GROUP_CONCAT(industry_head_master.industryHeadName) 
+//                     FROM industry_head_master 
+//                     WHERE FIND_IN_SET(industry_head_master.id, account_manager_master.industryHeadIds)) AS industryHeadNames, company_info.companyName
+//             FROM account_manager_master
+//             LEFT JOIN 
+//             company_info ON account_manager_master.companyId = company_info.id
+//                     LEFT JOIN
+//             users 
+//             on users.id = account_manager_master.updated_by
+            
+//         `;
+//     const [accountManagers] = await db.execute(query);
+//     return accountManagers;
+//   } catch (err) {
+//     console.error("Error retrieving Account Managers:", err);
+//     throw err;
+//   }
+// };
+
+
 const getAccountManagersList = async () => {
   try {
     const query = `
-            SELECT account_manager_master.*, 
-            users.username as updated_by,
-                   (SELECT GROUP_CONCAT(industry_head_master.industryHeadName) 
-                    FROM industry_head_master 
-                    WHERE FIND_IN_SET(industry_head_master.id, account_manager_master.industryHeadIds)) AS industryHeadNames, company_info.companyName
-            FROM account_manager_master
-            LEFT JOIN 
-            company_info ON account_manager_master.companyId = company_info.id
-                    LEFT JOIN
-            users 
-            on users.id = account_manager_master.updated_by
-            
-        `;
+      SELECT 
+        account_manager_master.*, 
+        users.username AS updated_by,
+        company_info.companyName,
+
+        -- Active industry head names
+        (SELECT GROUP_CONCAT(ih.industryHeadName)
+         FROM industry_head_master ih
+         WHERE FIND_IN_SET(ih.id, account_manager_master.industryHeadIds)
+        ) AS industryHeadNames,
+
+        -- Deactivated industry head names
+        (SELECT GROUP_CONCAT(ih.industryHeadName)
+         FROM industry_head_master ih
+         WHERE FIND_IN_SET(ih.id, account_manager_master.deactivatedIndustryIds)
+        ) AS deactivatedIndustryHeadNames
+
+      FROM account_manager_master
+      LEFT JOIN company_info 
+        ON account_manager_master.companyId = company_info.id
+      LEFT JOIN users 
+        ON users.id = account_manager_master.updated_by
+    `;
+
     const [accountManagers] = await db.execute(query);
     return accountManagers;
   } catch (err) {
@@ -2089,6 +2162,7 @@ const getAccountManagersList = async () => {
     throw err;
   }
 };
+
 
 // Technology Group Master
 const insertTechnologyGroup = async (
