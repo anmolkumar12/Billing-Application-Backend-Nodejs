@@ -5065,7 +5065,7 @@ const insertCreditNote = async (
   invoice_number_id,
   currency,
   due_date,
-  terms_of_payment,
+  terms_of_payment
 ) => {
   try {
     console.log("Received values in insertInvoice:", {
@@ -5154,7 +5154,7 @@ const insertCreditNote = async (
         filePath, total_amount, gst_total, final_amount, clientContact_name,
         clientBillTo_name, clientShipAddress_name, projectService, projectService_names,   invoice_number, invoice_number_id,currency,
     due_date,
-    terms_of_payment,
+    terms_of_payment
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
@@ -5211,7 +5211,7 @@ const updateCreditNote = async (
   final_amount, invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
   projectService, projectService_names, invoice_number, invoice_number_id,     currency,
   due_date,
-  terms_of_payment,
+  terms_of_payment
 ) => {
   try {
     const query = `
@@ -5823,7 +5823,7 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
           <div style="width: 90%; max-width: 750px; height: 90vh; background-color: white; padding: 2rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); overflow-y: auto;" onclick="event.stopPropagation()">
 
             <img src="http://localhost:5000/${invoice.companyInfo.logopath}" alt="Polestar" style="height: 35px; width: 80px; margin-bottom: 0px; margin-left: 10px;" />
-            <h1 style="text-align: center; font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">Tax Invoice</h1>
+            <h1 style="text-align: center; font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">${pdfPath.includes("creditnotes") ? 'Credit Note' : 'Tax Invoice'  }</h1>
             <div style="border: 1px solid black;">
               <div style="display: flex;">
                 <div style="display: flex; width: 40%; ">
