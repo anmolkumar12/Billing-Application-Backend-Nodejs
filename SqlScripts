@@ -863,3 +863,13 @@ ADD COLUMN `terms_of_payment` VARCHAR(500) NULL DEFAULT NULL;
 
 ALTER TABLE invoice_info 
 ADD COLUMN `iec_code` VARCHAR(50) NULL DEFAULT NULL;
+
+
+-- 10-04-2025-------------
+
+ALTER TABLE invoice_info ADD COLUMN currency varchar(50) DEFAULT NULL;
+ALTER TABLE invoice_info 
+ADD COLUMN `due_date` DATE NULL DEFAULT NULL;
+
+ALTER TABLE invoice_info 
+ADD COLUMN `terms_of_payment` VARCHAR(500) NULL DEFAULT NULL;

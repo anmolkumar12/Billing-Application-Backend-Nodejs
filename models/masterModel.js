@@ -5063,6 +5063,9 @@ const insertCreditNote = async (
   projectService_names,
   invoice_number,
   invoice_number_id,
+  currency,
+  due_date,
+  terms_of_payment,
 ) => {
   try {
     console.log("Received values in insertInvoice:", {
@@ -5072,7 +5075,9 @@ const insertCreditNote = async (
       tax_code, tax_code_id, invoice_amount, note_one, note_two, updated_by, isActive,
       filePath, total_amount, gst_total, final_amount, clientContact_name, clientBillTo_name,
       clientShipAddress_name, projectService, projectService_names, invoice_number,
-      invoice_number_id, invoiceData
+      invoice_number_id,currency,
+      due_date,
+      terms_of_payment, invoiceData
     });
 
     // Ensure client_id is a number
@@ -5132,7 +5137,10 @@ const insertCreditNote = async (
       projectService || null,
       projectService_names || null,
       invoice_number || null,
-      invoice_number_id || null
+      invoice_number_id || null,
+      currency || null,
+      due_date || null,
+      terms_of_payment || null
     ];
 
     console.log("Final safeValues before query:", safeValues);
@@ -5144,8 +5152,10 @@ const insertCreditNote = async (
         company_name, bill_from, invoice_bill_from_id, tax_type, tax_type_id,
         tax_code, tax_code_id, invoice_amount, note_one, note_two, updated_by, isActive,
         filePath, total_amount, gst_total, final_amount, clientContact_name,
-        clientBillTo_name, clientShipAddress_name, projectService, projectService_names,   invoice_number, invoice_number_id
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        clientBillTo_name, clientShipAddress_name, projectService, projectService_names,   invoice_number, invoice_number_id,currency,
+    due_date,
+    terms_of_payment,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const [invoiceResult] = await db.execute(insertQuery, safeValues);
@@ -5199,7 +5209,9 @@ const updateCreditNote = async (
   company_name, bill_from, invoice_bill_from_id, tax_type, tax_type_id, tax_code, tax_code_id,
   invoice_amount, note_one, note_two, updated_by, isActive, filePath, total_amount, gst_total,
   final_amount, invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
-  projectService, projectService_names, invoice_number, invoice_number_id
+  projectService, projectService_names, invoice_number, invoice_number_id,     currency,
+  due_date,
+  terms_of_payment,
 ) => {
   try {
     const query = `
@@ -5212,7 +5224,9 @@ const updateCreditNote = async (
         tax_code_id = ?, invoice_amount = ?, note_one = ?, note_two = ?, updated_by = ?, 
         isActive = ?, filePath = ?, total_amount = ?, gst_total = ?, final_amount = ?, 
         clientContact_name = ?, clientBillTo_name = ?, clientShipAddress_name = ?, 
-        projectService = ?, projectService_names = ?, invoice_number = ?, invoice_number_id = ? WHERE id = ?
+        projectService = ?, projectService_names = ?, invoice_number = ?, invoice_number_id = ?,     currency = ?,
+    due_date = ?,
+    terms_of_payment = ? WHERE id = ?
     `;
 
     const values = [
@@ -5226,7 +5240,9 @@ const updateCreditNote = async (
       sanitizeValue(note_two), sanitizeValue(updated_by), sanitizeValue(isActive),
       sanitizeValue(filePath), sanitizeValue(total_amount), sanitizeValue(gst_total),
       sanitizeValue(final_amount), sanitizeValue(clientContact_name), sanitizeValue(clientBillTo_name),
-      sanitizeValue(clientShipAddress_name), sanitizeValue(projectService), sanitizeValue(projectService_names), sanitizeValue(invoice_number), sanitizeValue(invoice_number_id),
+      sanitizeValue(clientShipAddress_name), sanitizeValue(projectService), sanitizeValue(projectService_names), sanitizeValue(invoice_number), sanitizeValue(invoice_number_id),     sanitizeValue(currency),
+      sanitizeValue(due_date),
+      sanitizeValue(terms_of_payment),
       sanitizeValue(id)
     ];
 
@@ -5329,17 +5345,43 @@ const formatDate = (dateString) => {
   return `${day}/${month}/${year}`;
 };
 
+// const convertAmountToWords = (amount, currency) => {
+//   let [whole, decimal] = amount.toString().split(".");
+
+//   let currencyWord = currency === "USD" ? "Dollars" : "Rupees";
+//   let subCurrencyWord = currency === "USD" ? "Cents" : "Paise";
+
+//   let words = numberToWords.toWords(parseInt(whole)) + ` ${currencyWord}`;
+
+//   if (decimal && parseInt(decimal) > 0) {
+//     if (decimal.length === 1) decimal += "0"; // Ensure two decimal places
+//     words += ` and ${numberToWords.toWords(parseInt(decimal))} ${subCurrencyWord}`;
+//   }
+
+//   return `In Words: ${currency} ${words} Only`;
+// };
+
+
+
+
+const currencyWordsMap = {
+  INR: { currency: 'Rupees', subCurrency: 'Paise' },
+  USD: { currency: 'Dollars', subCurrency: 'Cents' },
+  EUR: { currency: 'Euros', subCurrency: 'Cents' },
+  AUD: { currency: 'Australian Dollars', subCurrency: 'Cents' },
+  AED: { currency: 'Dirhams', subCurrency: 'Fils' }
+};
+
 const convertAmountToWords = (amount, currency) => {
   let [whole, decimal] = amount.toString().split(".");
 
-  let currencyWord = currency === "USD" ? "Dollars" : "Rupees";
-  let subCurrencyWord = currency === "USD" ? "Cents" : "Paise";
+  const currencyInfo = currencyWordsMap[currency] || { currency: 'Currency', subCurrency: 'Subunit' };
 
-  let words = numberToWords.toWords(parseInt(whole)) + ` ${currencyWord}`;
+  let words = numberToWords.toWords(parseInt(whole)) + ` ${currencyInfo.currency}`;
 
   if (decimal && parseInt(decimal) > 0) {
     if (decimal.length === 1) decimal += "0"; // Ensure two decimal places
-    words += ` and ${numberToWords.toWords(parseInt(decimal))} ${subCurrencyWord}`;
+    words += ` and ${numberToWords.toWords(parseInt(decimal))} ${currencyInfo.subCurrency}`;
   }
 
   return `In Words: ${currency} ${words} Only`;
@@ -5357,6 +5399,25 @@ const generateInvoicePDF = async (invoice_number) => {
     }
 
     const invoice = invoiceData[0];
+
+
+    // Breakdown Invoice Amount Info
+    const breakdownInvoiceAmountQuery = "SELECT * FROM invoice_data WHERE invoice_id = ?";
+    const [breakdownInvoiceAmountData] = await db.execute(breakdownInvoiceAmountQuery, [invoice.id]);
+
+    if (breakdownInvoiceAmountData.length) {
+      const breakdownRows = breakdownInvoiceAmountData.map(item => {
+        return `
+          <tr>
+            <td style="border: 1px solid black; padding: 4px;">${item.description || ''}</td>
+            <td style="border: 1px solid black; padding: 4px; text-align: right;">${item.amount || 0}</td>
+          </tr>
+        `;
+      }).join('');
+      invoice['invoiceAmountInfo'] = breakdownRows;
+    } else {
+      invoice['invoiceAmountInfo'] = [];
+    }
 
     // Company Info
     const companyQuery = "SELECT * FROM company_info WHERE companyName = ?";
@@ -5529,27 +5590,23 @@ const createPDF = async (invoice, pdfPath) => {
       : ''
     }
 
-
-                  <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
-                    <thead>
-                      <tr>
-                        <th style="border: 1px solid black; padding: 4px; text-align: left;">Description</th>
-                        <th style="border: 1px solid black; padding: 4px; text-align: right;">Amount (INR)</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td style="border: 1px solid black; padding: 4px; vertical-align: top; height: 200px;">
-                          <span style="font-weight: 600;">${invoice.companyInfo.description}</span><br />
-
-                          <span style="font-weight: 600;">Total Amount Payable</span>
-                        </td>
-                        <td style="border: 1px solid black; padding: 4px; text-align: right; font-weight: 600;">
-                          <span>${invoice.final_amount}</span>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+<table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+    <thead>
+      <tr>
+        <th style="border: 1px solid black; padding: 4px; text-align: left;">Description</th>
+        <th style="border: 1px solid black; padding: 4px; text-align: right;">Amount (INR)</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${invoice.invoiceAmountInfo}
+      <tr>
+        <td style="border: 1px solid black; padding: 4px; font-weight: 600;">Total Amount Payable</td>
+        <td style="border: 1px solid black; padding: 4px; text-align: right; font-weight: 600;">
+          ${invoice.final_amount}
+        </td>
+      </tr>
+    </tbody>
+  </table>
                 </div>
                 <div style="border: 1px solid black; padding: 4px; font-size: 12px;">
                   <span style="font-weight: 600;">${convertAmountToWords(invoice.final_amount, invoice.currency)}</span>
@@ -5630,6 +5687,24 @@ const generateCreditNotePDF = async (invoice_number) => {
 
     const invoice = invoiceData[0];
 
+    // Breakdown Invoice Amount Info
+    const breakdownInvoiceAmountQuery = "SELECT * FROM credit_note_data WHERE invoice_id = ?";
+    const [breakdownInvoiceAmountData] = await db.execute(breakdownInvoiceAmountQuery, [invoice.id]);
+
+    if (breakdownInvoiceAmountData.length) {
+      const breakdownRows = breakdownInvoiceAmountData.map(item => {
+        return `
+              <tr>
+                <td style="border: 1px solid black; padding: 4px;">${item.description || ''}</td>
+                <td style="border: 1px solid black; padding: 4px; text-align: right;">${item.amount || 0}</td>
+              </tr>
+            `;
+      }).join('');
+      invoice['invoiceAmountInfo'] = breakdownRows;
+    } else {
+      invoice['invoiceAmountInfo'] = [];
+    }
+
     // Company info
     const companyQuery = "SELECT * FROM company_info WHERE companyName = ?";
     const [companyData] = await db.execute(companyQuery, [invoice.company_name]);
@@ -5674,6 +5749,30 @@ const generateCreditNotePDF = async (invoice_number) => {
       invoice['clientContactInfo'] = {};
     }
 
+    // Tax Details Info
+    const invoiceTaxQuery = "SELECT * FROM credit_note_data WHERE invoice_id = ?";
+    const [invoiceTaxData] = await db.execute(invoiceTaxQuery, [invoice.id]);
+    
+    invoiceTaxData[0].taxDetails = invoiceTaxData[0].taxBreakdown;
+    invoice['invoiceTaxInfo'] = invoiceTaxData[0];
+
+    invoiceTaxData[0].taxDetails = invoiceTaxData[0].taxBreakdown;
+    invoice['invoiceTaxInfo'] = invoiceTaxData[0];
+    // invoice['breakDownAmount'] = invoiceTaxData;
+    invoice['breakDownRowsHtml'] = invoiceTaxData.map(item => `
+      <tr>
+        <td style="border: 1px solid black; padding: 4px; text-align: left;">
+          ${item.description || "N/A"}
+        </td>
+        <td style="border: 1px solid black; padding: 4px; text-align: left;">
+          ${item.sacCode || "N/A"}
+        </td>
+        <td style="border: 1px solid black; padding: 4px; text-align: right;">
+          ${item.amount || "0.00"}
+        </td>
+      </tr>
+    `).join('');
+
     // Directory setup
     const dirPath = path.join(__dirname, '..', 'models', 'creditnotes');
     if (!fs.existsSync(dirPath)) {
@@ -5686,7 +5785,9 @@ const generateCreditNotePDF = async (invoice_number) => {
     const relativePDFUrl = `/creditnotes/${fileName}`; // this is the public URL
 
     // Generate PDF
-    await createPDF(invoice, pdfPath);
+    // await createPDF(invoice, pdfPath);
+    await createTaxInvoicePDF(invoice, pdfPath);
+
 
     // Optional: Update PDF path in DB
     const updatePDFQuery = "UPDATE invoice_info SET pdf_path = ? WHERE invoice_name = ?";
@@ -5811,17 +5912,7 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <td style="border: 1px solid black; padding: 4px; text-align: left;">
-                              ${invoice.invoiceTaxInfo.description || "N/A"}
-                            </td>
-                            <td style="border: 1px solid black; padding: 4px; text-align: left;">
-                              ${invoice.invoiceTaxInfo.sacCode || "N/A"}
-                            </td>
-                            <td style="border: 1px solid black; padding: 4px; text-align: right;">
-                              ${invoice.invoiceTaxInfo.amount}
-                            </td>
-                          </tr>
+                        ${invoice.breakDownRowsHtml}
                           <tr>
                             <td colspan="2" style="border: 1px solid black; padding: 4px; text-align: right; font-weight: bold; padding-right: 10px;">
                               Total
@@ -5991,8 +6082,24 @@ const generateTaxInvoicePDF = async (invoice_number) => {
     // Tax Details Info
     const invoiceTaxQuery = "SELECT * FROM invoice_data WHERE invoice_id = ?";
     const [invoiceTaxData] = await db.execute(invoiceTaxQuery, [invoice.id]);
+    console.log('bbbbbbbbbbbbb', invoiceTaxData);
+
     invoiceTaxData[0].taxDetails = invoiceTaxData[0].taxBreakdown;
     invoice['invoiceTaxInfo'] = invoiceTaxData[0];
+    // invoice['breakDownAmount'] = invoiceTaxData;
+    invoice['breakDownRowsHtml'] = invoiceTaxData.map(item => `
+      <tr>
+        <td style="border: 1px solid black; padding: 4px; text-align: left;">
+          ${item.description || "N/A"}
+        </td>
+        <td style="border: 1px solid black; padding: 4px; text-align: left;">
+          ${item.sacCode || "N/A"}
+        </td>
+        <td style="border: 1px solid black; padding: 4px; text-align: right;">
+          ${item.amount || "0.00"}
+        </td>
+      </tr>
+    `).join('');
 
     // Create Directory
     const dirPath = path.join(__dirname, '..', 'models', 'taxinvoices');
