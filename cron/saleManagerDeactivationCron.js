@@ -59,7 +59,6 @@ const updateAccountManagerStatusOnDeactivationDate = async () => {
 
         for (const row of rows) {
             const { id, industryHeadIds, deactivatedIndustryIds } = row;
-
             const activeIds = industryHeadIds?.split(',').map(i => i.trim()).filter(Boolean) || [];
             const toDeactivateIds = deactivatedIndustryIds?.split(',').map(i => i.trim()).filter(Boolean) || [];
 
