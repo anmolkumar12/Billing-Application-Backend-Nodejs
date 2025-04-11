@@ -9,7 +9,7 @@ const updateSalesManagerStatusOnDeactivationDate = async () => {
         const [rows] = await db.execute(`
       SELECT id, industryHeadIds, deactivatedIndustryIds, deactivationDate
       FROM sales_manager_master
-      WHERE deactivationDate = ? AND isActive = 1
+      WHERE deactivationDate <= ? AND isActive = 1
     `, [today]);
 
         for (const row of rows) {
@@ -54,12 +54,11 @@ const updateAccountManagerStatusOnDeactivationDate = async () => {
         const [rows] = await db.execute(
             `SELECT id, industryHeadIds, deactivatedIndustryIds, deactivationDate
          FROM account_manager_master
-         WHERE deactivationDate = ? AND isActive = 1`, [today]
+         WHERE deactivationDate <= ? AND isActive = 1`, [today]
         );
 
         for (const row of rows) {
             const { id, industryHeadIds, deactivatedIndustryIds } = row;
-
             const activeIds = industryHeadIds?.split(',').map(i => i.trim()).filter(Boolean) || [];
             const toDeactivateIds = deactivatedIndustryIds?.split(',').map(i => i.trim()).filter(Boolean) || [];
 
