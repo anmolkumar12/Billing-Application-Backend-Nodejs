@@ -5929,7 +5929,7 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
                 <div style="display: grid; width: 60%; grid-template-columns: repeat(4, 1fr);">
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px; font-size: 12px">Invoice No:</span>
-                    <span style="font-weight: 300; font-size: 12px">${pdfPath.includes("creditnotes") ? invoice.invoice_number : invoice.invoice_name}</span>
+                    <span style="font-weight: 300; font-size: 12px">${pdfPath.includes("creditnotes") ? (invoice.invoice_number || '') : invoice.invoice_name}</span>
                   </div>
                   <div style="display: flex; flex-direction: column; align-items: flex-start; font-size: 14px; padding: 4px; border: 1px solid black;">
                     <span style="font-weight: bold; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px; font-size: 12px">Invoice Date:</span>
