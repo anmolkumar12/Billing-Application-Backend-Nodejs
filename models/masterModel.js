@@ -4836,7 +4836,8 @@ const insertInvoice = async (
   currency, due_date,
   terms_of_payment,
   iec_code,
-  place_of_supply
+  place_of_supply,
+  is_india
 ) => {
   try {
     console.log("Received values in insertInvoice:", {
@@ -4847,7 +4848,7 @@ const insertInvoice = async (
       filePath, total_amount, gst_total, final_amount, clientContact_name, clientBillTo_name,
       clientShipAddress_name, projectService, projectService_names, billed_hours, currency, due_date,
       terms_of_payment,
-      iec_code, place_of_supply, invoiceData
+      iec_code, place_of_supply, is_india, invoiceData
     });
 
     // Ensure client_id is a number
@@ -4911,7 +4912,8 @@ const insertInvoice = async (
       due_date || null,
       terms_of_payment || null,
       iec_code || null,
-      place_of_supply || null
+      place_of_supply || null,
+      is_india || null
     ];
 
     console.log("Final safeValues before query:", safeValues);
@@ -4925,7 +4927,7 @@ const insertInvoice = async (
         filePath, total_amount, gst_total, final_amount, clientContact_name,
         clientBillTo_name, clientShipAddress_name, projectService, projectService_names, billed_hours, currency, due_date,
     terms_of_payment,
-    iec_code , place_of_supply
+    iec_code , place_of_supply, is_india
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
@@ -4987,7 +4989,7 @@ const updateInvoice = async (
   final_amount, invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
   projectService, projectService_names, billed_hours, due_date,
   terms_of_payment,
-  iec_code, place_of_supply
+  iec_code, place_of_supply, is_india
 ) => {
   try {
     const query = `
@@ -5002,7 +5004,7 @@ const updateInvoice = async (
         clientContact_name = ?, clientBillTo_name = ?, clientShipAddress_name = ?, 
         projectService = ?, projectService_names = ?, billed_hours = ?,due_date = ?,
     terms_of_payment = ?,
-    iec_code = ?, place_of_supply = ? WHERE id = ?
+    iec_code = ?, place_of_supply = ?, is_india = ? WHERE id = ?
     `;
 
     const values = [
@@ -5018,7 +5020,7 @@ const updateInvoice = async (
       sanitizeValue(final_amount), sanitizeValue(clientContact_name), sanitizeValue(clientBillTo_name),
       sanitizeValue(clientShipAddress_name), sanitizeValue(projectService), sanitizeValue(projectService_names), sanitizeValue(billed_hours), sanitizeValue(due_date),
       sanitizeValue(terms_of_payment),
-      sanitizeValue(iec_code), sanitizeValue(place_of_supply),
+      sanitizeValue(iec_code), sanitizeValue(place_of_supply), sanitizeValue(is_india),
       sanitizeValue(id)
     ];
 
@@ -5143,7 +5145,8 @@ const insertCreditNote = async (
   due_date,
   terms_of_payment,
   iec_code,
-  place_of_supply
+  place_of_supply,
+  is_india
 ) => {
   try {
     console.log("Received values in insertInvoice:", {
@@ -5155,7 +5158,7 @@ const insertCreditNote = async (
       clientShipAddress_name, projectService, projectService_names, invoice_number,
       invoice_number_id,currency,
       due_date,
-      terms_of_payment, iec_code, place_of_supply, invoiceData
+      terms_of_payment, iec_code, place_of_supply, is_india, invoiceData
     });
 
     // Ensure client_id is a number
@@ -5220,7 +5223,8 @@ const insertCreditNote = async (
       due_date || null,
       terms_of_payment || null,
       iec_code || null,
-      place_of_supply || null
+      place_of_supply || null,
+      is_india || null
     ];
 
     console.log("Final safeValues before query:", safeValues);
@@ -5234,8 +5238,8 @@ const insertCreditNote = async (
         filePath, total_amount, gst_total, final_amount, clientContact_name,
         clientBillTo_name, clientShipAddress_name, projectService, projectService_names,   invoice_number, invoice_number_id,currency,
     due_date,
-    terms_of_payment, iec_code, place_of_supply
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    terms_of_payment, iec_code, place_of_supply, is_india
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const [invoiceResult] = await db.execute(insertQuery, safeValues);
@@ -5291,7 +5295,7 @@ const updateCreditNote = async (
   final_amount, invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
   projectService, projectService_names, invoice_number, invoice_number_id,     currency,
   due_date,
-  terms_of_payment, iec_code, place_of_supply
+  terms_of_payment, iec_code, place_of_supply, is_india
 ) => {
   try {
     const query = `
@@ -5306,7 +5310,7 @@ const updateCreditNote = async (
         clientContact_name = ?, clientBillTo_name = ?, clientShipAddress_name = ?, 
         projectService = ?, projectService_names = ?, invoice_number = ?, invoice_number_id = ?,     currency = ?,
     due_date = ?,
-    terms_of_payment = ?, iec_code = ?, place_of_supply = ? WHERE id = ?
+    terms_of_payment = ?, iec_code = ?, place_of_supply = ?, is_india =? WHERE id = ?
     `;
 
     const values = [
@@ -5322,7 +5326,7 @@ const updateCreditNote = async (
       sanitizeValue(final_amount), sanitizeValue(clientContact_name), sanitizeValue(clientBillTo_name),
       sanitizeValue(clientShipAddress_name), sanitizeValue(projectService), sanitizeValue(projectService_names), sanitizeValue(invoice_number), sanitizeValue(invoice_number_id),     sanitizeValue(currency),
       sanitizeValue(due_date),
-      sanitizeValue(terms_of_payment), sanitizeValue(iec_code), sanitizeValue(place_of_supply),
+      sanitizeValue(terms_of_payment), sanitizeValue(iec_code), sanitizeValue(place_of_supply), sanitizeValue(is_india),
       sanitizeValue(id)
     ];
 
@@ -5652,7 +5656,6 @@ const createPDF = async (invoice, pdfPath) => {
                     <span style="font-weight: 600; text-decoration: underline;">Delivery Address:</span><br />
                     <span>${invoice.client_name}</span><br />
                     <span>${invoice.clientShipAddress_name}</span><br />
-                    <span>${invoice.place_of_supply}</span><br />
                   </div>
                   <div style="border: 1px solid black; padding: 4px;">
                     <span style="font-weight: 600; text-decoration: underline;">Billing Address:</span><br />
@@ -5976,7 +5979,7 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
                     <span style="font-weight: 600; text-decoration: underline;">Delivery Address:</span><br />
                     <span>${invoice.client_name}</span><br />
                     <span>${invoice.clientShipAddress_name}</span><br />
-                    <span>${invoice.place_of_supply}</span><br />
+                    ${invoice.place_of_supply ? `<span style="font-weight: bold; text-decoration: underline;">Place Of Supply : ${invoice.place_of_supply}</span><br />` : ''}
                   </div>
                   <div style="border: 1px solid black; padding: 4px;">
                     <span style="font-weight: 600; text-decoration: underline;">Billing Address:</span><br />
@@ -6002,50 +6005,68 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
                     </div>
 
                     <div style="overflow-x: auto;">
-                      <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
-                        <thead>
-                          <tr>
-                            <th style="border: 1px solid black; padding: 4px; text-align: left;">Description</th>
-                            <th style="border: 1px solid black; padding: 4px; text-align: left;">SAC Code</th>
-                            <th style="border: 1px solid black; padding: 4px; text-align: right;">Amount (${invoice.currency})</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                        ${invoice.breakDownRowsHtml}
-                          <tr>
-                            <td colspan="2" style="border: 1px solid black; padding: 4px; text-align: right; font-weight: bold; padding-right: 10px;">
-                              Total
-                            </td>
-                            <td style="border: 1px solid black; padding: 4px; text-align: right;">
-                              ${invoice.invoiceTaxInfo.totalAmount}
-                            </td>
-                          </tr>
-                          ${JSON.parse(invoice.invoiceTaxInfo.taxDetails)
-      .map(
-        (tax) => `
-                                <tr>
-                                  <td colspan="2" style="border: 1px solid black; padding: 4px; text-align: right; font-weight: bold; padding-right: 10px;">
-                                  
-                                    ${tax.taxFieldName}
-                                  </td>
-                                  <td style="border: 1px solid black; padding: 4px; text-align: right;">
-                                    ${tax.calculatedAmount}
-                                  </td>
-                                </tr>
-                                `
-      )
-      .join("")}
-                          <tr>
-                            <td colspan="2" style="border: 1px solid black; padding: 4px; text-align: right; font-weight: bold; padding-right: 10px;">
-                              Total Amount After Tax
-                            </td>
-                            <td style="border: 1px solid black; padding: 4px; text-align: right; font-weight: 600;">
-                              ${invoice.invoiceTaxInfo.finalAmount}
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
+  <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+    <thead>
+      <tr>
+        <th style="border: 1px solid black; padding: 4px; text-align: left;">Description</th>
+        ${
+          invoice.is_india === 1
+            ? `<th style="border: 1px solid black; padding: 4px; text-align: left;">SAC Code</th>`
+            : ""
+        }
+        <th style="border: 1px solid black; padding: 4px; text-align: right;">Amount (${invoice.currency})</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${invoice.breakDownRows
+        .map(
+          (row) => `
+            <tr>
+              <td style="border: 1px solid black; padding: 4px;">${row.description}</td>
+              ${
+                invoice.is_india === 1
+                  ? `<td style="border: 1px solid black; padding: 4px;">${row.sacCode || ""}</td>`
+                  : ""
+              }
+              <td style="border: 1px solid black; padding: 4px; text-align: right;">${row.amount}</td>
+            </tr>
+          `
+        )
+        .join("")}
+      <tr>
+        <td colspan="${invoice.is_india === 1 ? 2 : 1}" style="border: 1px solid black; padding: 4px; text-align: right; font-weight: bold; padding-right: 10px;">
+          Total
+        </td>
+        <td style="border: 1px solid black; padding: 4px; text-align: right;">
+          ${invoice.invoiceTaxInfo.totalAmount}
+        </td>
+      </tr>
+      ${JSON.parse(invoice.invoiceTaxInfo.taxDetails)
+        .map(
+          (tax) => `
+            <tr>
+              <td colspan="${invoice.is_india === 1 ? 2 : 1}" style="border: 1px solid black; padding: 4px; text-align: right; font-weight: bold; padding-right: 10px;">
+                ${tax.taxFieldName}
+              </td>
+              <td style="border: 1px solid black; padding: 4px; text-align: right;">
+                ${tax.calculatedAmount}
+              </td>
+            </tr>
+          `
+        )
+        .join("")}
+      <tr>
+        <td colspan="${invoice.is_india === 1 ? 2 : 1}" style="border: 1px solid black; padding: 4px; text-align: right; font-weight: bold; padding-right: 10px;">
+          Total Amount After Tax
+        </td>
+        <td style="border: 1px solid black; padding: 4px; text-align: right; font-weight: 600;">
+          ${invoice.invoiceTaxInfo.finalAmount}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 
                     <div style="border: 1px solid black; padding: 4px; font-size: 12px;">
                       <span style="font-weight: 600;">${convertAmountToWords(invoice.invoiceTaxInfo.finalAmount, invoice.currency)}</span>
