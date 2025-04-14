@@ -4835,7 +4835,8 @@ const insertInvoice = async (
   billed_hours,
   currency, due_date,
   terms_of_payment,
-  iec_code
+  iec_code,
+  place_of_supply
 ) => {
   try {
     console.log("Received values in insertInvoice:", {
@@ -4846,7 +4847,7 @@ const insertInvoice = async (
       filePath, total_amount, gst_total, final_amount, clientContact_name, clientBillTo_name,
       clientShipAddress_name, projectService, projectService_names, billed_hours, currency, due_date,
       terms_of_payment,
-      iec_code, invoiceData
+      iec_code, place_of_supply, invoiceData
     });
 
     // Ensure client_id is a number
@@ -4909,7 +4910,8 @@ const insertInvoice = async (
       currency || null,
       due_date || null,
       terms_of_payment || null,
-      iec_code || null
+      iec_code || null,
+      place_of_supply || null
     ];
 
     console.log("Final safeValues before query:", safeValues);
@@ -4923,8 +4925,8 @@ const insertInvoice = async (
         filePath, total_amount, gst_total, final_amount, clientContact_name,
         clientBillTo_name, clientShipAddress_name, projectService, projectService_names, billed_hours, currency, due_date,
     terms_of_payment,
-    iec_code 
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    iec_code , place_of_supply
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const [invoiceResult] = await db.execute(insertQuery, safeValues);
@@ -4985,7 +4987,7 @@ const updateInvoice = async (
   final_amount, invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
   projectService, projectService_names, billed_hours, due_date,
   terms_of_payment,
-  iec_code
+  iec_code, place_of_supply
 ) => {
   try {
     const query = `
@@ -5000,7 +5002,7 @@ const updateInvoice = async (
         clientContact_name = ?, clientBillTo_name = ?, clientShipAddress_name = ?, 
         projectService = ?, projectService_names = ?, billed_hours = ?,due_date = ?,
     terms_of_payment = ?,
-    iec_code = ? WHERE id = ?
+    iec_code = ?, place_of_supply = ? WHERE id = ?
     `;
 
     const values = [
@@ -5016,7 +5018,7 @@ const updateInvoice = async (
       sanitizeValue(final_amount), sanitizeValue(clientContact_name), sanitizeValue(clientBillTo_name),
       sanitizeValue(clientShipAddress_name), sanitizeValue(projectService), sanitizeValue(projectService_names), sanitizeValue(billed_hours), sanitizeValue(due_date),
       sanitizeValue(terms_of_payment),
-      sanitizeValue(iec_code),
+      sanitizeValue(iec_code), sanitizeValue(place_of_supply),
       sanitizeValue(id)
     ];
 
@@ -5140,7 +5142,8 @@ const insertCreditNote = async (
   currency,
   due_date,
   terms_of_payment,
-  iec_code
+  iec_code,
+  place_of_supply
 ) => {
   try {
     console.log("Received values in insertInvoice:", {
@@ -5152,7 +5155,7 @@ const insertCreditNote = async (
       clientShipAddress_name, projectService, projectService_names, invoice_number,
       invoice_number_id,currency,
       due_date,
-      terms_of_payment, iec_code, invoiceData
+      terms_of_payment, iec_code, place_of_supply, invoiceData
     });
 
     // Ensure client_id is a number
@@ -5216,7 +5219,8 @@ const insertCreditNote = async (
       currency || null,
       due_date || null,
       terms_of_payment || null,
-      iec_code || null
+      iec_code || null,
+      place_of_supply || null
     ];
 
     console.log("Final safeValues before query:", safeValues);
@@ -5230,8 +5234,8 @@ const insertCreditNote = async (
         filePath, total_amount, gst_total, final_amount, clientContact_name,
         clientBillTo_name, clientShipAddress_name, projectService, projectService_names,   invoice_number, invoice_number_id,currency,
     due_date,
-    terms_of_payment, iec_code
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    terms_of_payment, iec_code, place_of_supply
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const [invoiceResult] = await db.execute(insertQuery, safeValues);
@@ -5287,7 +5291,7 @@ const updateCreditNote = async (
   final_amount, invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
   projectService, projectService_names, invoice_number, invoice_number_id,     currency,
   due_date,
-  terms_of_payment, iec_code
+  terms_of_payment, iec_code, place_of_supply
 ) => {
   try {
     const query = `
@@ -5302,7 +5306,7 @@ const updateCreditNote = async (
         clientContact_name = ?, clientBillTo_name = ?, clientShipAddress_name = ?, 
         projectService = ?, projectService_names = ?, invoice_number = ?, invoice_number_id = ?,     currency = ?,
     due_date = ?,
-    terms_of_payment = ?, iec_code = ? WHERE id = ?
+    terms_of_payment = ?, iec_code = ?, place_of_supply = ? WHERE id = ?
     `;
 
     const values = [
@@ -5318,7 +5322,7 @@ const updateCreditNote = async (
       sanitizeValue(final_amount), sanitizeValue(clientContact_name), sanitizeValue(clientBillTo_name),
       sanitizeValue(clientShipAddress_name), sanitizeValue(projectService), sanitizeValue(projectService_names), sanitizeValue(invoice_number), sanitizeValue(invoice_number_id),     sanitizeValue(currency),
       sanitizeValue(due_date),
-      sanitizeValue(terms_of_payment), sanitizeValue(iec_code),
+      sanitizeValue(terms_of_payment), sanitizeValue(iec_code), sanitizeValue(place_of_supply),
       sanitizeValue(id)
     ];
 
@@ -5648,6 +5652,7 @@ const createPDF = async (invoice, pdfPath) => {
                     <span style="font-weight: 600; text-decoration: underline;">Delivery Address:</span><br />
                     <span>${invoice.client_name}</span><br />
                     <span>${invoice.clientShipAddress_name}</span><br />
+                    <span>${invoice.place_of_supply}</span><br />
                   </div>
                   <div style="border: 1px solid black; padding: 4px;">
                     <span style="font-weight: 600; text-decoration: underline;">Billing Address:</span><br />
@@ -5673,7 +5678,7 @@ const createPDF = async (invoice, pdfPath) => {
     <thead>
       <tr>
         <th style="border: 1px solid black; padding: 4px; text-align: left;">Description</th>
-        <th style="border: 1px solid black; padding: 4px; text-align: right;">Amount ((${invoice.currency})</th>
+        <th style="border: 1px solid black; padding: 4px; text-align: right;">Amount (${invoice.currency})</th>
       </tr>
     </thead>
     <tbody>
@@ -5971,6 +5976,7 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
                     <span style="font-weight: 600; text-decoration: underline;">Delivery Address:</span><br />
                     <span>${invoice.client_name}</span><br />
                     <span>${invoice.clientShipAddress_name}</span><br />
+                    <span>${invoice.place_of_supply}</span><br />
                   </div>
                   <div style="border: 1px solid black; padding: 4px;">
                     <span style="font-weight: 600; text-decoration: underline;">Billing Address:</span><br />
@@ -6019,7 +6025,8 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
         (tax) => `
                                 <tr>
                                   <td colspan="2" style="border: 1px solid black; padding: 4px; text-align: right; font-weight: bold; padding-right: 10px;">
-                                    ${tax.taxFieldName} @ ${tax.taxPercentage}%
+                                  
+                                    ${tax.taxFieldName}
                                   </td>
                                   <td style="border: 1px solid black; padding: 4px; text-align: right;">
                                     ${tax.calculatedAmount}
