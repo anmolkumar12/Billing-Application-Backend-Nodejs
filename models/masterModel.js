@@ -1722,11 +1722,22 @@ const insertSalesManager = async (
   fromDate,
   description,
   updatedBy,
-  sales_manager_email, // Add email here
+  sales_manager_email,
   isActive,
   companyId
 ) => {
   try {
+    // Check if a record already exists with same email or code for the same companyId
+    const [existing] = await db.execute(
+      `SELECT 1 FROM sales_manager_master 
+       WHERE (sales_manager_email = ? OR code = ?) AND companyId = ?`,
+      [sales_manager_email, code, companyId]
+    );
+
+    if (existing.length > 0) {
+      throw new Error("DUPLICATE_ENTRY");
+    }
+
     const query = `
       INSERT INTO sales_manager_master 
       (name, code, industryHeadIds, fromDate, description, updated_by, sales_manager_email, isActive, updated_at, companyId)
@@ -1740,15 +1751,19 @@ const insertSalesManager = async (
       fromDate,
       description,
       updatedBy,
-      sales_manager_email, // Insert email here
+      sales_manager_email,
       isActive,
       companyId
     ]);
   } catch (err) {
+    if (err.message === "DUPLICATE_ENTRY") {
+      throw new Error("Email or E-Code already exists for this company.");
+    }
     console.error("Error inserting sales manager:", err);
     throw err;
   }
 };
+
 
 const updateSalesManagerDetails = async (
   companyId,
@@ -1808,77 +1823,143 @@ const updateSalesManagerDetails = async (
 // };
 
 
+// const updateSalesManagerStatus = async (
+//   salesManagerId,
+//   isActive,
+//   industryHeadIds,
+//   updatedBy,
+//   deactivationDate
+// ) => {
+//   try {
+//     const [rows] = await db.execute(
+//       `SELECT industryHeadIds, deactivatedIndustryIds FROM sales_manager_master WHERE id = ?`,
+//       [salesManagerId]
+//     );
+
+//     if (!rows.length) throw new Error("Sales Manager not found");
+
+//     const currentIndustryIds = rows[0].industryHeadIds?.split(',').map(id => id.trim()).filter(Boolean) || [];
+//     const currentDeactivatedIds = rows[0].deactivatedIndustryIds?.split(',').map(id => id.trim()).filter(Boolean) || [];
+
+//     let updatedIndustryIds = [...currentIndustryIds];
+//     let updatedDeactivatedIds = [...currentDeactivatedIds];
+
+//     if (isActive) {
+//       // 🟢 Activation
+//       const reactivatingIds = industryHeadIds.map(String);
+//       // Add to industryHeadIds if not already present
+//       updatedIndustryIds = Array.from(new Set([...updatedIndustryIds, ...reactivatingIds]));
+//       // Remove from deactivated list
+//       updatedDeactivatedIds = updatedDeactivatedIds.filter(id => !reactivatingIds.includes(id));
+//     } else {
+//       // 🔴 Deactivation request - Schedule for cron
+//       const toDeactivate = industryHeadIds.map(String);
+//       updatedDeactivatedIds = Array.from(new Set([...updatedDeactivatedIds, ...toDeactivate]));
+//     }
+
+//     const newIndustryHeadStr = updatedIndustryIds.length ? updatedIndustryIds.join(',') : null;
+//     const newDeactivatedStr = updatedDeactivatedIds.length ? updatedDeactivatedIds.join(',') : null;
+
+//     const isActiveFinal = updatedIndustryIds.length > 0 ? 1 : 0;
+
+//     const updateQuery = `
+//       UPDATE sales_manager_master
+//       SET 
+//         industryHeadIds = ?,
+//         deactivatedIndustryIds = ?,
+//         isActive = ?,
+//         updated_by = ?,
+//         updated_at = CURRENT_TIMESTAMP,
+//         deactivationDate = ?
+//       WHERE id = ?
+//     `;
+
+//     await db.execute(updateQuery, [
+//       newIndustryHeadStr,
+//       newDeactivatedStr,
+//       isActiveFinal,
+//       updatedBy,
+//       newDeactivatedStr ? deactivationDate : null,
+//       salesManagerId
+//     ]);
+
+//     // ✅ Immediately run cron logic if deactivationDate is today and it's a deactivation
+//     if (!isActive && deactivationDate <= new Date().toISOString().split("T")[0]) {
+//       console.log("⏱️ Immediate deactivation triggered inside updateSalesManagerStatus");
+//       await updateSalesManagerStatusOnDeactivationDate();
+//     }
+
+//   } catch (err) {
+//     console.error("Error updating Sales Manager status:", err);
+//     throw err;
+//   }
+// };
+
+
 const updateSalesManagerStatus = async (
   salesManagerId,
-  isActive,
+  companyId,
+  name,
+  code,
   industryHeadIds,
+  fromDate,
+  description,
   updatedBy,
+  sales_manager_email,
+  isActive,
   deactivationDate
 ) => {
   try {
-    const [rows] = await db.execute(
-      `SELECT industryHeadIds, deactivatedIndustryIds FROM sales_manager_master WHERE id = ?`,
-      [salesManagerId]
+    // 🔍 Check for duplicate code or email in the same company (excluding current record)
+    const [existing] = await db.execute(
+      `SELECT 1 FROM sales_manager_master 
+       WHERE (sales_manager_email = ? OR code = ?) 
+       AND companyId = ? AND id != ?`,
+      [sales_manager_email, code, companyId, salesManagerId]
     );
 
-    if (!rows.length) throw new Error("Sales Manager not found");
-
-    const currentIndustryIds = rows[0].industryHeadIds?.split(',').map(id => id.trim()).filter(Boolean) || [];
-    const currentDeactivatedIds = rows[0].deactivatedIndustryIds?.split(',').map(id => id.trim()).filter(Boolean) || [];
-
-    let updatedIndustryIds = [...currentIndustryIds];
-    let updatedDeactivatedIds = [...currentDeactivatedIds];
-
-    if (isActive) {
-      // 🟢 Activation
-      const reactivatingIds = industryHeadIds.map(String);
-      // Add to industryHeadIds if not already present
-      updatedIndustryIds = Array.from(new Set([...updatedIndustryIds, ...reactivatingIds]));
-      // Remove from deactivated list
-      updatedDeactivatedIds = updatedDeactivatedIds.filter(id => !reactivatingIds.includes(id));
-    } else {
-      // 🔴 Deactivation request - Schedule for cron
-      const toDeactivate = industryHeadIds.map(String);
-      updatedDeactivatedIds = Array.from(new Set([...updatedDeactivatedIds, ...toDeactivate]));
+    if (existing.length > 0) {
+      throw new Error("DUPLICATE_ENTRY");
     }
 
-    const newIndustryHeadStr = updatedIndustryIds.length ? updatedIndustryIds.join(',') : null;
-    const newDeactivatedStr = updatedDeactivatedIds.length ? updatedDeactivatedIds.join(',') : null;
-
-    const isActiveFinal = updatedIndustryIds.length > 0 ? 1 : 0;
-
-    const updateQuery = `
+    const query = `
       UPDATE sales_manager_master
       SET 
+        name = ?,
+        code = ?,
         industryHeadIds = ?,
-        deactivatedIndustryIds = ?,
-        isActive = ?,
+        fromDate = ?,
+        description = ?,
         updated_by = ?,
+        sales_manager_email = ?,
+        isActive = ?,
         updated_at = CURRENT_TIMESTAMP,
         deactivationDate = ?
       WHERE id = ?
     `;
 
-    await db.execute(updateQuery, [
-      newIndustryHeadStr,
-      newDeactivatedStr,
-      isActiveFinal,
+    await db.execute(query, [
+      name,
+      code,
+      industryHeadIds,
+      fromDate,
+      description,
       updatedBy,
-      newDeactivatedStr ? deactivationDate : null,
+      sales_manager_email,
+      isActive,
+      deactivationDate || null,
       salesManagerId
     ]);
 
-    // ✅ Immediately run cron logic if deactivationDate is today and it's a deactivation
-    if (!isActive && deactivationDate <= new Date().toISOString().split("T")[0]) {
-      console.log("⏱️ Immediate deactivation triggered inside updateSalesManagerStatus");
-      await updateSalesManagerStatusOnDeactivationDate();
-    }
-
   } catch (err) {
-    console.error("Error updating Sales Manager status:", err);
+    if (err.message === "DUPLICATE_ENTRY") {
+      throw new Error("Email or E-Code already exists for this company.");
+    }
+    console.error("Error updating Sales Manager:", err);
     throw err;
   }
 };
+
 
 
 const getSalesManagersList = async () => {
@@ -1947,6 +2028,42 @@ const getSalesManagersList = async () => {
 // };
 
 // Account Manager Master
+// const insertAccountManager = async (
+//   companyId,
+//   name,
+//   code,
+//   industryHeadIds,
+//   fromDate,
+//   description,
+//   updatedBy,
+//   account_manager_email, // Add email here
+//   isActive
+// ) => {
+//   try {
+//     const query = `
+//       INSERT INTO account_manager_master 
+//       (companyId, name, code, industryHeadIds, fromDate, description, updated_by, account_manager_email, isActive, updated_at)
+//       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+//     `;
+//     await db.execute(query, [
+//       companyId,
+//       name,
+//       code,
+//       industryHeadIds,
+//       fromDate,
+//       description,
+//       updatedBy,
+//       account_manager_email, // Insert email here
+//       isActive,
+//     ]);
+//   } catch (err) {
+//     console.error("Error inserting Account Manager:", err);
+//     throw err;
+//   }
+// };
+
+
+
 const insertAccountManager = async (
   companyId,
   name,
@@ -1955,15 +2072,27 @@ const insertAccountManager = async (
   fromDate,
   description,
   updatedBy,
-  account_manager_email, // Add email here
+  account_manager_email,
   isActive
 ) => {
   try {
+    // Check if a record already exists with same email or code for the same companyId
+    const [existing] = await db.execute(
+      `SELECT 1 FROM account_manager_master 
+       WHERE (account_manager_email = ? OR code = ?) AND companyId = ?`,
+      [account_manager_email, code, companyId]
+    );
+
+    if (existing.length > 0) {
+      throw new Error("DUPLICATE_ENTRY");
+    }
+
     const query = `
       INSERT INTO account_manager_master 
       (companyId, name, code, industryHeadIds, fromDate, description, updated_by, account_manager_email, isActive, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
+
     await db.execute(query, [
       companyId,
       name,
@@ -1972,50 +2101,54 @@ const insertAccountManager = async (
       fromDate,
       description,
       updatedBy,
-      account_manager_email, // Insert email here
-      isActive,
+      account_manager_email,
+      isActive
     ]);
   } catch (err) {
+    if (err.message === "DUPLICATE_ENTRY") {
+      throw new Error("Email or A-Code already exists for this company.");
+    }
     console.error("Error inserting Account Manager:", err);
     throw err;
   }
 };
 
-const updateAccountManager = async (
-  companyId,
-  id,
-  name,
-  code,
-  industryHeadIds,
-  fromDate,
-  description,
-  updatedBy,
-  account_manager_email, // Add email here
-  isActive
-) => {
-  try {
-    const query = `
-      UPDATE account_manager_master
-      SET companyId = ?, name = ?, code = ?, industryHeadIds = ?, fromDate = ?, description = ?, updated_by = ?, account_manager_email = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
-      WHERE id = ?
-    `;
-    await db.execute(query, [
-      companyId,
-      name,
-      code,
-      industryHeadIds,
-      fromDate,
-      description,
-      updatedBy,
-      account_manager_email, // Update email here
-      isActive,
-      id,
-    ]);
-  } catch (err) {
-    console.error("Error updating Account Manager:", err);
-    throw err;
-  }
-};
+
+// const updateAccountManager = async (
+//   companyId,
+//   id,
+//   name,
+//   code,
+//   industryHeadIds,
+//   fromDate,
+//   description,
+//   updatedBy,
+//   account_manager_email, // Add email here
+//   isActive
+// ) => {
+//   try {
+//     const query = `
+//       UPDATE account_manager_master
+//       SET companyId = ?, name = ?, code = ?, industryHeadIds = ?, fromDate = ?, description = ?, updated_by = ?, account_manager_email = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
+//       WHERE id = ?
+//     `;
+//     await db.execute(query, [
+//       companyId,
+//       name,
+//       code,
+//       industryHeadIds,
+//       fromDate,
+//       description,
+//       updatedBy,
+//       account_manager_email, // Update email here
+//       isActive,
+//       id,
+//     ]);
+//   } catch (err) {
+//     console.error("Error updating Account Manager:", err);
+//     throw err;
+//   }
+// };
 
 // const activateOrDeactivateAccountManager = async (id, isActive, updatedBy, deactivationDate) => {
 //   try {
@@ -2030,6 +2163,60 @@ const updateAccountManager = async (
 //     throw err;
 //   }
 // };
+
+const updateAccountManager = async (
+  companyId,
+  id,
+  name,
+  code,
+  industryHeadIds,
+  fromDate,
+  description,
+  updatedBy,
+  account_manager_email,
+  isActive
+) => {
+  try {
+    // Check for duplicates excluding the current record by id
+    const [existing] = await db.execute(
+      `SELECT 1 FROM account_manager_master 
+       WHERE (account_manager_email = ? OR code = ?) 
+       AND companyId = ? 
+       AND id != ?`,
+      [account_manager_email, code, companyId, id]
+    );
+
+    if (existing.length > 0) {
+      throw new Error("DUPLICATE_ENTRY");
+    }
+
+    const query = `
+      UPDATE account_manager_master
+      SET companyId = ?, name = ?, code = ?, industryHeadIds = ?, fromDate = ?, description = ?, updated_by = ?, account_manager_email = ?, isActive = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
+
+    await db.execute(query, [
+      companyId,
+      name,
+      code,
+      industryHeadIds,
+      fromDate,
+      description,
+      updatedBy,
+      account_manager_email,
+      isActive,
+      id
+    ]);
+  } catch (err) {
+    if (err.message === "DUPLICATE_ENTRY") {
+      throw new Error("Email or A-Code already exists for this company.");
+    }
+    console.error("Error updating Account Manager:", err);
+    throw err;
+  }
+};
+
 
 
 const activateOrDeactivateAccountManager = async (
@@ -4835,7 +5022,9 @@ const insertInvoice = async (
   billed_hours,
   currency, due_date,
   terms_of_payment,
-  iec_code
+  iec_code,
+  place_of_supply,
+  is_india
 ) => {
   try {
     console.log("Received values in insertInvoice:", {
@@ -4846,7 +5035,7 @@ const insertInvoice = async (
       filePath, total_amount, gst_total, final_amount, clientContact_name, clientBillTo_name,
       clientShipAddress_name, projectService, projectService_names, billed_hours, currency, due_date,
       terms_of_payment,
-      iec_code, invoiceData
+      iec_code, place_of_supply, is_india, invoiceData
     });
 
     // Ensure client_id is a number
@@ -4909,7 +5098,9 @@ const insertInvoice = async (
       currency || null,
       due_date || null,
       terms_of_payment || null,
-      iec_code || null
+      iec_code || null,
+      place_of_supply || null,
+      is_india || null
     ];
 
     console.log("Final safeValues before query:", safeValues);
@@ -4923,8 +5114,8 @@ const insertInvoice = async (
         filePath, total_amount, gst_total, final_amount, clientContact_name,
         clientBillTo_name, clientShipAddress_name, projectService, projectService_names, billed_hours, currency, due_date,
     terms_of_payment,
-    iec_code 
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    iec_code , place_of_supply, is_india
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const [invoiceResult] = await db.execute(insertQuery, safeValues);
@@ -4985,7 +5176,7 @@ const updateInvoice = async (
   final_amount, invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
   projectService, projectService_names, billed_hours, due_date,
   terms_of_payment,
-  iec_code
+  iec_code, place_of_supply, is_india
 ) => {
   try {
     const query = `
@@ -5000,7 +5191,7 @@ const updateInvoice = async (
         clientContact_name = ?, clientBillTo_name = ?, clientShipAddress_name = ?, 
         projectService = ?, projectService_names = ?, billed_hours = ?,due_date = ?,
     terms_of_payment = ?,
-    iec_code = ? WHERE id = ?
+    iec_code = ?, place_of_supply = ?, is_india = ? WHERE id = ?
     `;
 
     const values = [
@@ -5016,7 +5207,7 @@ const updateInvoice = async (
       sanitizeValue(final_amount), sanitizeValue(clientContact_name), sanitizeValue(clientBillTo_name),
       sanitizeValue(clientShipAddress_name), sanitizeValue(projectService), sanitizeValue(projectService_names), sanitizeValue(billed_hours), sanitizeValue(due_date),
       sanitizeValue(terms_of_payment),
-      sanitizeValue(iec_code),
+      sanitizeValue(iec_code), sanitizeValue(place_of_supply), sanitizeValue(is_india),
       sanitizeValue(id)
     ];
 
@@ -5140,7 +5331,9 @@ const insertCreditNote = async (
   currency,
   due_date,
   terms_of_payment,
-  iec_code
+  iec_code,
+  place_of_supply,
+  is_india
 ) => {
   try {
     console.log("Received values in insertInvoice:", {
@@ -5152,7 +5345,7 @@ const insertCreditNote = async (
       clientShipAddress_name, projectService, projectService_names, invoice_number,
       invoice_number_id,currency,
       due_date,
-      terms_of_payment, iec_code, invoiceData
+      terms_of_payment, iec_code, place_of_supply, is_india, invoiceData
     });
 
     // Ensure client_id is a number
@@ -5216,7 +5409,9 @@ const insertCreditNote = async (
       currency || null,
       due_date || null,
       terms_of_payment || null,
-      iec_code || null
+      iec_code || null,
+      place_of_supply || null,
+      is_india || null
     ];
 
     console.log("Final safeValues before query:", safeValues);
@@ -5230,8 +5425,8 @@ const insertCreditNote = async (
         filePath, total_amount, gst_total, final_amount, clientContact_name,
         clientBillTo_name, clientShipAddress_name, projectService, projectService_names,   invoice_number, invoice_number_id,currency,
     due_date,
-    terms_of_payment, iec_code
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    terms_of_payment, iec_code, place_of_supply, is_india
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const [invoiceResult] = await db.execute(insertQuery, safeValues);
@@ -5287,7 +5482,7 @@ const updateCreditNote = async (
   final_amount, invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
   projectService, projectService_names, invoice_number, invoice_number_id,     currency,
   due_date,
-  terms_of_payment, iec_code
+  terms_of_payment, iec_code, place_of_supply, is_india
 ) => {
   try {
     const query = `
@@ -5302,7 +5497,7 @@ const updateCreditNote = async (
         clientContact_name = ?, clientBillTo_name = ?, clientShipAddress_name = ?, 
         projectService = ?, projectService_names = ?, invoice_number = ?, invoice_number_id = ?,     currency = ?,
     due_date = ?,
-    terms_of_payment = ?, iec_code = ? WHERE id = ?
+    terms_of_payment = ?, iec_code = ?, place_of_supply = ?, is_india =? WHERE id = ?
     `;
 
     const values = [
@@ -5318,7 +5513,7 @@ const updateCreditNote = async (
       sanitizeValue(final_amount), sanitizeValue(clientContact_name), sanitizeValue(clientBillTo_name),
       sanitizeValue(clientShipAddress_name), sanitizeValue(projectService), sanitizeValue(projectService_names), sanitizeValue(invoice_number), sanitizeValue(invoice_number_id),     sanitizeValue(currency),
       sanitizeValue(due_date),
-      sanitizeValue(terms_of_payment), sanitizeValue(iec_code),
+      sanitizeValue(terms_of_payment), sanitizeValue(iec_code), sanitizeValue(place_of_supply), sanitizeValue(is_india),
       sanitizeValue(id)
     ];
 
@@ -5673,7 +5868,7 @@ const createPDF = async (invoice, pdfPath) => {
     <thead>
       <tr>
         <th style="border: 1px solid black; padding: 4px; text-align: left;">Description</th>
-        <th style="border: 1px solid black; padding: 4px; text-align: right;">Amount ((${invoice.currency})</th>
+        <th style="border: 1px solid black; padding: 4px; text-align: right;">Amount (${invoice.currency})</th>
       </tr>
     </thead>
     <tbody>
@@ -5849,9 +6044,11 @@ const generateCreditNotePDF = async (invoice_number) => {
         <td style="border: 1px solid black; padding: 4px; text-align: left;">
           ${item.description || ""}
         </td>
-        <td style="border: 1px solid black; padding: 4px; text-align: left;">
-          ${item.sacCode || ""}
-        </td>
+         ${invoice.is_india == 1 ? `
+      <td style="border: 1px solid black; padding: 4px; text-align: left;">
+        ${item.sacCode || ""}
+      </td>
+    ` : ''}
         <td style="border: 1px solid black; padding: 4px; text-align: right;">
           ${item.amount || "0.00"}
         </td>
@@ -5971,6 +6168,7 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
                     <span style="font-weight: 600; text-decoration: underline;">Delivery Address:</span><br />
                     <span>${invoice.client_name}</span><br />
                     <span>${invoice.clientShipAddress_name}</span><br />
+                    ${invoice.place_of_supply ? `<span style="font-weight: bold; text-decoration: underline;">Place Of Supply : ${invoice.place_of_supply}</span><br />` : ''}
                   </div>
                   <div style="border: 1px solid black; padding: 4px;">
                     <span style="font-weight: 600; text-decoration: underline;">Billing Address:</span><br />
@@ -5996,49 +6194,53 @@ const createTaxInvoicePDF = async (invoice, pdfPath) => {
                     </div>
 
                     <div style="overflow-x: auto;">
-                      <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
-                        <thead>
-                          <tr>
-                            <th style="border: 1px solid black; padding: 4px; text-align: left;">Description</th>
-                            <th style="border: 1px solid black; padding: 4px; text-align: left;">SAC Code</th>
-                            <th style="border: 1px solid black; padding: 4px; text-align: right;">Amount (${invoice.currency})</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                        ${invoice.breakDownRowsHtml}
-                          <tr>
-                            <td colspan="2" style="border: 1px solid black; padding: 4px; text-align: right; font-weight: bold; padding-right: 10px;">
-                              Total
-                            </td>
-                            <td style="border: 1px solid black; padding: 4px; text-align: right;">
-                              ${invoice.invoiceTaxInfo.totalAmount}
-                            </td>
-                          </tr>
-                          ${JSON.parse(invoice.invoiceTaxInfo.taxDetails)
-      .map(
-        (tax) => `
-                                <tr>
-                                  <td colspan="2" style="border: 1px solid black; padding: 4px; text-align: right; font-weight: bold; padding-right: 10px;">
-                                    ${tax.taxFieldName} @ ${tax.taxPercentage}%
-                                  </td>
-                                  <td style="border: 1px solid black; padding: 4px; text-align: right;">
-                                    ${tax.calculatedAmount}
-                                  </td>
-                                </tr>
-                                `
-      )
-      .join("")}
-                          <tr>
-                            <td colspan="2" style="border: 1px solid black; padding: 4px; text-align: right; font-weight: bold; padding-right: 10px;">
-                              Total Amount After Tax
-                            </td>
-                            <td style="border: 1px solid black; padding: 4px; text-align: right; font-weight: 600;">
-                              ${invoice.invoiceTaxInfo.finalAmount}
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
+  <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+    <thead>
+      <tr>
+        <th style="border: 1px solid black; padding: 4px; text-align: left;">Description</th>
+        ${invoice.is_india == 1 ? `<th style="border: 1px solid black; padding: 4px; text-align: left;">SAC Code</th>` : ``}
+        <th style="border: 1px solid black; padding: 4px; text-align: right;">Amount (${invoice.currency})</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${invoice.breakDownRowsHtml}
+      <tr>
+        <td colspan="${invoice.is_india == 1 ? 2 : 1}" style="border: 1px solid black; padding: 4px; text-align: right; font-weight: bold; padding-right: 10px;">
+          Total
+        </td>
+        <td style="border: 1px solid black; padding: 4px; text-align: right;">
+          ${invoice.invoiceTaxInfo.totalAmount}
+        </td>
+      </tr>
+      ${
+        JSON.parse(invoice.invoiceTaxInfo.taxDetails)
+          .map(
+            (tax) => `
+              <tr>
+                <td colspan="${invoice.is_india == 1 ? 2 : 1}" style="border: 1px solid black; padding: 4px; text-align: right; font-weight: bold; padding-right: 10px;">
+                  ${tax.taxFieldName}
+                </td>
+                <td style="border: 1px solid black; padding: 4px; text-align: right;">
+                  ${tax.calculatedAmount}
+                </td>
+              </tr>`
+          )
+          .join("")
+      }
+      <tr>
+        <td colspan="${invoice.is_india == 1 ? 2 : 1}" style="border: 1px solid black; padding: 4px; text-align: right; font-weight: bold; padding-right: 10px;">
+          Total Amount After Tax
+        </td>
+        <td style="border: 1px solid black; padding: 4px; text-align: right; font-weight: 600;">
+          ${invoice.invoiceTaxInfo.finalAmount}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+
 
                     <div style="border: 1px solid black; padding: 4px; font-size: 12px;">
                       <span style="font-weight: 600;">${convertAmountToWords(invoice.invoiceTaxInfo.finalAmount, invoice.currency)}</span>
@@ -6185,9 +6387,11 @@ const generateTaxInvoicePDF = async (invoice_number) => {
         <td style="border: 1px solid black; padding: 4px; text-align: left;">
           ${item.description || ""}
         </td>
-        <td style="border: 1px solid black; padding: 4px; text-align: left;">
-          ${item.sacCode || ""}
-        </td>
+            ${invoice.is_india == 1 ? `
+      <td style="border: 1px solid black; padding: 4px; text-align: left;">
+        ${item.sacCode || ""}
+      </td>
+    ` : ''}
         <td style="border: 1px solid black; padding: 4px; text-align: right;">
           ${item.amount || "0.00"}
         </td>

@@ -4129,7 +4129,8 @@ const insertInvoiceHandler = async (req, res) => {
     currency,
     due_date,
     terms_of_payment,
-    iec_code 
+    iec_code ,
+    place_of_supply, is_india
   } = req.body;
 
   let parsedInvoiceData;
@@ -4198,7 +4199,7 @@ const insertInvoiceHandler = async (req, res) => {
     projectService_names,
     billed_hours, currency, due_date,
     terms_of_payment,
-    iec_code 
+    iec_code , place_of_supply, is_india
     );
 
     res.status(201).json({ statusCode: 201, message: "Invoice created successfully", invoice_name });
@@ -4221,7 +4222,7 @@ const updateInvoiceHandler = async (req, res) => {
     note_two, updated_by, isActive, total_amount, gst_total, final_amount,
     invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
     projectService, projectService_names, billed_hours, due_date,
-    terms_of_payment, iec_code 
+    terms_of_payment, iec_code , place_of_supply, is_india
   } = req.body;
 
   const filePath = req.files && req.files.file ? req.files.file[0].path.replace("\\", "/") : null;
@@ -4255,7 +4256,7 @@ const updateInvoiceHandler = async (req, res) => {
       invoice_amount, note_one, note_two, updated_by, isActive, filePath, total_amount, gst_total,
       final_amount, invoiceData, clientContact_name, clientBillTo_name, clientShipAddress_name,
       projectService, projectService_names, billed_hours, due_date, terms_of_payment,
-      iec_code 
+      iec_code , place_of_supply, is_india
     );
 
     res.status(200).json({ statusCode: 200, message: "Invoice updated successfully", result });
@@ -4337,7 +4338,7 @@ const insertCreditNoteHandler = async (req, res) => {
     currency,
     due_date,
     terms_of_payment,
-    iec_code
+    iec_code, place_of_supply, is_india
   } = req.body;
 
   let parsedInvoiceData;
@@ -4409,7 +4410,7 @@ const insertCreditNoteHandler = async (req, res) => {
     currency,
     due_date,
     terms_of_payment,
-    iec_code
+    iec_code, place_of_supply, is_india
     );
 
     res.status(201).json({ statusCode: 201, message: "Credit note created successfully", invoice_name });
@@ -4434,7 +4435,7 @@ const updateCreditNoteHandler = async (req, res) => {
     projectService, projectService_names, invoice_number,
     invoice_number_id,currency,
     due_date,
-    terms_of_payment, iec_code
+    terms_of_payment, iec_code, place_of_supply
   } = req.body;
 
   const filePath = req.files && req.files.file ? req.files.file[0].path.replace("\\", "/") : null;
@@ -4470,7 +4471,7 @@ const updateCreditNoteHandler = async (req, res) => {
       projectService, projectService_names,   invoice_number,
       invoice_number_id,     currency,
       due_date,
-      terms_of_payment, iec_code
+      terms_of_payment, iec_code, place_of_supply, is_india
     );
 
     res.status(200).json({ statusCode: 200, message: "Credit note updated successfully", result });
