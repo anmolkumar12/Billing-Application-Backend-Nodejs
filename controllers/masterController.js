@@ -4435,7 +4435,7 @@ const updateCreditNoteHandler = async (req, res) => {
     projectService, projectService_names, invoice_number,
     invoice_number_id,currency,
     due_date,
-    terms_of_payment, iec_code, place_of_supply
+    terms_of_payment, iec_code, place_of_supply, is_india
   } = req.body;
 
   const filePath = req.files && req.files.file ? req.files.file[0].path.replace("\\", "/") : null;
